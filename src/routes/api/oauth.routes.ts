@@ -23,7 +23,15 @@ router.get(
 // Token endpoint
 router.post('/api/oauth/token', validateRequest(OAuthZSchema.issueTokensSchema), oauthController.issueTokens);
 
-// UserInfo endpoint
-router.route('/api/oauth/account/:id').get(Authentication.client, oauthController.getUserInfo);
+// Standard OIDC UserInfo endpoints (GET and POST supported per OIDC Core 5.3.1)
+router
+  .route('/userinfo')
+  .get(Authentication.client, oauthController.userinfo)
+  .post(Authentication.client, oauthController.userinfo);
+
+router
+  .route('/api/oauth/userinfo')
+  .get(Authentication.client, oauthController.userinfo)
+  .post(Authentication.client, oauthController.userinfo);
 
 export default router;

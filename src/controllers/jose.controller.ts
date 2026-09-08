@@ -10,6 +10,7 @@ export class JoseController extends BaseController {
   getJwks = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const jwks = await this.joseService.getJwks();
+      res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
       res.status(200).json({ keys: jwks.keys });
     } catch (error) {
       next(error);

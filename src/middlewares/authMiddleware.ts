@@ -7,7 +7,7 @@ import { AppError } from '../utils/appError.js';
 import { ErrorCode } from '../utils/errorCodes.js';
 import { AppCrypto } from '../utils/crypto.js';
 import { COOKIE_NAMES, setSessionCookies } from '../utils/cookies.js';
-import { CRYPTO_ALGORITHMS } from '../utils/constant.js';
+import { CRYPTO_ALGORITHMS, SCOPES } from '../utils/constant.js';
 import type { Role, Scope } from '../utils/constant.js';
 import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticationFlow } from '../services/auth.service.js';
@@ -91,23 +91,50 @@ export class Authentication {
     };
   };
 
-  static async client(req: Request, _res: Response, next: NextFunction): Promise<void> {
+  static async client(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const auth = req.headers.authorization;
 
       // get access token from client req header
       if (!auth?.startsWith('Bearer ')) {
+        res.setHeader(
+          'WWW-Authenticate',
+          'Bearer error="invalid_token", error_description="Missing or malformed access token"',
+        );
         throw new AppError('Missing access token', 401, ErrorCode.UNAUTHORIZED);
       }
 
-      const token = auth.slice(7);
-      const payload = await joseService.verifyJwt(token, 'userinfo');
+      const token = auth.slice(7).trim();
+      if (!token) {
+        res.setHeader(
+          'WWW-Authenticate',
+          'Bearer error="invalid_token", error_description="Access token is empty"',
+        );
+        throw new AppError('Missing access token', 401, ErrorCode.UNAUTHORIZED);
+      }
 
-      if (String(payload.sub) !== String(req.params.id)) {
-        throw new AppError('Forbidden', 403, ErrorCode.FORBIDDEN);
+      let payload;
+      try {
+        payload = await joseService.verifyJwt(token, 'userinfo');
+      } catch {
+        res.setHeader(
+          'WWW-Authenticate',
+          'Bearer error="invalid_token", error_description="The access token is invalid or expired"',
+        );
+        throw new AppError('Invalid or expired token', 401, ErrorCode.UNAUTHORIZED);
       }
 
       const scopes: Scope[] = oauthService.validateScopes(payload.scope);
+
+      // OpenID Connect UserInfo requires the openid scope
+      if (!scopes.includes(SCOPES.OPENID)) {
+        res.setHeader('WWW-Authenticate', 'Bearer error="insufficient_scope", scope="openid"');
+        throw new AppError(
+          'Insufficient scope: openid scope is required for UserInfo',
+          403,
+          ErrorCode.INVALID_SCOPE,
+        );
+      }
 
       req.client = {
         id: String(payload.aud),

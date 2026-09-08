@@ -392,6 +392,58 @@ export class OAuthService {
       },
     });
   }
+
+  // ---------- OIDC USERINFO CLAIMS ----------
+
+  async getUserInfoClaims(userId: string, scopes: Scope[]): Promise<Record<string, unknown>> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+        email: true,
+        isEmailVerified: true,
+        isActive: true,
+      },
+    });
+
+    if (!user || !user.isActive) {
+      throw new AppError('User not found or disabled', 404, ErrorCode.NOT_FOUND);
+    }
+
+    const claims: Record<string, unknown> = {};
+
+    // openid scope -> sub
+    if (scopes.includes(SCOPES.OPENID)) {
+      claims.sub = user.id;
+    }
+
+    // email scope -> email, email_verified, emailVerified
+    if (scopes.includes(SCOPES.EMAIL)) {
+      claims.email = user.email;
+      claims.email_verified = user.isEmailVerified ?? false;
+      claims.emailVerified = user.isEmailVerified ?? false;
+    }
+
+    // profile scope -> name, picture
+    if (scopes.includes(SCOPES.PROFILE)) {
+      claims.name = user.name;
+      if (user.avatar) {
+        claims.picture = user.avatar;
+      }
+    }
+
+    // avatar scope -> avatar, picture
+    if (scopes.includes(SCOPES.AVATAR)) {
+      claims.avatar = user.avatar;
+      if (user.avatar && !claims.picture) {
+        claims.picture = user.avatar;
+      }
+    }
+
+    return claims;
+  }
 }
 
 export const oauthService = new OAuthService(joseService, clientService);

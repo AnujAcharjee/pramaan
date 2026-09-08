@@ -116,34 +116,19 @@ export class OAuthController extends BaseController {
       };
     });
 
-  // ---------------- GET USER INFO ----------------
+  // ---------------- OIDC USERINFO ----------------
 
-  getUserInfo = (req: Request, res: Response, next: NextFunction) =>
-    this.handleApiRequest(req, res, next, async () => {
+  userinfo = async (req: Request, res: Response, next: NextFunction) => {
+    try {
       const { userId, scopes } = req.client;
+      const claims = await this.oauthService.getUserInfoClaims(userId, scopes);
 
-      const user = await this.accountService.get(userId);
-
-      const data: Record<string, unknown> = {};
-
-      if (scopes.includes(SCOPES.OPENID)) {
-        data.sub = user.id;
-      }
-      if (scopes.includes(SCOPES.EMAIL)) {
-        data.email = user.email;
-        data.emailVerified = user.isEmailVerified ?? false;
-      }
-      if (scopes.includes(SCOPES.PROFILE)) {
-        data.name = user.name;
-      }
-      if (scopes.includes(SCOPES.AVATAR)) {
-        data.avatar = user.avatar;
-      }
-
-      return {
-        res,
-        data,
-        message: 'User info sent successfully',
-      };
-    });
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', 'no-store, no-cache, max-age=0, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      return res.status(200).json(claims);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
