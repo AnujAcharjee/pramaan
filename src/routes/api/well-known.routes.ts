@@ -3,10 +3,13 @@ import { JoseController } from '../../controllers/jose.controller.js';
 import { joseService } from '../../services/jose.service.js';
 import { DiscoveryController } from '../../controllers/discovery.controller.js';
 import { discoveryService } from '../../services/discovery.service.js';
+import { oauthCors } from '../../middlewares/oauthCors.js';
 
 const router = Router();
 const joseController = new JoseController(joseService);
 const discoveryController = new DiscoveryController(discoveryService);
+
+router.use(oauthCors);
 
 // OIDC Discovery endpoints (RFC 8414 & OpenID Connect Discovery 1.0)
 router.get('/.well-known/openid-configuration', discoveryController.getOpenIdConfiguration);
