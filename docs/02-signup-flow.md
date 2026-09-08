@@ -4,6 +4,8 @@ This guide walks through the complete Authorization Code flow with PKCE using Pr
 
 The examples use Node.js with Express and the [`jose`](https://github.com/panva/jose) library for JWT verification.
 
+> 💡 **Using Node.js or TypeScript?** You do not need to implement this protocol manually. The official SDK [**`@anuj304/pramaan`**](./03-sdk-guide.md) implements this complete flow with automated PKCE, cryptographic state verification, token exchange, and JWKS verification out-of-the-box.
+
 ---
 
 ## Overview
@@ -289,3 +291,12 @@ res.redirect("/dashboard");
 6. Fetch user claims from the UserInfo endpoint
 7. Create or link user in your database
 8. Issue your own application session
+
+---
+
+## Next Steps
+
+- [Official SDK Integration Guide →](./03-sdk-guide.md) — Integrate in 4 lines of code with `@anuj304/pramaan`
+- [API & Claims Reference →](./04-api-reference.md) — Comprehensive endpoints and claims specifications
+- [Security Best Practices →](./05-security.md) — Production hardening, PKCE rationale, and CSRF mitigation
+

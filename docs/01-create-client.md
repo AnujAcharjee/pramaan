@@ -52,5 +52,7 @@ From the **Client Dashboard** you can:
 
 ## Next Steps
 
-- [Implementation Guide →](./02-signup-flow.md) — Step-by-step code to wire up the OAuth flow
-- [Test Client →](./test-app/README.md) — Run the reference app locally to see the full flow in action
+- [Official SDK Guide →](./03-sdk-guide.md) — Fast and secure integration using `@anuj304/pramaan`
+- [Manual Implementation Guide →](./02-signup-flow.md) — Raw HTTP and protocol flow for any backend language
+- [API & Claims Reference →](./04-api-reference.md) — Comprehensive endpoints, parameters, and claims specifications
+

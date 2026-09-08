@@ -1,0 +1,53 @@
+{
+  "name": "@anuj304/pramaan",
+  "version": "1.0.0",
+  "description": "Official Node.js SDK for Pramaan OAuth 2.0 and OpenID Connect Identity Provider",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "node -e \"const fs = require('fs'); fs.rmSync('./dist', { recursive: true, force: true });\"",
+    "typecheck": "tsc --project tsconfig.test.json",
+    "test": "tsx --test tests/**/*.test.ts",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "pramaan",
+    "oauth2",
+    "oidc",
+    "openid-connect",
+    "identity",
+    "authentication",
+    "pkce",
+    "jwt",
+    "idp",
+    "sso"
+  ],
+  "author": "Anuj Acharjee",
+  "license": "MIT",
+  "dependencies": {
+    "jose": "^5.9.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

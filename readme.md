@@ -22,34 +22,62 @@ Pramaan exposes the following OIDC-compliant endpoints. All paths are discoverab
 
 ---
 
-## Getting Started
+## Quick Start with Official SDK
 
-### 1. Register a Client
+The fastest and most secure way to integrate Pramaan with Node.js / TypeScript is using the official SDK:
 
-Create an OAuth client in the Pramaan dashboard to get your **Client ID** and **Client Secret**.
+```bash
+npm install @anuj304/pramaan
+```
 
-📄 [Client Registration Guide →](./docs/01-create-client.md)
+```typescript
+import { PramaanClient } from "@anuj304/pramaan";
 
-### 2. Implement the OAuth Flow
+const pramaan = new PramaanClient({
+  issuer: "https://pramaan.anujacharjee.com",
+  clientId: process.env.PRAMAAN_CLIENT_ID!,
+  clientSecret: process.env.PRAMAAN_CLIENT_SECRET,
+  redirectUri: "http://localhost:3000/callback",
+});
 
-Wire up the authorization redirect, token exchange, ID token verification, and user session creation in your application.
+// 1. Initiate login
+const { url, transaction } = await pramaan.createAuthorizationRequest({
+  scope: ["openid", "profile", "email"],
+});
 
-📄 [Implementation Guide →](./docs/02-signup-flow.md)
+// 2. Complete callback & verify ID token via JWKS
+const tokens = await pramaan.handleCallback({
+  code: req.query.code,
+  state: req.query.state,
+  transaction: req.session.transaction,
+});
 
-### 3. Run the Test Client
-
-A fully working reference client is included under [`docs/test-app/`](./docs/test-app/README.md). Clone it, point it at your Pramaan instance, and run through the complete flow locally.
+// 3. Fetch user profile
+const user = await pramaan.getUserInfo(tokens.accessToken);
+```
 
 ---
 
-## Documentation
+## Documentation Suite
+
+Comprehensive guides for every stage of integration:
+
+| Guide | Description |
+| :--- | :--- |
+| 📄 [**01 — Registering an OAuth Client**](./docs/01-create-client.md) | How to register your application, configure redirect URIs, and retrieve credentials. |
+| 🚀 [**02 — Manual Protocol Guide**](./docs/02-signup-flow.md) | Step-by-step RFC-compliant flow for Python, Go, Rust, Java, or raw HTTP integrations. |
+| ⚡ [**03 — Official SDK Guide**](./docs/03-sdk-guide.md) | Detailed documentation for `@anuj304/pramaan` with full options, typed errors, and utilities. |
+| 📚 [**04 — API & Claims Reference**](./docs/04-api-reference.md) | Endpoints, query parameters, token response formats, claim mappings, and error codes. |
+| 🛡️ [**05 — Security & Best Practices**](./docs/05-security.md) | Threat model, PKCE rationale, timing-safe state comparison, and production checklist. |
+| 💻 [**Runnable Express Example**](./sdk/examples/express/) | Full, production-ready Express reference application with sessions and UI. |
 
 ```
 docs/
-├── 01-create-client.md    # Register your app as an OAuth client
-├── 02-signup-flow.md       # Step-by-step implementation guide
-└── test-app/
-    └── README.md           # Run the reference client locally
+├── 01-create-client.md       # Register and manage OAuth clients
+├── 02-signup-flow.md         # Protocol flow & manual integration (Python, Go, etc.)
+├── 03-sdk-guide.md           # Official Node.js/TypeScript SDK guide
+├── 04-api-reference.md       # Endpoints, schemas, claims & error reference
+└── 05-security.md            # Threat model, PKCE, and production checklist
 ```
 
 ---
