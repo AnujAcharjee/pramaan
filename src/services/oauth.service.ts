@@ -49,6 +49,16 @@ type IdTokenPayload = {
   nonce: string;
 };
 
+export type OAuthTokenResponse = {
+  access_token: string;
+  token_type: 'Bearer';
+  expires_in: number;
+  scope?: string;
+  id_token?: string;
+  accessToken: string;
+  idToken?: string;
+};
+
 export class OAuthService {
   private readonly authCodeTTL = ENV.NODE_ENV === 'production' ? ENV.AUTH_CODE_EX : 300;
   private readonly authTokensTTL = ENV.NODE_ENV === 'production' ? ENV.AUTH_TOKENS_EX : '10m';
@@ -58,6 +68,26 @@ export class OAuthService {
     private joseService: JoseService,
     private clientService: ClientService,
   ) {}
+
+  getTokensExpiresInSeconds(): number {
+    if (typeof this.authTokensTTL === 'number') return this.authTokensTTL;
+    const match = String(this.authTokensTTL).match(/^(\d+)([smhd])?$/);
+    if (!match) return 600;
+    const value = parseInt(match[1], 10);
+    const unit = match[2];
+    switch (unit) {
+      case 's':
+        return value;
+      case 'm':
+        return value * 60;
+      case 'h':
+        return value * 3600;
+      case 'd':
+        return value * 86400;
+      default:
+        return value;
+    }
+  }
 
   private authCodeKey = (hashedToken: string): string => `OAuth:authCode:${hashedToken}`;
   private authRequestKey = (id: string): string => `OAuth:req:${id}`;
@@ -246,33 +276,41 @@ export class OAuthService {
     code: string;
     codeVerifier?: string;
     clientId: string;
-    clientSecret: string;
-  }) {
+    clientSecret?: string;
+  }): Promise<OAuthTokenResponse> {
     if (input.grantType !== 'authorization_code') {
-      throw new AppError('Unsupported grant_type', 400, ErrorCode.INVALID_INPUT);
+      throw new AppError(
+        'Unsupported grant_type. Only "authorization_code" is supported.',
+        400,
+        ErrorCode.UNSUPPORTED_GRANT_TYPE,
+      );
     }
 
     // get cache
     const hash = AppCrypto.hash(input.code, CRYPTO_ALGORITHMS.sha256, 'hex');
     const raw = await redis.get(this.authCodeKey(hash));
-    if (!raw) throw new AppError('Invalid grant', 400, ErrorCode.UNAUTHORIZED_CLIENT);
+    if (!raw) {
+      throw new AppError('The authorization code has expired or is invalid', 400, ErrorCode.INVALID_GRANT);
+    }
     const authReq = JSON.parse(raw) as AuthCodeReqCacheType;
 
     // Client validation
     if (authReq.clientId !== input.clientId) {
-      throw new AppError('Invalid client', 401, ErrorCode.INVALID_CLIENT);
+      throw new AppError('Client mismatch for authorization code', 401, ErrorCode.INVALID_CLIENT);
     }
 
     const isValidClient = await this.clientService.verifyClient({
       clientId: input.clientId,
-      clientSecret: input.clientSecret,
+      clientSecret: input.clientSecret ?? '',
     });
-    if (!isValidClient) throw new AppError('Invalid client', 401, ErrorCode.INVALID_CLIENT);
+    if (!isValidClient) {
+      throw new AppError('Client authentication failed', 401, ErrorCode.INVALID_CLIENT);
+    }
 
     // PKCE validation
     if (authReq.codeChallenge) {
       if (!input.codeVerifier) {
-        throw new AppError('PKCE codeVerifier missing.', 400, ErrorCode.INVALID_INPUT);
+        throw new AppError('PKCE code_verifier is missing.', 400, ErrorCode.INVALID_REQUEST);
       }
 
       let ok = false;
@@ -280,7 +318,7 @@ export class OAuthService {
         ok = AppCrypto.timingSafeCompare(input.codeVerifier, authReq.codeChallenge);
       } else {
         if (!authReq.codeChallengeAlgo) {
-          throw new AppError('PKCE codeChallengeAlgo missing.', 400, ErrorCode.INVALID_INPUT);
+          throw new AppError('PKCE codeChallengeAlgo missing.', 400, ErrorCode.INVALID_REQUEST);
         }
         ok = AppCrypto.verifyPKCE({
           codeVerifier: input.codeVerifier,
@@ -290,7 +328,7 @@ export class OAuthService {
       }
 
       if (!ok) {
-        throw new AppError('Invalid grant', 400, ErrorCode.UNAUTHORIZED_CLIENT);
+        throw new AppError('PKCE verification failed', 400, ErrorCode.INVALID_GRANT);
       }
     }
 
@@ -306,7 +344,18 @@ export class OAuthService {
       idToken = await this.generateIdToken(authReq.userId, authReq.nonce, authReq.clientId);
     }
 
-    return { accessToken, idToken };
+    const expiresIn = this.getTokensExpiresInSeconds();
+    const scopesString = authReq.scopes.join(' ');
+
+    return {
+      access_token: accessToken,
+      token_type: 'Bearer',
+      expires_in: expiresIn,
+      scope: scopesString,
+      ...(idToken ? { id_token: idToken } : {}),
+      accessToken,
+      ...(idToken ? { idToken } : {}),
+    };
   }
 
   // ---------- GET ALL CONSENTS FROM A USER ----------

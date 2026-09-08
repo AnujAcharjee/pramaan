@@ -97,24 +97,38 @@ export class OAuthController extends BaseController {
     }
   };
 
-  // ---------------- TOKEN ----------------
+  // ---------------- TOKEN (RFC 6749) ----------------
 
-  issueTokens = (req: Request, res: Response, next: NextFunction) =>
-    this.handleApiRequest(req, res, next, async () => {
+  issueTokens = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let clientId = req.body?.client_id;
+      let clientSecret = req.body?.client_secret;
+
+      // Support HTTP Basic Authentication header per RFC 6749 Section 2.3.1
+      const authHeader = req.headers.authorization;
+      if (authHeader?.startsWith('Basic ')) {
+        const decoded = Buffer.from(authHeader.slice(6), 'base64').toString('utf8');
+        const [id, secret] = decoded.split(':');
+        if (id) clientId = id;
+        if (secret) clientSecret = secret;
+      }
+
       const tokens = await this.oauthService.issueTokens({
-        grantType: req.body.grant_type,
-        code: req.body.code,
-        codeVerifier: req.body.code_verifier,
-        clientId: req.body.client_id,
-        clientSecret: req.body.client_secret,
+        grantType: req.body?.grant_type,
+        code: req.body?.code,
+        codeVerifier: req.body?.code_verifier,
+        clientId,
+        clientSecret,
       });
 
-      return {
-        res,
-        data: tokens,
-        message: 'Tokens issued successfully',
-      };
-    });
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Cache-Control', 'no-store');
+      res.setHeader('Pragma', 'no-cache');
+      return res.status(200).json(tokens);
+    } catch (error) {
+      next(error);
+    }
+  };
 
   // ---------------- OIDC USERINFO ----------------
 
