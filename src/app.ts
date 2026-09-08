@@ -11,8 +11,8 @@ import { loggingMiddleware } from './middlewares/loggingMiddleware.js';
 import { setupSecurityHeaders } from './middlewares/securityHeaders.js';
 import { ensureRequestId } from './middlewares/requestId.js';
 import { apiLimiter } from './middlewares/rateLimiter.js';
-import oauthRouter from './routes/oauth.routes.js';
-import uiRouter from './routes/ui.routes.js';
+import apiRouter from './routes/api/index.js';
+import webRouter from './routes/web/index.js';
 
 const app = express();
 
@@ -56,8 +56,8 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // Routes
-app.use('/', uiRouter);
-app.use('/', oauthRouter);
+app.use('/', webRouter);
+app.use('/', apiRouter);
 
 // 404 handler
 app.use(notFoundHandler);
