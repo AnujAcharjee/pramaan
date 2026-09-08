@@ -16,6 +16,10 @@ export interface AppUser {
 }
 
 export interface TokenResponse {
-  accessToken: string;
-  idToken: string;
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  id_token?: string;
+  accessToken?: string;
+  idToken?: string;
 }

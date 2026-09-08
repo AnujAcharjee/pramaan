@@ -15,3 +15,6 @@ export const PRAMAAN_SERVER = requireEnv('PRAMAAN_SERVER');
 
 export const CLIENT_ID = requireEnv('CLIENT_ID');
 export const CLIENT_SECRET = requireEnv('CLIENT_SECRET');
+
+export const CALLBACK_URL = `${CLIENT_URI}/oauth/callback`;
+export const IS_HTTPS = CLIENT_URI.startsWith('https://');

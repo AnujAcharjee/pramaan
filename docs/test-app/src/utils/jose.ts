@@ -1,11 +1,20 @@
-import { createRemoteJWKSet, jwtVerify } from 'jose';
-import { PRAMAAN_SERVER, CLIENT_ID } from '../config.js';
+import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey } from 'jose';
+import { CLIENT_ID } from '../config.js';
+import { getOpenIdConfiguration } from './discovery.js';
 
-const jwks = createRemoteJWKSet(new URL(`${PRAMAAN_SERVER}/api/.well-known/jwks.json`));
+let jwksCache: JWTVerifyGetKey | null = null;
 
 export async function verifyIdToken(idToken: string, nonce: string) {
-  const verified = await jwtVerify(idToken, jwks, {
-    issuer: PRAMAAN_SERVER,
+  const oidcConfig = await getOpenIdConfiguration();
+
+  if (!jwksCache) {
+    jwksCache = createRemoteJWKSet(new URL(oidcConfig.jwks_uri));
+  }
+
+  const issuers = Array.from(new Set([oidcConfig.issuer, new URL(oidcConfig.jwks_uri).origin]));
+
+  const verified = await jwtVerify(idToken, jwksCache, {
+    issuer: issuers.length === 1 ? issuers[0] : issuers,
     audience: CLIENT_ID,
     algorithms: ['RS256'],
   });

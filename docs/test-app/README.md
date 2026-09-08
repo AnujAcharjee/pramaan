@@ -1,105 +1,121 @@
-# 🧪 Pramaan Test Client
+# Pramaan Test Client
 
-This is a reference OAuth 2.0 + OpenID Connect (OIDC) client used to test integration with **Pramaan Identity Provider**.
+A reference OAuth 2.0 + OpenID Connect client for testing the complete authentication flow against Pramaan.
 
-The application runs in Docker and uses HTTPS locally to simulate a production-grade authentication environment.
+The app runs behind Caddy (automatic HTTPS via local CA) inside Docker, giving you a realistic production-like setup on `https://test.localhost`.
 
 ---
 
-# 🚀 Setup Guide
+## Project Structure
 
-## 1. Clone the Repository
+```
+test-app/
+├── src/
+│   ├── controllers/       # Route handlers (auth, home)
+│   ├── services/           # OAuth logic & user store
+│   ├── middlewares/         # Auth guards
+│   ├── routes/              # Express route definitions
+│   ├── utils/
+│   │   ├── discovery.ts     # OIDC discovery with endpoint caching
+│   │   ├── jose.ts          # ID token verification via JWKS
+│   │   └── securityParameters.ts  # PKCE, state, nonce generation
+│   ├── views/               # EJS templates (login, dashboard)
+│   ├── @types/              # TypeScript declarations
+│   ├── config.ts            # Environment config
+│   ├── app.ts               # Express setup
+│   └── index.ts             # Entry point
+├── Caddyfile                # Reverse proxy config
+├── Dockerfile
+├── docker-compose.yaml
+└── .env.example
+```
+
+---
+
+## Setup
+
+### 1. Clone and Navigate
 
 ```bash
 git clone https://github.com/AnujAcharjee/pramaan.git
 cd pramaan/docs/test-app
 ```
 
-## 2. Configure Environment Variables
+### 2. Configure Environment
 
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and add:
+Open `.env` and fill in your client credentials:
 
+```env
+PORT=3000
+CLIENT_URI=https://test.localhost
+PRAMAAN_SERVER=https://pramaan.anujacharjee.com
+CLIENT_ID=<your-client-id>
+CLIENT_SECRET=<your-client-secret>
 ```
-CLIENT_ID=
-CLIENT_SECRET=
-```
 
-Obtain these values from the Pramaan dashboard after creating a client.
+Get `CLIENT_ID` and `CLIENT_SECRET` from the [Pramaan dashboard](https://pramaan.anujacharjee.com/account) after [creating a client](../01-create-client.md). Set the redirect URI to `https://test.localhost/oauth/callback`.
 
-## 3. Install Dependencies
+### 3. Install Dependencies
 
 ```bash
 npm install
 ```
 
-## 4. Build Docker Images
+### 4. Build and Start (Docker)
 
 ```bash
 npm run docker:build
-```
-
-## 5. Start the Containers
-
-```bash
 npm run docker:up
 ```
 
-## 6. Trust the Local HTTPS Certificate
+This starts two containers:
+- **app** — the Node.js test client on port 3000
+- **caddy** — reverse proxy serving `https://test.localhost` with automatic TLS
+
+### 5. Trust the Local CA Certificate
 
 ```bash
 npm run trust
 ```
 
-This generates a `root.crt` file in the project root directory.
-Import and trust the `root.crt` in your system if prompted.
+This copies `root.crt` from the Caddy container. Import it into your system's trusted root certificate store so your browser accepts `https://test.localhost`.
 
-> 🤖 Need Help Installing the Certificate?
+### 6. Open the App
 
-If you're unsure how to install the generated `root.crt` on your system, copy and ask an AI assistant:
+Visit [https://test.localhost](https://test.localhost) and click **Sign In with Pramaan**.
 
-```
-I have generated a local Certificate Authority file named `root.crt` for enabling HTTPS on localhost for an OAuth 2.0 + OIDC application.
+---
 
-I need step-by-step instructions to:
+## Running Without Docker
 
-1. Import this certificate into my system's Trusted Root Certification Authorities
-2. Mark it as trusted
-3. Verify that https://localhost is secure
-
-My operating system is: <Windows / macOS / Linux>.
-Please give exact system-level steps.
-```
-
-Replace `<Windows / macOS / Linux>` with your OS.
-
-## 7. Start the Application
+If you prefer to run locally without Docker (HTTP only, suitable for development):
 
 ```bash
-npm run start
+npm run dev
 ```
 
----
-
-# 🔐 What This Test Client Demonstrates
-
-- OAuth 2.0 Authorization Code Flow with PKCE
-- OpenID Connect ID token validation
-- Secure cookie handling
-- Server-side session management
-- HTTPS enforcement
-- State and nonce validation
-- Token exchange
-- Secure session creation
+The app will start on `http://localhost:3000`. Make sure your `CLIENT_URI` in `.env` matches and that you've registered `http://localhost:3000/oauth/callback` as a redirect URI with environment set to **Development** in the Pramaan dashboard.
 
 ---
 
-# ⚠️ Important
+## What This Client Demonstrates
 
-- Do not disable HTTPS
-- Always validate state and nonce
-- Never expose CLIENT_SECRET publicly
-- Always verify ID token signatures using JWKS
+- **OIDC Discovery** — fetches `/.well-known/openid-configuration` and caches endpoint URLs
+- **Authorization Code + PKCE** — generates `code_verifier`/`code_challenge` (S256), `state`, and `nonce`
+- **Token Exchange** — exchanges the authorization code at the token endpoint with PKCE proof
+- **ID Token Verification** — validates RS256 signature via remote JWKS, checks `issuer`, `audience`, and `nonce`
+- **UserInfo Claims** — fetches user profile from the `/userinfo` endpoint using the access token
+- **Session Management** — creates a server-side session with secure cookie flags after authentication
+
+---
+
+## Security Notes
+
+- Do not disable HTTPS in production — OAuth requires it for redirect URIs
+- Always validate `state` and `nonce` on the callback
+- Never expose `CLIENT_SECRET` in client-side code
+- Verify ID token signatures via JWKS — never skip verification

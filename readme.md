@@ -1,132 +1,121 @@
 # Pramaan — Identity Provider
 
-**Pramaan** is an OAuth 2.0 and OpenID Connect (OIDC) compliant Identity Provider (IdP) designed to provide secure, standards-based authentication and authorization for web, mobile, and backend applications.
+**Pramaan** is a self-hosted OAuth 2.0 and OpenID Connect identity provider built for developers who want full control over authentication without third-party lock-in.
 
-OAuth 2.0 and OpenID Connect are complementary industry standards that solve different but related security challenges in modern distributed systems.
+It implements the **Authorization Code flow with PKCE** (RFC 7636) and **OpenID Connect Core 1.0**, issuing RS256-signed tokens verifiable via standard JWKS discovery.
 
-- **[OAuth 2.0](https://oauth.net/2/)** is an authorization framework that answers:  
-  _"What is this client application allowed to access?"_
-
-- **[OpenID Connect (OIDC)](https://medium.com/@dmosyan/openid-connect-oidc-explained-b7a368c90168)** is an authentication layer built on OAuth 2.0 that answers:  
-  _"Who is the authenticated user?"_
-
-Pramaan implements the **OAuth 2.0 Authorization Code Flow with PKCE**, the recommended and most secure flow for both public and confidential clients. OpenID Connect support is automatically enabled when the `openid` scope is requested.
-
-Pramaan acts as a centralized trust authority — issuing tokens, managing user identity, and enforcing secure authorization policies across connected applications.
-
-🌐 **Website:** https://pramaan.anujacharjee.com
-
-# 🚀 Getting Started
-
-Follow these steps to integrate Pramaan into your application.
-
-## 1. Create Your First OAuth Client
-
-Register your application inside Pramaan to obtain:
-
-- Client ID
-- Client Secret (for confidential clients)
-- Redirect URI configuration
-
-📄 **Guide:**  
-[Create Client Documentation](./docs/01-create-client.md)
-
-## 2. Implement OAuth Flow in Your Application
-
-Integrate Pramaan using:
-
-- Security parameter generation (state, nonce, PKCE)
-- Authorization redirect
-- Token exchange
-- ID token verification
-- User creation
-- Session management
-
-📄 **Guide:**  
-[Implementation Guide](./docs/02-signup-flow.md)
-
-# 📁 Documentation Structure
-
-```
-root/
-├── README.md
-└── docs/
-    ├── test-app
-    ├── 01-create-client.md
-    └── 02-signup-flow.md
-```
-
-# 🧪 Test Client (Sample Application)
-
-A fully working reference client is included to help you test the complete OAuth 2.0 + OIDC flow against Pramaan.
-You can clone and run the test client locally.
-
-For detailed setup instructions, click [more](https://github.com/AnujAcharjee/pramaan/tree/main/docs/test-app/README.md)
-
-# 🔐 OAuth Tokens vs Application Sessions
-
-Understanding this distinction is critical.
-
-| OAuth Token         | Application Session  |
-| ------------------- | -------------------- |
-| Issued by Pramaan   | Issued by your app   |
-| Short-lived         | Longer-lived         |
-| Used for API access | Used for login state |
-
-⚠ Never use OAuth tokens as your application session.
-
-After successful authentication, create your own session mechanism.
-
-# 🛠 Common Issues & Solutions
-
-### Invalid Redirect URI
-
-Ensure the redirect URI exactly matches what is registered in Pramaan.
-
-### State Mismatch
-
-Possible CSRF attempt or expired session.  
-Validate state parameter properly.
-
-### Invalid ID Token
-
-Verify:
-
-- Issuer
-- Audience
-- Nonce
-- Signature
-- Expiration
-
-### Access Token Expired
-
-Use refresh token or require re-authentication.
-
-# 🏗 Production Checklist
-
-- HTTPS enabled for all redirect URIs
-- Secure cookies (`httpOnly`, `secure`, `sameSite`)
-- PKCE enforced
-- ID token verification enabled
-- Sessions expire correctly
-- Database indexed on `pramaanId`
-- Rate limiting on login endpoints
-- CSRF protection enabled
-- XSS protection enabled
-- Proper logging & monitoring configured
-
-# 🔒 Security Best Practices
-
-- Never expose `CLIENT_SECRET`
-- Always validate `state`
-- Always validate `nonce`
-- Verify ID token signature using JWKS
-- Use server-side sessions (recommended)
-- Do not store OAuth tokens in database
-- Expire OAuth parameters in 10–15 minutes
-- Enforce RS256 verification
+🌐 **Live:** [pramaan.anujacharjee.com](https://pramaan.anujacharjee.com)
 
 ---
 
-**Last Updated:** February 2026  
-**Version:** 2.0
+## Endpoints
+
+Pramaan exposes the following OIDC-compliant endpoints. All paths are discoverable via the OpenID Configuration document.
+
+| Endpoint | Path |
+| :--- | :--- |
+| OpenID Configuration | `/.well-known/openid-configuration` |
+| JWKS | `/.well-known/jwks.json` |
+| Authorization | `/api/oauth/authorize` |
+| Token | `/api/oauth/token` |
+| UserInfo | `/userinfo` |
+
+---
+
+## Getting Started
+
+### 1. Register a Client
+
+Create an OAuth client in the Pramaan dashboard to get your **Client ID** and **Client Secret**.
+
+📄 [Client Registration Guide →](./docs/01-create-client.md)
+
+### 2. Implement the OAuth Flow
+
+Wire up the authorization redirect, token exchange, ID token verification, and user session creation in your application.
+
+📄 [Implementation Guide →](./docs/02-signup-flow.md)
+
+### 3. Run the Test Client
+
+A fully working reference client is included under [`docs/test-app/`](./docs/test-app/README.md). Clone it, point it at your Pramaan instance, and run through the complete flow locally.
+
+---
+
+## Documentation
+
+```
+docs/
+├── 01-create-client.md    # Register your app as an OAuth client
+├── 02-signup-flow.md       # Step-by-step implementation guide
+└── test-app/
+    └── README.md           # Run the reference client locally
+```
+
+---
+
+## Token Model
+
+Pramaan issues two token types. Understanding the distinction from your application session is critical.
+
+| | Access Token | ID Token |
+| :--- | :--- | :--- |
+| **Purpose** | Authorize API calls (e.g. `/userinfo`) | Prove user identity |
+| **Audience** | Resource server (`userinfo`) | Your client (`client_id`) |
+| **Signed with** | RS256 (asymmetric) | RS256 (asymmetric) |
+| **Lifetime** | Short-lived (configurable) | Short-lived (configurable) |
+| **Contains** | `sub`, `scope` | `sub`, `nonce`, `aud`, `iss` |
+
+> ⚠️ Never use OAuth tokens as your application session. After verifying the ID token, create your own session (cookie, JWT, etc.) with appropriate expiration and security flags.
+
+---
+
+## Supported Scopes
+
+| Scope | Claims Returned |
+| :--- | :--- |
+| `openid` | `sub` |
+| `profile` | `name`, `picture` |
+| `email` | `email`, `email_verified` |
+| `avatar` | `avatar`, `picture` |
+
+---
+
+## Common Issues
+
+| Problem | Fix |
+| :--- | :--- |
+| **Invalid Redirect URI** | Must exactly match the URI registered in the client dashboard |
+| **State Mismatch** | Possible CSRF or expired session — validate the `state` parameter against your stored value |
+| **Invalid ID Token** | Verify `issuer`, `audience`, `nonce`, RS256 signature (via JWKS), and `exp` |
+| **Access Token Expired** | Re-authenticate the user; Pramaan does not currently issue refresh tokens |
+
+---
+
+## Production Checklist
+
+- [ ] HTTPS on all redirect URIs
+- [ ] Secure cookies (`httpOnly`, `secure`, `sameSite: 'lax'`)
+- [ ] PKCE enforced for all clients
+- [ ] ID token signature verified via JWKS
+- [ ] Session expiration configured
+- [ ] Rate limiting on login/token endpoints
+- [ ] `state` and `nonce` validated on every callback
+- [ ] Client secret rotated periodically
+- [ ] Logging and monitoring enabled
+
+---
+
+## Security Practices
+
+- Never expose `CLIENT_SECRET` in frontend code or version control
+- Always validate `state` and `nonce` on the callback
+- Verify ID token signatures using the JWKS endpoint — never skip verification
+- Use server-side sessions; do not store OAuth tokens in localStorage
+- Expire OAuth parameters (state, nonce, code_verifier) within 5–10 minutes
+- Enforce RS256 as the only accepted signing algorithm
+
+---
+
+**Last Updated:** September 2026
+**Version:** 2.1

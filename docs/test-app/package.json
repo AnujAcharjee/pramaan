@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "npx tsc --build",
+    "dev": "npm run build && node dist/index.js",
     "start": "node dist/index.js",
     "docker:build": "docker compose build --no-cache",
     "docker:up": "docker compose up -d",

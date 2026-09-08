@@ -1,69 +1,56 @@
-## Follow these steps to register your application:
+# Registering an OAuth Client
 
-1. Go to:  
-   https://pramaan.anujacharjee.com/account
+Register your application in Pramaan to obtain the credentials needed for the OAuth flow.
 
-2. Navigate to **Registered Clients** (Developer Section)
+---
 
-3. Click **Create OAuth Client**
+## 1. Open the Dashboard
 
-4. Fill in the required details (Client Configuration Fields):
+Sign in at [pramaan.anujacharjee.com/account](https://pramaan.anujacharjee.com/account) and navigate to **Registered Clients** under the developer section.
 
-#### Client Name
+Click **Create OAuth Client**.
 
-The public-facing name of your application.  
-This will be shown to users during authentication and consent screens.
+---
 
-#### Client Domain
+## 2. Fill in Client Details
 
-Used to generate client-specific API routes.  
-_(Coming soon)_
+| Field | Description |
+| :--- | :--- |
+| **Client Name** | Display name shown to users on the consent screen |
+| **Client Domain** | Your application's primary domain (e.g. `yourapp.com`) |
+| **Client Type** | `Confidential` for server-side apps (can store a secret securely), `Public` for SPAs/mobile apps |
+| **Environment** | `Production` enforces `https://` redirect URIs. `Development` allows `http://localhost` |
+| **Redirect URI** | The exact callback URL that receives the authorization code (e.g. `https://yourapp.com/oauth/callback`) |
 
-#### Client Type
+> ⚠️ Redirect URIs are matched exactly. A trailing slash or different port will cause a mismatch error.
 
-Choose based on your application architecture:
+---
 
-- **Confidential** — For server-side applications (recommended).  
-  Use this if your application runs on a backend server that can securely store secrets.
+## 3. Save Your Credentials
 
-- **Public** — For SPAs and Mobile applications.  
-  Use this if your application runs in the browser or on a user device.  
-  Client secrets cannot be securely stored in these environments.
+After creation you'll see:
 
-#### Environment
+- **Client ID** — a public identifier included in authorization requests
+- **Client Secret** — used by confidential clients during the token exchange
 
-- **Development**  
-  Allows `http://` redirect URIs for local development.
+Store the Client Secret securely. It is not recoverable after you leave the page, but it can be regenerated from the dashboard.
 
-- **Production (Recommended)**  
-  Allows only `https://` redirect URIs.
+> Never commit your Client Secret to version control or expose it in client-side code.
 
-> ⚠ Even during development, using Production is recommended because some browsers block redirects from `https` to `http`.
+---
 
-#### Redirect URI
+## 4. Manage Your Client
 
-The endpoint on your application that will receive the **Authorization Code** from Pramaan after successful authentication.
+From the **Client Dashboard** you can:
 
-Example:
-`https://yourapp.com/auth/callback`
-
-5. Click **Create Client**
-
-🎉 Congratulations! Your OAuth client has been created.
-
-## After Client Creation
-
-You will be redirected to your **Client Dashboard**, where you can:
-
-- View client configuration
-- Manage redirect URIs
+- View and update the client configuration
+- Add or remove redirect URIs
 - Regenerate credentials
-- Update environment settings
+- Switch between development and production environments
 
-## Important Notes
+---
 
-- The **Client ID** is displayed only once immediately after creation.  
-  Store it securely.
+## Next Steps
 
-- If lost, you can generate a new Client ID.  
-  However, you must update it in your application configuration.
+- [Implementation Guide →](./02-signup-flow.md) — Step-by-step code to wire up the OAuth flow
+- [Test Client →](./test-app/README.md) — Run the reference app locally to see the full flow in action
