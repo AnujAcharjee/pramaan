@@ -139,6 +139,59 @@ app.get("/logout", (req, res) => {
 
 ---
 
+### Step 5: Popup Window Authentication UX (Optional)
+
+If you prefer a seamless popup window UX rather than redirecting the main browser tab:
+
+#### 1. Open Centered Popup on Click (Frontend)
+
+```typescript
+function signInWithPramaan() {
+  const width = 500;
+  const height = 650;
+  const left = window.screenX + (window.outerWidth - width) / 2;
+  const top = window.screenY + (window.outerHeight - height) / 2;
+
+  const popup = window.open(
+    "/login",
+    "pramaan_login",
+    `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+  );
+
+  // Listen for callback completion from the popup
+  window.addEventListener("message", function onMessage(event) {
+    if (event.origin !== window.location.origin) return;
+
+    if (event.data?.type === "PRAMAAN_AUTH_SUCCESS") {
+      window.removeEventListener("message", onMessage);
+      window.location.href = "/dashboard"; // Navigate initial tab to dashboard
+    }
+  });
+}
+```
+
+#### 2. Close Popup on Callback Completion (Backend)
+
+In your callback route, after exchanging tokens and setting your session cookie, return an HTML script that notifies the initial tab and closes the popup:
+
+```html
+<script>
+  if (window.opener) {
+    // Notify the initial tab
+    window.opener.postMessage({ type: "PRAMAAN_AUTH_SUCCESS" }, window.location.origin);
+    // Close the popup window
+    window.close();
+  } else {
+    // Fallback for full-page redirect
+    window.location.href = "/dashboard";
+  }
+</script>
+```
+
+The popup will close automatically upon user consent, and the initial browser tab will immediately navigate to the dashboard!
+
+---
+
 ## 4. Client Configuration Reference
 
 | Option | Type | Required | Description |
