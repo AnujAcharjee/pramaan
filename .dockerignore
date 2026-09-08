@@ -40,9 +40,12 @@ coverage
 .prettierrc.*
 eslint.config.*
 
-# docs
+# Docs & SDK
 README.md
+readme.md
+docs
 doc
+sdk
 
 # Docker
 Dockerfile
