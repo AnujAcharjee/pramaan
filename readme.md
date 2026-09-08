@@ -1,10 +1,18 @@
 # Pramaan — Identity Provider
 
-**Pramaan** is a self-hosted OAuth 2.0 and OpenID Connect identity provider built for developers who want full control over authentication without third-party lock-in.
+**Pramaan** is a self-hostable OAuth 2.0 and OpenID Connect identity provider built for developers who want full control over their authentication infrastructure without third-party lock-in.
 
 It implements the **Authorization Code flow with PKCE** (RFC 7636) and **OpenID Connect Core 1.0**, issuing RS256-signed tokens verifiable via standard JWKS discovery.
 
-🌐 **Live:** [pramaan.anujacharjee.com](https://pramaan.anujacharjee.com)
+---
+
+## Get Started
+
+Use the hosted Pramaan instance or deploy your own.
+
+🌐 **Hosted:** [pramaan.anujacharjee.com](https://pramaan.anujacharjee.com/)
+
+🛠️ **Self-host:** Clone the repository and run Pramaan on your own infrastructure. [Deployment Guide →](./docs/deployment.md)
 
 ---
 
@@ -60,10 +68,11 @@ const user = await pramaan.getUserInfo(tokens.accessToken);
 
 ## Documentation Suite
 
-Comprehensive guides for every stage of integration:
+Comprehensive guides for every stage of integration and hosting:
 
 | Guide | Description |
 | :--- | :--- |
+| 🐳 [**Self-Hosting & Deployment**](./docs/deployment.md) | How to deploy your own instance of Pramaan with Docker Compose, Caddy, Postgres, and Redis. |
 | 📄 [**01 — Registering an OAuth Client**](./docs/01-create-client.md) | How to register your application, configure redirect URIs, and retrieve credentials. |
 | 🚀 [**02 — Manual Protocol Guide**](./docs/02-signup-flow.md) | Step-by-step RFC-compliant flow for Python, Go, Rust, Java, or raw HTTP integrations. |
 | ⚡ [**03 — Official SDK Guide**](./docs/03-sdk-guide.md) | Detailed documentation for `@anuj304/pramaan` with full options, typed errors, and utilities. |
@@ -73,6 +82,7 @@ Comprehensive guides for every stage of integration:
 
 ```
 docs/
+├── deployment.md             # Docker Compose, Caddy & self-hosting instructions
 ├── 01-create-client.md       # Register and manage OAuth clients
 ├── 02-signup-flow.md         # Protocol flow & manual integration (Python, Go, etc.)
 ├── 03-sdk-guide.md           # Official Node.js/TypeScript SDK guide

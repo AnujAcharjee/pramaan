@@ -1,6 +1,6 @@
 # @anuj304/pramaan
 
-The official Node.js SDK for **Pramaan** — the self-hosted OAuth 2.0 and OpenID Connect Identity Provider.
+The official Node.js SDK for **Pramaan** — the self-hostable OAuth 2.0 and OpenID Connect Identity Provider.
 
 Integrate authentication and single sign-on into your Node.js applications with standard Authorization Code flow, automated PKCE (RFC 7636), cryptographic state/nonce verification, JWKS key rotation, and UserInfo profile retrieval.
 
