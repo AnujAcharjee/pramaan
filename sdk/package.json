@@ -1,5 +1,5 @@
 {
-  "name": "@anujacharjee/pramaan",
+  "name": "@anuj304/pramaan",
   "version": "1.0.0",
   "description": "Official Node.js SDK for Pramaan OAuth 2.0 and OpenID Connect Identity Provider",
   "main": "./dist/index.js",
@@ -41,13 +41,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AnujAcharjee/pramaan.git",
+    "url": "git+https://github.com/anuj304/pramaan.git",
     "directory": "sdk"
   },
   "bugs": {
-    "url": "https://github.com/AnujAcharjee/pramaan/issues"
+    "url": "https://github.com/anuj304/pramaan/issues"
   },
-  "homepage": "https://github.com/AnujAcharjee/pramaan#readme",
+  "homepage": "https://github.com/anuj304/pramaan#readme",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
