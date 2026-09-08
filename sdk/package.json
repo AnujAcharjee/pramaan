@@ -39,6 +39,18 @@
   ],
   "author": "Anuj Acharjee",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anuj304/pramaan.git",
+    "directory": "sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/anuj304/pramaan/issues"
+  },
+  "homepage": "https://github.com/anuj304/pramaan#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "dependencies": {
     "jose": "^5.9.6"
   },
