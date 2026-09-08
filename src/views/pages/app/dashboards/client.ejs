@@ -80,26 +80,26 @@
           <div class="min-w-0">
             <h2 class="text-2xl font-extrabold text-slate-900 dark:text-slate-100 truncate"><%= client.name %></h2>
             <% if (client.domain) { %>
-            <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold tracking-wide lowercase mt-0.5"><%= client.domain %></p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold tracking-wide lowercase mt-0.5"><%= client.domain %></p>
             <% } %>
           </div>
         </div>
 
         <div class="space-y-4">
           <!-- Client ID -->
-          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#1a1e2e]/50 border border-slate-200/60 dark:border-slate-700/25 shadow-xs">
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20">
             <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2">Client ID</p>
             <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-              <input id="client-id" type="text" readonly value="<%= client.id %>" class="flex-1 text-xs font-mono bg-white dark:bg-[#0b0d18]/60 text-slate-700 dark:text-slate-300 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/40 focus:outline-none" />
-              <button type="button" class="copy-btn shrink-0 inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold text-white dark:text-slate-300 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-650 focus:outline-none transition-all cursor-pointer rounded-xl" data-copy-target="client-id">
+              <input id="client-id" type="text" readonly value="<%= client.id %>" class="flex-1 text-xs font-mono bg-white dark:bg-[#050811] text-slate-700 dark:text-slate-200 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800/80 focus:outline-none" />
+              <button type="button" class="copy-btn shrink-0 inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold text-white dark:text-slate-200 bg-slate-800 dark:bg-slate-700 hover:bg-slate-900 dark:hover:bg-slate-600 focus:outline-none transition-all cursor-pointer rounded-xl" data-copy-target="client-id">
                 <span class="copy-btn-label">Copy ID</span>
               </button>
             </div>
           </div>
 
-          <div class="bg-sky-50/50 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 rounded-2xl p-4 flex gap-3 shadow-xs">
+          <div class="bg-sky-50/70 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/30 rounded-2xl p-4 flex gap-3 shadow-xs">
             <span class="text-lg shrink-0 mt-0.5">💡</span>
-            <p class="text-xs text-sky-850 dark:text-sky-350 font-medium leading-relaxed">
+            <p class="text-xs text-sky-900 dark:text-sky-300 font-medium leading-relaxed">
               Use this <span class="font-extrabold">Client ID</span> in your client integration headers to authorize users. It uniquely identifies your client app.
             </p>
           </div>
@@ -116,21 +116,21 @@
           </div>
           <div>
             <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Security Credentials</h2>
-            <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5">Configure authentication profiles and keys.</p>
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Configure authentication profiles and keys.</p>
           </div>
         </div>
 
         <div class="space-y-6">
           <!-- Client Type -->
-          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#1a1e2e]/50 border border-slate-200/60 dark:border-slate-700/25 shadow-xs hover:border-slate-350 dark:hover:border-slate-600/40 transition-all duration-300">
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-300">
             <div class="flex items-center justify-between gap-4 flex-wrap">
               <div>
                 <div class="flex items-center gap-2.5">
                   <p class="text-sm font-bold text-slate-800 dark:text-slate-200">Client Type</p>
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase
               <%= client.clientType === 'confidential'
-                ? 'bg-sky-100 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400'
-                : 'bg-purple-100 dark:bg-purple-500/10 text-purple-700 dark:text-purple-400' %>">
+                ? 'bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300/30'
+                : 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-300/30' %>">
                     <%= client.clientType %>
                   </span>
                 </div>
@@ -142,15 +142,15 @@
           </div>
 
           <!-- PKCE -->
-          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#1a1e2e]/50 border border-slate-200/60 dark:border-slate-700/25 shadow-xs hover:border-slate-350 dark:hover:border-slate-600/40 transition-all duration-300">
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-300">
             <div class="flex items-center justify-between gap-4 flex-wrap">
               <div>
                 <div class="flex items-center gap-2.5">
                   <p class="text-sm font-bold text-slate-800 dark:text-slate-200">PKCE Enforcement</p>
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold
               <%= client.enforcePKCE 
-                ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' 
-                : 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' %>">
+                ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300/30' 
+                : 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/30' %>">
                     <%= client.enforcePKCE ? 'Enforced' : 'Optional' %>
                   </span>
                 </div>
@@ -162,15 +162,15 @@
           </div>
 
           <!-- Environment -->
-          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#1a1e2e]/50 border border-slate-200/60 dark:border-slate-700/25 shadow-xs hover:border-slate-350 dark:hover:border-slate-600/40 transition-all duration-300">
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-300">
             <div class="flex items-start justify-between gap-6 flex-wrap">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2.5">
                   <p class="text-sm font-bold text-slate-800 dark:text-slate-200">Policy Environment</p>
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase
               <%= client.environment === "production"
-                ? "bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
-                : "bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400" %>">
+                ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300/30"
+                : "bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/30" %>">
                     <%= client.environment %>
                   </span>
                 </div>
@@ -191,15 +191,15 @@
           </div>
 
           <!-- Client Secret -->
-          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#1a1e2e]/50 border border-slate-200/60 dark:border-slate-700/25 shadow-xs hover:border-slate-350 dark:hover:border-slate-600/40 transition-all duration-300">
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-300">
             <div class="space-y-4">
               <div class="flex items-center justify-between gap-4 flex-wrap">
                 <div class="flex items-center gap-2.5">
                   <p class="text-sm font-bold text-slate-800 dark:text-slate-200">Client Secret</p>
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold
                     <%= client.client_secret 
-                      ? 'bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400' 
-                      : 'bg-slate-200 dark:bg-slate-700/30 text-slate-600 dark:text-slate-500' %>">
+                      ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/30' 
+                      : 'bg-slate-200 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300' %>">
                     <%= client.client_secret ? 'Revealed once' : 'Protected / Rotated' %>
                   </span>
                 </div>
@@ -215,23 +215,23 @@
               </div>
               
               <% if (client.client_secret) { %>
-              <div class="rounded-2xl bg-amber-50/50 dark:bg-amber-500/10 border border-amber-250 dark:border-amber-500/20 p-4 shadow-xs">
-                <p class="text-xs font-bold text-amber-900 dark:text-amber-400">⚠️ Secure storage required</p>
-                <p class="text-[11px] text-amber-800 dark:text-amber-305/85 leading-normal mt-0.5">This secret is displayed only once. If you reload this page or close this tab, it will be hidden. Save it securely on your servers.</p>
+              <div class="rounded-2xl bg-amber-50/70 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/30 p-4 shadow-xs">
+                <p class="text-xs font-bold text-amber-900 dark:text-amber-300">⚠️ Secure storage required</p>
+                <p class="text-[11px] text-amber-800 dark:text-amber-200 leading-normal mt-0.5">This secret is displayed only once. If you reload this page or close this tab, it will be hidden. Save it securely on your servers.</p>
               </div>
 
               <div class="flex flex-col sm:flex-row gap-2">
-                <div class="flex items-center gap-2 flex-1 bg-white dark:bg-[#0b0d18]/60 rounded-xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-700/40 shadow-xs">
+                <div class="flex items-center gap-2 flex-1 bg-white dark:bg-[#050811] rounded-xl px-3.5 py-2.5 border border-slate-200 dark:border-slate-800/80 shadow-xs">
                   <input id="client-secret" type="text" readonly value="<%= client.client_secret %>" class="flex-1 font-mono text-xs text-slate-800 dark:text-slate-200 bg-transparent focus:outline-none" />
-                  <button type="button" class="copy-btn text-xs font-bold text-slate-500 dark:text-slate-450 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer" data-copy-target="client-secret">
+                  <button type="button" class="copy-btn text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer" data-copy-target="client-secret">
                     <span class="copy-btn-label">Copy Secret</span>
                   </button>
                 </div>
               </div>
               <% } else { %>
-              <div class="rounded-2xl bg-slate-200/20 dark:bg-[#0b0d18]/40 border border-slate-200/80 dark:border-slate-800/40 p-4 shadow-xs">
-                <p class="text-xs font-bold text-slate-700 dark:text-slate-300">No active secret visible</p>
-                <p class="text-[11px] text-slate-500 dark:text-slate-500 leading-normal mt-0.5">Secrets are protected on client endpoints. Generate or rotate your key below if you need a new credential for confidential flows.</p>
+              <div class="rounded-2xl bg-slate-200/40 dark:bg-[#050811]/60 border border-slate-200/80 dark:border-slate-800/80 p-4 shadow-xs">
+                <p class="text-xs font-bold text-slate-800 dark:text-slate-200">No active secret visible</p>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-normal mt-0.5">Secrets are protected on client endpoints. Generate or rotate your key below if you need a new credential for confidential flows.</p>
                 
                 <form action="/client/rotate-secret" method="POST" class="mt-3">
                   <input type="hidden" name="client_id" value="<%= client.id %>" />
@@ -257,29 +257,29 @@
           </div>
           <div>
             <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Redirect URIs</h2>
-            <p class="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5">Manage authorized domains and callback paths.</p>
+            <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Manage authorized domains and callback paths.</p>
           </div>
         </div>
 
         <% if (client.redirectURIs.length === 0) { %>
-        <div class="text-center py-10 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800/40 bg-slate-50/20 dark:bg-[#1a1e2e]/20 mb-6">
-          <svg class="w-10 h-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="text-center py-10 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800/80 bg-slate-50/40 dark:bg-[#070b14]/40 mb-6">
+          <svg class="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p class="text-slate-700 dark:text-slate-300 font-bold text-sm">No redirects registered</p>
-          <p class="text-xs text-slate-550 dark:text-slate-500">You must register at least one URI to accept OAuth code requests.</p>
+          <p class="text-slate-700 dark:text-slate-200 font-bold text-sm">No redirects registered</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400">You must register at least one URI to accept OAuth code requests.</p>
         </div>
         <% } else { %>
         <div class="space-y-2 mb-6">
           <% for (const uri of client.redirectURIs) { %>
-          <div class="flex items-center justify-between gap-4 p-3 rounded-2xl bg-slate-50 dark:bg-[#1a1e2e]/50 border border-slate-200/60 dark:border-slate-700/25 shadow-xs hover:border-slate-350 dark:hover:border-slate-600/40 transition-colors">
-            <code class="font-mono text-xs text-slate-650 dark:text-slate-300 truncate select-all">
+          <div class="flex items-center justify-between gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-colors">
+            <code class="font-mono text-xs text-slate-700 dark:text-slate-200 truncate select-all">
               <%= uri %>
             </code>
             <form method="POST" action="/client/<%= client.id %>/ruri" class="shrink-0">
               <input type="hidden" name="action" value="del" />
               <input type="hidden" name="redirect_uri" value="<%= uri %>" />
-              <button type="submit" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-450 transition-colors cursor-pointer" title="Remove URI">
+              <button type="submit" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer" title="Remove URI">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M3 6h18M8 6V4h8v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6m5 5v6m4-6v6" />
                 </svg>
@@ -291,7 +291,7 @@
         <% } %>
 
         <!-- Add URI Form -->
-        <div class="p-5 rounded-2xl bg-orange-50/10 dark:bg-brand-orange/5 border border-brand-orange/20 dark:border-brand-orange/30 shadow-xs">
+        <div class="p-5 rounded-2xl bg-orange-50/20 dark:bg-[#070b14]/80 border border-brand-orange/30 dark:border-brand-orange/30 shadow-xs">
           <form method="POST" action="/client/<%= client.id %>/ruri" class="space-y-3">
             <input type="hidden" name="action" value="add" />
 
@@ -302,7 +302,7 @@
               </button>
             </div>
             
-            <p class="text-[10px] text-amber-950/80 dark:text-brand-orange/80 leading-normal font-semibold">
+            <p class="text-[11px] text-amber-900/90 dark:text-brand-orange/90 leading-normal font-semibold">
               ⚠️ Callback URLs must exactly match parameter values and conform to secure protocol policies.
             </p>
           </form>
@@ -316,7 +316,7 @@
       
       <!-- Metadata Section -->
       <section class="dashboard-section !p-6">
-        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 dark:border-slate-800/40 pb-4">
+        <div class="flex items-center gap-3 mb-6 border-b border-slate-100 dark:border-slate-800/80 pb-4">
           <div class="dashboard-icon bg-sky-500 shadow-sky-200">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -324,35 +324,35 @@
           </div>
           <div>
             <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Metadata</h2>
-            <p class="text-[10px] font-semibold text-slate-400 dark:text-slate-500">System attributes</p>
+            <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400">System attributes</p>
           </div>
         </div>
 
         <div class="space-y-4">
-          <div class="pb-3 border-b border-slate-100 dark:border-slate-800/40">
+          <div class="pb-3 border-b border-slate-100 dark:border-slate-800/80">
             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">Created</p>
-            <p class="text-xs font-bold text-slate-700 dark:text-slate-350"><%= createdAtFormatted %></p>
+            <p class="text-xs font-bold text-slate-700 dark:text-slate-200"><%= createdAtFormatted %></p>
           </div>
 
-          <div class="pb-3 border-b border-slate-100 dark:border-slate-800/40">
+          <div class="pb-3 border-b border-slate-100 dark:border-slate-800/80">
             <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1">Last Updated</p>
-            <p class="text-xs font-bold text-slate-700 dark:text-slate-350"><%= updatedAtFormatted %></p>
+            <p class="text-xs font-bold text-slate-700 dark:text-slate-200"><%= updatedAtFormatted %></p>
           </div>
 
           <% if (client.revokedAt) { %>
-          <div class="pb-3 border-b border-slate-100 dark:border-slate-800/40">
-            <p class="text-[10px] font-bold uppercase tracking-wider text-red-500 dark:text-rose-450 mb-1">Revoked</p>
-            <p class="text-xs font-bold text-red-700 dark:text-rose-400"><%= revokedAtFormatted %></p>
+          <div class="pb-3 border-b border-slate-100 dark:border-slate-800/80">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-red-500 dark:text-rose-400 mb-1">Revoked</p>
+            <p class="text-xs font-bold text-red-700 dark:text-rose-300"><%= revokedAtFormatted %></p>
           </div>
           <% } %>
         </div>
 
-        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-4 leading-normal">System attributes are read-only metadata records generated during lifecycle updates.</p>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-4 leading-normal">System attributes are read-only metadata records generated during lifecycle updates.</p>
       </section>
 
       <!-- Danger Zone -->
       <section class="dashboard-danger-section">
-        <div class="flex items-center gap-3 mb-6 border-b border-red-200/40 dark:border-rose-950/40 pb-4">
+        <div class="flex items-center gap-3 mb-6 border-b border-red-200/40 dark:border-rose-950/60 pb-4">
           <div class="dashboard-icon bg-rose-500">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -360,18 +360,18 @@
           </div>
           <div>
             <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100">Danger Zone</h2>
-            <p class="text-[10px] font-semibold text-red-500/80 dark:text-rose-450/80">Client lifecycle actions</p>
+            <p class="text-[10px] font-semibold text-red-500/90 dark:text-rose-400">Client lifecycle actions</p>
           </div>
         </div>
 
         <div class="space-y-4">
           <!-- Toggle Active Status -->
-          <div class="p-4 bg-white dark:bg-[#1a1e2e]/60 border border-slate-200 dark:border-slate-750/30 rounded-2xl flex flex-col justify-between gap-3 shadow-xs dark:shadow-black/10">
+          <div class="p-4 bg-white dark:bg-[#070b14]/80 border border-slate-200 dark:border-slate-800/80 rounded-2xl flex flex-col justify-between gap-3 shadow-xs dark:shadow-black/20">
             <div>
-              <p class="text-xs font-bold text-slate-900 dark:text-slate-200">
+              <p class="text-xs font-bold text-slate-900 dark:text-slate-100">
                 <%= client.isActive ? "Disable Client" : "Activate Client" %>
               </p>
-              <p class="text-[10px] text-slate-450 dark:text-slate-500 mt-1 leading-normal">
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
                 <%= client.isActive 
                   ? "Prevent this client configuration from validating any OAuth code flow requests." 
                   : "Restore code authentication validation capacity." %>
@@ -390,10 +390,10 @@
           </div>
 
           <!-- Permanent Delete -->
-          <div class="p-4 bg-white dark:bg-[#1a1e2e]/60 border border-rose-100 dark:border-rose-500/15 rounded-2xl flex flex-col justify-between gap-3 shadow-xs dark:shadow-black/10">
+          <div class="p-4 bg-white dark:bg-[#070b14]/80 border border-rose-200 dark:border-rose-900/40 rounded-2xl flex flex-col justify-between gap-3 shadow-xs dark:shadow-black/20">
             <div>
-              <p class="text-xs font-bold text-slate-900 dark:text-slate-200">Delete Client</p>
-              <p class="text-[10px] text-slate-450 dark:text-slate-500 mt-1 leading-normal">Permanently remove credentials, secrets, callback records, and active keys. This cannot be undone.</p>
+              <p class="text-xs font-bold text-slate-900 dark:text-slate-100">Delete Client</p>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">Permanently remove credentials, secrets, callback records, and active keys. This cannot be undone.</p>
             </div>
             <a href="/client/<%= client.id %>/delete?name=<%= encodeURIComponent(client.name) %>" class="btn-outline-rose text-xs py-2 w-full text-center block">
               Delete Client

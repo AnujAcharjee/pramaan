@@ -48,6 +48,8 @@ export class OAuthController extends BaseController {
     const authReq = await this.oauthService.getAuthorizationRequest(requestId);
     const client = await this.clientService.getClient(authReq.clientId);
 
+    const user = req.user?.id ? await this.accountService.get(req.user.id) : null;
+
     res.render('pages/oauth/consent', {
       title: 'Authorize Application',
       requestId: authReq.id,
@@ -55,6 +57,7 @@ export class OAuthController extends BaseController {
       clientName: client.name,
       clientDomain: client.domain,
       scopes: authReq.scopes,
+      user,
     });
   });
 

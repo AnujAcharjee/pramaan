@@ -1,85 +1,147 @@
 <section id="oauth-flow" class="relative overflow-hidden border-t border-slate-200/40 dark:border-slate-700/20">
-  <div class="max-w-6xl mx-auto px-6 sm:px-8 py-20 sm:py-24">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
 
     <!-- Heading -->
     <div class="max-w-3xl mb-12">
       <p class="text-xs font-semibold text-brand-orange tracking-wider uppercase">
-        OAuth 2.0 Flow
+        OAuth 2.0 & OpenID Connect Flow
       </p>
 
+      <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-slate-100 mt-2 font-brand-hero">
+        Standards-compliant implementation
+      </h2>
+
       <p class="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-        Pramaan uses the Authorization Code flow with PKCE to securely authenticate users.
-        Tokens are exchanged server-side and never exposed to the browser.
+        Pramaan implements the Authorization Code flow with PKCE and OpenID Connect Core, with RS256-signed tokens and standards-based JWKS for verification.
       </p>
     </div>
 
-    <!-- Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- 3-Step Equal Width & Height Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
 
-      <!-- Step 1 -->
-      <div class="rounded-3xl bg-slate-950 text-slate-100 p-6 sm:p-8 shadow-xl border border-slate-800 flex flex-col hover-scale">
-
-        <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-900">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Step 1 · Redirect User
+      <!-- Step 1 Card -->
+      <div class="w-full min-w-0 flex flex-col h-full rounded-3xl bg-[#070b14] text-slate-100 p-5 sm:p-6 shadow-xl border border-slate-800 hover:border-slate-750 transition-all duration-300">
+        <!-- Terminal Window Header (Fixed Height) -->
+        <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-800/80 gap-2 shrink-0 h-10">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+          </div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 truncate">
+            Step 1 · Authorization URL
           </span>
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-400/10 text-emerald-400">
-            Client
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 shrink-0">
+            Browser
           </span>
         </div>
 
-        <pre class="text-xs font-mono leading-relaxed whitespace-pre overflow-x-auto w-full text-slate-300">
+        <!-- Scrollable Code Container (Full Height, Scrollbar Aligned at Bottom) -->
+        <div class="code-scrollbar flex-1 min-w-0 w-full overflow-x-auto min-h-[370px] pb-2 flex flex-col justify-between">
+          <pre class="text-[11px] sm:text-xs font-mono leading-relaxed text-slate-300 w-max min-w-full m-0">
 <code><span class="text-sky-400">const</span> authorizeUrl = <span class="text-emerald-400">new</span> URL(
   <span class="text-amber-400">"<%= serverUrl %>/api/oauth/authorize"</span>
 );
 
 authorizeUrl.search = <span class="text-emerald-400">new</span> URLSearchParams({
+  <span class="text-purple-400">response_type</span>: <span class="text-amber-400">"code"</span>,
   <span class="text-purple-400">client_id</span>: process.env.AUTH_CLIENT_ID,
   <span class="text-purple-400">redirect_uri</span>: <span class="text-amber-400">"https://client.com/callback"</span>,
-  <span class="text-purple-400">response_type</span>: <span class="text-amber-400">"code"</span>,
   <span class="text-purple-400">scope</span>: <span class="text-amber-400">"openid profile email"</span>,
-  <span class="text-purple-400">state</span>: csrfToken,
-  <span class="text-purple-400">nonce</span>: randomValue,
+  <span class="text-purple-400">state</span>: csrfState,
+  <span class="text-purple-400">nonce</span>: randomNonce,
   <span class="text-purple-400">code_challenge</span>: pkceChallenge,
-  <span class="text-purple-400">code_challenge_algo</span>: <span class="text-amber-400">"sha256"</span>,
+  <span class="text-purple-400">code_challenge_method</span>: <span class="text-amber-400">"S256"</span>,
 }).toString();
 
+<span class="text-slate-500">// Redirect user to Pramaan login & consent</span>
 res.redirect(authorizeUrl.toString());</code>
-        </pre>
+          </pre>
+        </div>
       </div>
 
-      <!-- Step 2 -->
-      <div class="rounded-3xl bg-slate-950 text-slate-100 p-6 sm:p-8 shadow-xl border border-slate-800 flex flex-col hover-scale">
-
-        <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-900">
-          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Step 2 · Exchange Code
+      <!-- Step 2 Card -->
+      <div class="w-full min-w-0 flex flex-col h-full rounded-3xl bg-[#070b14] text-slate-100 p-5 sm:p-6 shadow-xl border border-slate-800 hover:border-slate-750 transition-all duration-300">
+        <!-- Terminal Window Header (Fixed Height) -->
+        <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-800/80 gap-2 shrink-0 h-10">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+          </div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 truncate">
+            Step 2 · Token Exchange
           </span>
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-400/10 text-emerald-400">
-            Client
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-sky-400/10 text-sky-400 border border-sky-400/20 shrink-0">
+            Backend
           </span>
         </div>
 
-        <pre class="text-xs font-mono leading-relaxed whitespace-pre overflow-x-auto w-full text-slate-300">
+        <!-- Scrollable Code Container (Full Height, Scrollbar Aligned at Bottom) -->
+        <div class="code-scrollbar flex-1 min-w-0 w-full overflow-x-auto min-h-[370px] pb-2 flex flex-col justify-between">
+          <pre class="text-[11px] sm:text-xs font-mono leading-relaxed text-slate-300 w-max min-w-full m-0">
 <code><span class="text-sky-400">const</span> response = <span class="text-emerald-400">await</span> fetch(
   <span class="text-amber-400">"<%= serverUrl %>/api/oauth/token"</span>,
   {
     <span class="text-purple-400">method</span>: <span class="text-amber-400">"POST"</span>,
     <span class="text-purple-400">headers</span>: {
-      <span class="text-amber-400">"content-type"</span>: <span class="text-amber-400">"application/x-www-form-urlencoded"</span>,
+      <span class="text-amber-400">"Content-Type"</span>: <span class="text-amber-400">"application/x-www-form-urlencoded"</span>,
     },
     <span class="text-purple-400">body</span>: <span class="text-emerald-400">new</span> URLSearchParams({
       <span class="text-purple-400">grant_type</span>: <span class="text-amber-400">"authorization_code"</span>,
       <span class="text-purple-400">code</span>,
+      <span class="text-purple-400">client_id</span>: process.env.AUTH_CLIENT_ID,
+      <span class="text-purple-400">client_secret</span>: process.env.AUTH_CLIENT_SECRET,
       <span class="text-purple-400">code_verifier</span>: pkceVerifier,
-      <span class="text-purple-400">client_id</span>: issued_client_id,
-      <span class="text-purple-400">client_secret</span>: issued_client_secret,
     }),
   }
 );
 
-<span class="text-sky-400">const</span> tokens = <span class="text-emerald-400">await</span> response.json();</code>
-        </pre>
+<span class="text-sky-400">const</span> tokens = <span class="text-emerald-400">await</span> response.json();
+<span class="text-slate-500">// tokens: { access_token, id_token, token_type }</span></code>
+          </pre>
+        </div>
+      </div>
+
+      <!-- Step 3 Card -->
+      <div class="w-full min-w-0 flex flex-col h-full rounded-3xl bg-[#070b14] text-slate-100 p-5 sm:p-6 shadow-xl border border-slate-800 hover:border-slate-750 transition-all duration-300">
+        <!-- Terminal Window Header (Fixed Height) -->
+        <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-800/80 gap-2 shrink-0 h-10">
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+          </div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 truncate">
+            Step 3 · Fetch Claims
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-400/10 text-purple-400 border border-purple-400/20 shrink-0">
+            OIDC Core
+          </span>
+        </div>
+
+        <!-- Scrollable Code Container (Full Height, Scrollbar Aligned at Bottom) -->
+        <div class="code-scrollbar flex-1 min-w-0 w-full overflow-x-auto min-h-[370px] pb-2 flex flex-col justify-between">
+          <pre class="text-[11px] sm:text-xs font-mono leading-relaxed text-slate-300 w-max min-w-full m-0">
+<code><span class="text-sky-400">const</span> response = <span class="text-emerald-400">await</span> fetch(
+  <span class="text-amber-400">"<%= serverUrl %>/userinfo"</span>,
+  {
+    <span class="text-purple-400">method</span>: <span class="text-amber-400">"GET"</span>,
+    <span class="text-purple-400">headers</span>: {
+      <span class="text-purple-400">"Authorization"</span>: <span class="text-amber-400">`Bearer ${tokens.access_token}`</span>,
+      <span class="text-purple-400">"Accept"</span>: <span class="text-amber-400">"application/json"</span>,
+    },
+  }
+);
+
+<span class="text-sky-400">if</span> (!response.ok) {
+  <span class="text-sky-400">throw</span> <span class="text-emerald-400">new</span> Error(<span class="text-amber-400">"Failed to fetch userinfo"</span>);
+}
+
+<span class="text-sky-400">const</span> user = <span class="text-emerald-400">await</span> response.json();
+<span class="text-slate-500">// user claims: { sub, name, email, picture }</span></code>
+          </pre>
+        </div>
       </div>
 
     </div>

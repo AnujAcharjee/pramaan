@@ -54,62 +54,65 @@
   }
 
   .dashboard-section {
-    @apply bg-white/90 dark:bg-[#12141f]/80 backdrop-blur-xl rounded-3xl 
-          shadow-xl shadow-slate-200/80 dark:shadow-2xl dark:shadow-black/40
-          border border-slate-100/80 dark:border-slate-800/40
-          p-6 sm:p-8 hover:-translate-y-1 
-          hover:shadow-2xl hover:shadow-slate-300/50 dark:hover:shadow-brand-orange/5 
-          transition-all duration-350;
+    @apply bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-xl rounded-3xl 
+          shadow-xl shadow-slate-200/80 dark:shadow-2xl dark:shadow-black/70
+          border border-slate-200/70 dark:border-slate-800
+          p-6 sm:p-8 hover:-translate-y-0.5 
+          hover:shadow-2xl hover:shadow-slate-300/50 dark:hover:border-slate-700/80 dark:hover:shadow-brand-orange/5 
+          transition-all duration-300;
   }
 
   .dashboard-danger-section {
-    @apply bg-red-50/60 dark:bg-rose-950/15 backdrop-blur-xl rounded-3xl 
-          shadow-xl shadow-red-100/60 dark:shadow-2xl dark:shadow-black/40
-          border border-red-200/50 dark:border-rose-500/15
-          p-6 sm:p-8 hover:-translate-y-1 
+    @apply bg-red-50/70 dark:bg-[#140b10]/90 backdrop-blur-xl rounded-3xl 
+          shadow-xl shadow-red-100/60 dark:shadow-2xl dark:shadow-black/70
+          border border-red-200/60 dark:border-rose-900/50
+          p-6 sm:p-8 hover:-translate-y-0.5 
           hover:shadow-2xl hover:shadow-red-200/40 
-          transition-all duration-350;
+          transition-all duration-300;
   }
 
   .dashboard-icon {
-    @apply w-12 h-12 rounded-2xl bg-linear-to-br from-brand-orange to-brand-orangeDark flex items-center justify-center shadow-md shadow-brand-orange/20 dark:shadow-brand-orange/10;
+    @apply w-12 h-12 rounded-2xl bg-linear-to-br from-brand-orange to-brand-orangeDark flex items-center justify-center shadow-md shadow-brand-orange/20 dark:shadow-brand-orange/25;
   }
 
   .glass-card {
-    @apply bg-white/95 dark:bg-[#12141f]/80 backdrop-blur-2xl rounded-3xl 
-          border border-white dark:border-slate-800/40
-          shadow-2xl shadow-slate-300/40 dark:shadow-2xl dark:shadow-black/50
-          hover:-translate-y-1 hover:shadow-slate-300/60 dark:hover:shadow-brand-orange/5
-          transition-all duration-350;
+    @apply bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-2xl rounded-3xl 
+          border border-slate-200/80 dark:border-slate-800
+          shadow-2xl shadow-slate-300/40 dark:shadow-2xl dark:shadow-black/70
+          hover:-translate-y-0.5 hover:shadow-slate-300/60 dark:hover:border-slate-700/80
+          transition-all duration-300;
   }
 
   .input-field {
     @apply block w-full rounded-xl 
-          border border-slate-200 dark:border-slate-800/50
-          bg-white/80 dark:bg-[#0b0d18]/60
+          border border-slate-200 dark:border-slate-800
+          bg-white/90 dark:bg-[#080d17]/95
           px-4 py-3 text-sm 
-          text-slate-900 dark:text-slate-200
-          placeholder:text-slate-400 dark:placeholder:text-slate-600
-          transition-all duration-300 
-          focus:border-brand-orange dark:focus:border-brand-orange/70
-          focus:bg-white dark:focus:bg-[#0e1019] 
+          text-slate-900 dark:text-slate-100
+          placeholder:text-slate-400 dark:placeholder:text-slate-500
+          transition-all duration-200 
+          focus:border-brand-orange dark:focus:border-brand-orange
+          focus:bg-white dark:focus:bg-[#0e1422] 
           focus:outline-none focus:ring-4 
-          focus:ring-brand-orange/20 dark:focus:ring-brand-orange/10 
-          disabled:bg-slate-50/80 dark:disabled:bg-[#0b0d18]/40 
-          disabled:text-slate-500 disabled:cursor-not-allowed;
+          focus:ring-brand-orange/20 dark:focus:ring-brand-orange/25 
+          disabled:bg-slate-50/80 dark:disabled:bg-slate-800/60 
+          disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed;
   }
 
   .hover-scale {
-    @apply hover:scale-[1.015] active:scale-[0.985] transition-all duration-350;
+    @apply hover:scale-[1.015] active:scale-[0.985] transition-all duration-300;
   }
 
   .bg-theme {
-    background-image: linear-gradient(to bottom right, #f1f5f9, rgba(255, 247, 237, 0.6), rgba(241, 245, 249, 0.9));
+    background-image: linear-gradient(to bottom right, #f8fafc, rgba(255, 247, 237, 0.5), #f1f5f9);
   }
 
   :where(.dark, .dark *) .bg-theme {
-    background-image: linear-gradient(to bottom right, #0b0d18, #060916, #0b0d18) !important;
-    background-color: #0b0d18 !important;
+    background-image: 
+      radial-gradient(ellipse at 15% 0%, rgba(255, 150, 68, 0.14) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 100%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+      linear-gradient(to bottom right, #0b1120, #0e1629, #0b1120) !important;
+    background-color: #0b1120 !important;
   }
 }
 
@@ -127,5 +130,29 @@
 
   .animate-slideIn {
     animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  .code-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 150, 68, 0.45) rgba(15, 23, 42, 0.3);
+  }
+
+  .code-scrollbar::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .code-scrollbar::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.3);
+    border-radius: 9999px;
+  }
+
+  .code-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 150, 68, 0.45);
+    border-radius: 9999px;
+    transition: background-color 0.2s ease;
+  }
+
+  .code-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 150, 68, 0.8);
   }
 }
