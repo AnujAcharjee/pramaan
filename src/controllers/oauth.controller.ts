@@ -51,13 +51,17 @@ export class OAuthController extends BaseController {
     const user = req.user?.id ? await this.accountService.get(req.user.id) : null;
 
     res.render('pages/oauth/consent', {
-      title: 'Authorize Application',
+      title: `Authorize ${client.name}`,
       requestId: authReq.id,
       clientId: authReq.clientId,
       clientName: client.name,
       clientDomain: client.domain,
+      clientEnvironment: client.environment,
+      domainStatus: client.domainStatus,
+      redirectUri: authReq.redirectUri,
       scopes: authReq.scopes,
       user,
+      client,
     });
   });
 

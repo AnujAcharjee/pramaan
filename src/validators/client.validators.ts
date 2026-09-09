@@ -11,25 +11,21 @@ export const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-
 
 export class ClientZSchema {
   static addClientSchema = z.object({
-    body: z
-      .object({
-        name: z.string().min(1, 'Client name is required'),
-        domain: z.string().optional(),
-        slug: z.string().optional(),
-        client_type: z
-          .enum(Object.values(OAUTH_CLIENT_TYPES) as [OAuthClientType, ...OAuthClientType[]])
-          .optional(),
-        client_environment: z
-          .enum(
-            Object.values(OAUTH_CLIENT_ENVIRONMENTS) as [OAuthClientEnvironment, ...OAuthClientEnvironment[]],
-          )
-          .optional(),
-        redirect_uri: UtilFields.redirectUriField,
-      })
-      .refine((data) => Boolean(data.domain || data.slug), {
-        message: 'Domain is required',
-        path: ['domain'],
-      }),
+    body: z.object({
+      name: z.string().trim().min(1, 'Client name is required'),
+      has_domain: z.enum(['yes', 'no']).optional(),
+      domain: z.string().optional(),
+      slug: z.string().optional(),
+      client_type: z
+        .enum(Object.values(OAUTH_CLIENT_TYPES) as [OAuthClientType, ...OAuthClientType[]])
+        .optional(),
+    }),
+  });
+
+  static verifyDomainSchema = z.object({
+    params: z.object({
+      client_id: UtilFields.clientIdField,
+    }),
   });
 
   static manageRedirectsSchema = z.object({
@@ -74,12 +70,8 @@ export class ClientZSchema {
       client_id: UtilFields.clientIdField,
     }),
     body: z.object({
-      name: z.string().min(1, 'Client name cannot be empty').optional(),
-      domain: z
-        .string()
-        .min(1, 'Domain cannot be empty')
-        .regex(domainRegex, 'Domain must be a valid domain name like "xyz.com"')
-        .optional(),
+      name: z.string().optional(),
+      domain: z.string().optional(),
     }),
   });
 

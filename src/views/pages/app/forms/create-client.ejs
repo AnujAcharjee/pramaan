@@ -5,18 +5,30 @@
 %>
 
 <div class="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 relative z-10 animate-slideIn">
-  <div class="w-full max-w-2xl">
+  <div class="w-full max-w-lg">
     <!-- Main Card -->
     <div class="glass-card p-8 sm:p-10 hover:shadow-orange-500/5 hover:border-brand-orange/20 transition-all duration-500">
 
       <%- include("../../../partials/form/header", {
         title: "Create New Client",
-        subtitle: "Set up OAuth credentials and configure access for your client application."
+        subtitle: "Register a new OAuth client application."
       }) %>
 
       <%- include("../../../partials/alert", {success, error}) %>
 
-      <form method="POST" action="/create-client" class="space-y-6 mt-8">
+      <!-- Developer Notice -->
+      <div class="mt-6 p-3.5 rounded-xl bg-indigo-50/70 dark:bg-indigo-500/10 border border-indigo-200/70 dark:border-indigo-500/20 text-xs flex items-start gap-2.5 shadow-2xs">
+        <div class="w-4 h-4 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+        </div>
+        <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+          <strong class="text-slate-900 dark:text-slate-100">Developer Zone:</strong> This registration creates an OAuth 2.0 client for custom app developers. Standard users do not need to register a client or configure a plan.
+        </p>
+      </div>
+
+      <form method="POST" action="/create-client" class="space-y-6 mt-6">
 
         <%- include("../../../partials/form/input", {
           id: "name",
@@ -27,78 +39,39 @@
           value: fd.name ?? "",
           required: true,
           autocomplete: "name",
-          helperText: "A friendly name to identify your client"
+          helperText: "A friendly name to identify your client application"
         }) %>
 
-        <%- include("../../../partials/form/input", {
-          id: "domain",
-          name: "domain",
-          type: "text",
-          label: "Client Domain",
-          placeholder: "xyz.com",
-          value: fd.domain ?? "",
-          required: true,
-          autocomplete: "off",
-          helperText: "Actual domain where your app is hosted (e.g. xyz.com or app.xyz.com - not a URL)"
-        }) %>
+        <!-- Default Settings Info Card -->
+        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/80 dark:border-slate-800/80 space-y-3.5 shadow-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Default Configuration</span>
+            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300/30">Auto-Set</span>
+          </div>
 
-        <%- include("../../../partials/form/select", {
-          id: "client_type",
-          name: "client_type",
-          label: "Client Type",
-          value: fd.client_type || "CONFIDENTIAL",
-          required: true,
-          options: [
-            { value: "CONFIDENTIAL", label: "Confidential (Server-side apps)" },
-            { value: "PUBLIC", label: "Public (SPAs / Mobile apps)" }
-          ],
-          helperText: "Determines authentication method and security requirements"
-        }) %>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="p-3.5 rounded-xl bg-white dark:bg-[#050811] border border-slate-200/80 dark:border-slate-800/80">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Domain</span>
+              <span class="font-mono font-bold text-slate-800 dark:text-slate-200 mt-0.5 block">localhost</span>
+            </div>
 
-        <%- include("../../../partials/form/select", {
-          id: "client_environment",
-          name: "client_environment",
-          label: "Environment",
-          value: fd.client_environment || "development",
-          required: true,
-          options: [
-            { value: "development", label: "Development (localhost HTTP allowed)" },
-            { value: "production", label: "Production (HTTPS only)" }
-          ],
-          helperText: "Controls redirect URI policy for this client"
-        }) %>
-
-        <%- include("../../../partials/form/input", {
-          id: "redirect_uri",
-          name: "redirect_uri",
-          type: "url",
-          label: "Redirect URI",
-          placeholder: "https://xyz.com/oauth/callback",
-          value: fd.redirect_uri ?? "",
-          required: true,
-          autocomplete: "off",
-          helperText: "Must match registered domain in production (or localhost/127.0.0.1 in development)"
-        }) %>
-
-        <!-- Info Box -->
-        <div class="rounded-2xl border border-sky-200 bg-sky-50/50 dark:bg-sky-950/20 dark:border-sky-900/40 p-4 shadow-xs">
-          <div class="flex items-start gap-3">
-            <svg class="w-5 h-5 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div class="flex-1">
-              <p class="text-xs font-bold text-sky-900 dark:text-sky-300">What happens next?</p>
-              <p class="text-[11px] text-sky-800 dark:text-sky-400 leading-normal mt-0.5">After registering, you'll receive a Client ID and a Client Secret (for confidential clients) to identify the application in authorization flows.</p>
+            <div class="p-3.5 rounded-xl bg-white dark:bg-[#050811] border border-slate-200/80 dark:border-slate-800/80">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Client Type</span>
+              <span class="font-bold text-slate-800 dark:text-slate-200 mt-0.5 block">Confidential</span>
             </div>
           </div>
+
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed pt-0.5">
+            💡 These are default settings. You can configure your actual domain (including Vercel dev domains), switch client type, manage redirect URLs, and verify DNS records inside the client dashboard.
+          </p>
         </div>
 
-        <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-          <a href="/account" class="btn-outline-sky text-center">
+        <div class="flex items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <a href="/account" class="btn-outline-sky !py-2.5 !px-5 text-sm font-semibold">
             Back
           </a>
 
-          <button type="submit" class="btn-orange shadow-lg shadow-brand-orange/10 font-bold">
+          <button type="submit" class="btn-orange !py-2.5 !px-6 text-sm font-bold shadow-md shadow-brand-orange/20">
             Create client
           </button>
         </div>

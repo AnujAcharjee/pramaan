@@ -62,6 +62,12 @@ model OAuthClient {
   name   String @db.VarChar(99)
   domain String @db.VarChar(255)
 
+  // Domain Verification
+  domainStatus             DomainStatus @default(PENDING)
+  domainVerificationToken  String?      @db.VarChar(255)
+  domainVerificationMethod String       @default("DNS_TXT") @db.VarChar(30)
+  domainVerifiedAt         DateTime?
+
   // Secrets
   clientSecretHash String? @db.VarChar(255)
 
@@ -155,6 +161,11 @@ enum OAuthClientType {
 enum OAuthClientEnvironment {
   development
   production
+}
+
+enum DomainStatus {
+  PENDING
+  VERIFIED
 }
 
 // Signing Keys 

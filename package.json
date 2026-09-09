@@ -12,6 +12,7 @@
   ],
   "scripts": {
     "format": "prettier --write \"**/*.{ts,md}\"",
+    "test": "tsx --test tests/**/*.test.ts",
     "build": "npx tsc --build",
     "start": "node dist/index.js",
     "dev": "npx nodemon",

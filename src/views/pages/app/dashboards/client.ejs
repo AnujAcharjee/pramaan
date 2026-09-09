@@ -16,6 +16,12 @@
     danger: 'bg-red-100 dark:bg-rose-500/10 text-red-700 dark:text-rose-400 ring-1 ring-red-200 dark:ring-rose-500/20',
     info: 'bg-sky-100 dark:bg-sky-500/10 text-sky-700 dark:text-sky-400 ring-1 ring-sky-200 dark:ring-sky-500/20'
   };
+
+  const isVercelDomain = Boolean(
+    client.domain &&
+    client.domain.trim().toLowerCase().endsWith('.vercel.app') &&
+    client.domain.trim().toLowerCase().length > '.vercel.app'.length
+  );
 %>
 
 <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-slideIn relative z-10">
@@ -50,18 +56,56 @@
         <span class="block dark:hidden">Dark Mode</span>
       </button>
 
-      <span class="inline-flex items-center font-bold rounded-full px-3.5 py-1.5 text-xs <%= variantClasses[client.isActive ? "success" : "default"] %>">
-        <span class="w-1.5 h-1.5 rounded-full <%= client.isActive ? 'bg-green-500' : 'bg-slate-400' %> mr-1.5 animate-pulse"></span>
-        <%= client.isActive ? "Active" : "Disabled" %>
+      <%
+        const isClientDev = client.environment === 'development' || client.domain === 'localhost';
+      %>
+      <% if (!client.isActive) { %>
+      <span class="inline-flex items-center font-bold rounded-full px-3.5 py-1.5 text-xs bg-slate-100 dark:bg-slate-800/40 text-slate-700 dark:text-slate-400">
+        <span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
+        Disabled
       </span>
+      <% } else if (isClientDev) { %>
+      <span class="inline-flex items-center font-bold rounded-full px-3.5 py-1.5 text-xs bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 ring-1 ring-amber-300/60 dark:ring-amber-500/30 shadow-2xs">
+        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+        DEV
+      </span>
+      <% } else { %>
+      <span class="inline-flex items-center font-bold rounded-full px-3.5 py-1.5 text-xs <%= variantClasses['success'] %>">
+        <span class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse"></span>
+        Active
+      </span>
+      <% } %>
     </div>
   </div>
 
   <%
     const _warning = typeof warning !== 'undefined' ? warning : undefined;
+    const isEditing = typeof edit !== 'undefined' && edit === true;
+    const focusDomain = typeof target !== 'undefined' && target === 'domain';
   %>
   <% if (_renderPartial) { %>
   <%- _renderPartial("../../../partials/alert", { success, error, warning: _warning }) %>
+  <% } %>
+
+  <% if (client.environment === 'development') { %>
+  <div class="p-3.5 rounded-2xl bg-amber-50/90 dark:bg-amber-500/10 border border-amber-300/80 dark:border-amber-500/30 flex items-center justify-between gap-4 text-xs shadow-2xs">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="w-7 h-7 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      <div class="min-w-0">
+        <p class="font-bold text-amber-900 dark:text-amber-200">Developer Mode Active</p>
+        <p class="text-amber-800/90 dark:text-amber-300/90 mt-0.5 leading-normal">
+          This client is in development mode. Unverified domains and localhost callbacks are allowed for testing only.
+        </p>
+      </div>
+    </div>
+    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-200/80 dark:bg-amber-500/30 text-amber-900 dark:text-amber-200 shrink-0">
+      DEV
+    </span>
+  </div>
   <% } %>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -71,50 +115,232 @@
       
       <!-- App Overview -->
       <section class="dashboard-section">
-        <div class="flex items-start sm:items-center justify-between gap-4 mb-6 flex-wrap">
-          <div class="flex items-start sm:items-center gap-4">
-            <div class="dashboard-icon bg-slate-900 dark:bg-slate-200">
-              <svg class="w-6 h-6 text-white dark:text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-              </svg>
-            </div>
-            <div id="overview-static" class="min-w-0">
-              <h2 class="text-2xl font-extrabold text-slate-900 dark:text-slate-100 truncate"><%= client.name %></h2>
-              <% if (client.domain) { %>
-              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold tracking-wide lowercase mt-0.5"><%= client.domain %></p>
-              <% } %>
-            </div>
-          </div>
+        <form id="edit-details-form" action="/client/<%= client.id %>/settings" method="POST">
+          <div class="flex items-start sm:items-center justify-between gap-4 mb-6 flex-wrap">
+            <div class="flex items-start sm:items-center gap-4">
+              <div class="dashboard-icon bg-slate-900 dark:bg-slate-200">
+                <svg class="w-6 h-6 text-white dark:text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                </svg>
+              </div>
 
-          <button id="edit-details-btn" type="button" class="btn-outline-sky !py-1.5 !px-3.5 !text-xs rounded-xl inline-flex items-center gap-1.5 cursor-pointer">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            <span>Edit App Info</span>
-          </button>
-        </div>
+              <div class="min-w-0 flex-1 space-y-1">
+                <!-- Name Row (Static & Edit in-place matching account.ejs) -->
+                <h2 id="name-display" class="<%= isEditing ? 'hidden' : '' %> text-2xl font-extrabold text-slate-900 dark:text-slate-100 truncate">
+                  <%= client.name %>
+                </h2>
+                <div id="name-input-wrapper" class="<%= isEditing ? 'block' : 'hidden' %> relative group/name max-w-sm">
+                  <input type="text" id="edit-name" name="name" value="<%= client.name %>" required class="w-full text-2xl font-extrabold text-slate-900 dark:text-slate-100 bg-transparent border-b border-dashed border-slate-300 dark:border-slate-700 focus:border-brand-orange focus:outline-none transition-colors pr-6" placeholder="Client Name" />
+                  <div class="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 opacity-40 group-hover/name:opacity-100 transition-opacity pointer-events-none">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </div>
+                </div>
 
-        <!-- Inline Edit Form (Hidden by default) -->
-        <form id="edit-details-form" action="/client/<%= client.id %>/settings" method="POST" class="hidden mb-6 p-4 rounded-2xl bg-slate-100/70 dark:bg-[#0c1222] border border-slate-200 dark:border-slate-800 space-y-3.5">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label for="edit-name" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Client Name</label>
-              <input type="text" id="edit-name" name="name" value="<%= client.name %>" required class="input-field text-xs py-2 px-3" placeholder="App Name" />
+                <!-- Domain Row (Static & Edit in-place matching account.ejs) -->
+                <div id="domain-display" class="<%= isEditing ? 'hidden' : 'flex' %> items-center gap-2 mt-1 flex-wrap">
+                  <span class="text-xs font-mono font-semibold text-slate-600 dark:text-slate-300"><%= client.domain %></span>
+                  <% if (client.domain === 'localhost') { %>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/30" title="Local development only">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                      Localhost (Dev only)
+                    </span>
+                  <% } else if (isVercelDomain) { %>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-300/30" title="Vercel development domain (No DNS TXT verification needed in dev)">
+                      <svg class="w-2.5 h-2.5 fill-current" viewBox="0 0 1155 1000">
+                        <path d="m577.3 0 577.4 1000H0z"/>
+                      </svg>
+                      Vercel (Dev only)
+                    </span>
+                  <% } else if (client.environment === 'production' && client.domainStatus === 'VERIFIED') { %>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300/30">
+                      <svg class="w-3 h-3 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Verified
+                    </span>
+                  <% } else if (client.domainStatus === 'VERIFIED') { %>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/30">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                      Verified (Dev)
+                    </span>
+                  <% } else { %>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/30" title="DNS TXT verification required for production & custom callbacks">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                      Unverified
+                    </span>
+                  <% } %>
+                </div>
+
+                <div id="domain-input-wrapper" class="<%= isEditing ? 'flex' : 'hidden' %> items-center gap-2 mt-1 max-w-sm">
+                  <div class="relative group/domain flex-1">
+                    <input type="text" id="edit-domain" name="domain" value="<%= client.domain ? client.domain.replace(/^https?:\/\//i, '').replace(/\/+$/, '') : '' %>" required class="w-full text-xs font-mono font-bold text-slate-800 dark:text-slate-200 bg-transparent border-b border-dashed border-slate-300 dark:border-slate-700 focus:border-brand-orange focus:outline-none transition-colors pr-6 py-0.5" placeholder="e.g. xyz.com or localhost" />
+                    <div class="absolute right-0 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 opacity-40 group-hover/domain:opacity-100 transition-opacity pointer-events-none">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <label for="edit-domain" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Registered Domain</label>
-              <input type="text" id="edit-domain" name="domain" value="<%= client.domain %>" required class="input-field text-xs py-2 px-3 font-mono" placeholder="xyz.com" />
+
+            <!-- Actions - Normal State (Matching account.ejs) -->
+            <div id="normal-actions" class="<%= isEditing ? 'hidden' : 'flex' %> items-center">
+              <a id="edit-details-btn" href="/client/<%= client.id %>?edit=true" class="btn-outline-sky !py-1.5 !px-4 !text-xs rounded-lg inline-flex items-center gap-1.5 transition-all duration-350 cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                <span>Edit App Info</span>
+              </a>
             </div>
-          </div>
-          <div class="flex items-center justify-end gap-2 pt-1">
-            <button type="button" id="cancel-edit-details-btn" class="btn-outline-gray !py-1.5 !px-3 !text-xs rounded-lg cursor-pointer">
-              Cancel
-            </button>
-            <button type="submit" class="btn-orange !py-1.5 !px-4 !text-xs font-bold rounded-lg cursor-pointer shadow-sm">
-              Save Changes
-            </button>
+
+            <!-- Actions - Editing State (Matching account.ejs) -->
+            <div id="edit-actions" class="<%= isEditing ? 'flex' : 'hidden' %> items-center gap-2 transition-all duration-300">
+              <button id="save-details-btn" type="submit" class="btn-outline-sky !py-1.5 !px-4 !text-xs rounded-lg inline-flex items-center gap-1.5 transition-all duration-350 cursor-pointer">
+                <!-- Default Icon -->
+                <svg id="save-btn-icon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <!-- Spinner Icon -->
+                <svg id="save-btn-spinner" class="hidden w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span id="save-btn-text">Save</span>
+              </button>
+              <a id="cancel-details-btn" href="/client/<%= client.id %>" class="btn-outline-gray !py-1.5 !px-4 !text-xs rounded-lg inline-flex items-center gap-1.5 transition-all duration-350 cursor-pointer">
+                Cancel
+              </a>
+            </div>
           </div>
         </form>
+
+        <!-- Domain Verification / Localhost Notice Card -->
+        <% if (client.domain === 'localhost') { %>
+        <div class="mb-6 p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-300 space-y-3">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Localhost Development Mode</h3>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300/30">
+                    Local Only
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  This client is configured with <code class="px-1.5 py-0.5 rounded bg-white dark:bg-[#050811] text-xs font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80">localhost</code>. You can test authorization flows using local callback URIs (<code class="font-mono">http://localhost:*</code> or <code class="font-mono">http://127.0.0.1:*</code>).
+                </p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+                  When you're ready to deploy or switch to <span class="font-semibold text-slate-700 dark:text-slate-300">Production</span>, click <a href="/client/<%= client.id %>?edit=true&target=domain" class="add-real-domain-link font-semibold text-brand-orange hover:underline cursor-pointer">Edit App Info</a> above to set your custom domain and verify DNS ownership.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } else if (isVercelDomain) { %>
+        <div class="mb-6 p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-300 space-y-3">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 1155 1000">
+                  <path d="m577.3 0 577.4 1000H0z"/>
+                </svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Vercel Development Mode</h3>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-300/30">
+                    Dev Mode Only
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  This client is configured with <code class="px-1.5 py-0.5 rounded bg-white dark:bg-[#050811] text-xs font-mono font-bold text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-slate-800/80"><%= client.domain %></code>. Development Vercel domains are active immediately without DNS TXT verification. You can configure callback URIs using this domain and test authorization flows directly.
+                </p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+                  <span class="font-bold text-slate-700 dark:text-slate-300">Production note:</span> Switching to <span class="font-semibold text-slate-700 dark:text-slate-300">Production</span> requires a verified custom domain. Unverified Vercel domains cannot be switched to production.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } else if (client.domainStatus !== 'VERIFIED') { %>
+        <div class="mb-6 p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-300 space-y-4">
+          <div class="flex items-start justify-between gap-4 flex-wrap">
+            <div class="flex items-start gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div class="space-y-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h3 class="text-sm font-bold text-slate-900 dark:text-slate-100">Domain Ownership Verification</h3>
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/40 dark:border-amber-500/30">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    Verification Required
+                  </span>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Verify control of <span class="font-bold font-mono text-slate-800 dark:text-slate-200"><%= client.domain %></span> by adding this DNS TXT record with your DNS provider. Required before using custom domain callbacks or switching to Production.
+                </p>
+              </div>
+            </div>
+
+            <form action="/client/<%= client.id %>/domain/verify" method="POST" class="shrink-0">
+              <button type="submit" class="btn-orange !py-2 !px-4 !text-xs font-bold rounded-xl shadow-sm hover:shadow-brand-orange/20 cursor-pointer flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Verify Domain
+              </button>
+            </form>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-4 border-t border-slate-200/80 dark:border-slate-800/80">
+            <!-- Record Type -->
+            <div class="md:col-span-3 p-3.5 rounded-xl bg-white dark:bg-[#050811] border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Record Type</p>
+              <p class="text-xs font-mono font-extrabold text-slate-800 dark:text-slate-200 mt-1">TXT</p>
+            </div>
+
+            <!-- Host / Name -->
+            <div class="md:col-span-4 p-3.5 rounded-xl bg-white dark:bg-[#050811] border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
+              <div class="flex items-center justify-between">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Host / Name</p>
+                <button type="button" class="copy-btn text-[10px] font-bold text-brand-orange hover:underline cursor-pointer" data-copy-target="txt-host">
+                  <span class="copy-btn-label">Copy</span>
+                </button>
+              </div>
+              <input id="txt-host" type="text" readonly value="_pramaan-verification" class="w-full text-xs font-mono font-extrabold text-slate-800 dark:text-slate-200 mt-1 bg-transparent focus:outline-none" />
+              <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">Resolves to: _pramaan-verification.<%= client.domain %></p>
+            </div>
+
+            <!-- Record Value -->
+            <div class="md:col-span-5 p-3.5 rounded-xl bg-white dark:bg-[#050811] border border-slate-200/80 dark:border-slate-800/80 shadow-2xs">
+              <div class="flex items-center justify-between">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Record Value</p>
+                <button type="button" class="copy-btn text-[10px] font-bold text-brand-orange hover:underline cursor-pointer" data-copy-target="txt-val">
+                  <span class="copy-btn-label">Copy</span>
+                </button>
+              </div>
+              <input id="txt-val" type="text" readonly value="pramaan-verification=<%= client.domainVerificationToken %>" class="w-full text-xs font-mono font-extrabold text-slate-800 dark:text-slate-200 mt-1 bg-transparent focus:outline-none truncate" />
+              <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Exact verification token</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+            <span class="text-xs">💡</span>
+            <span>DNS changes can take 1 to 5 minutes to propagate depending on your DNS registrar.</span>
+          </div>
+        </div>
+        <% } %>
 
         <div class="space-y-4">
           <!-- Client ID -->
@@ -212,20 +438,42 @@
                     <%= client.environment %>
                   </span>
                 </div>
-                <% if (client.environment === "development") { %>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-                  Development mode allows localhost test domains to utilize insecure HTTP callbacks.
-                </p>
-                <% } else { %>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
-                  Production mode strictly enforces secure HTTPS for all callback redirects.
-                </p>
-                <% } %>
-              </div>
-              <a href="/client/<%= client.id %>/environment?environment=<%= client.environment === 'development' ? 'production' : 'development' %>" class="btn-outline-orange text-xs py-2 px-4 shrink-0 block text-center">
-                Switch to <%= client.environment === "development" ? "Production" : "Development" %>
-              </a>
+              <% if (client.environment === "development") { %>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                Development mode allows localhost callbacks and Vercel development domains without DNS verification.
+              </p>
+              <% } else { %>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                Production mode strictly enforces secure HTTPS for all callback redirects to your verified custom domain.
+              </p>
+              <% } %>
             </div>
+            <% if (client.environment === "development") { %>
+              <% if (isVercelDomain) { %>
+              <div class="flex flex-col items-center gap-1.5 shrink-0">
+                <button type="button" disabled class="btn-outline-gray opacity-50 cursor-not-allowed text-xs py-2 px-4 block text-center" title="Vercel domains (*.vercel.app) are development only. Configure and verify a custom domain to enable Production.">
+                  Switch to Production
+                </button>
+                <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 text-center">Requires custom domain</span>
+              </div>
+              <% } else if (client.domainStatus === "VERIFIED") { %>
+              <a href="/client/<%= client.id %>/environment?environment=production" class="btn-outline-orange text-xs py-2 px-4 shrink-0 block text-center">
+                Switch to Production
+              </a>
+              <% } else { %>
+              <div class="flex flex-col items-center gap-1.5 shrink-0">
+                <button type="button" disabled class="btn-outline-gray opacity-50 cursor-not-allowed text-xs py-2 px-4 block text-center" title="Verify domain ownership via DNS TXT record first">
+                  Switch to Production
+                </button>
+                <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 text-center">Requires verified domain</span>
+              </div>
+              <% } %>
+            <% } else { %>
+            <a href="/client/<%= client.id %>/environment?environment=development" class="btn-outline-orange text-xs py-2 px-4 shrink-0 block text-center">
+              Switch to Development
+            </a>
+            <% } %>
+          </div>
           </div>
 
           <!-- Client Secret -->
@@ -234,19 +482,18 @@
               <div class="flex items-center justify-between gap-4 flex-wrap">
                 <div class="flex items-center gap-2.5">
                   <p class="text-sm font-bold text-slate-800 dark:text-slate-200">Client Secret</p>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold
-                    <%= client.client_secret 
-                      ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/30' 
-                      : 'bg-slate-200 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300' %>">
-                    <%= client.client_secret ? 'Revealed once' : 'Protected / Rotated' %>
+                  <% if (client.client_secret) { %>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/30">
+                    Revealed once
                   </span>
+                  <% } %>
                 </div>
 
                 <% if (!client.client_secret) { %>
                 <form action="/client/rotate-secret" method="POST">
                   <input type="hidden" name="client_id" value="<%= client.id %>" />
                   <button type="submit" class="btn-outline-sky text-xs py-2 px-4 cursor-pointer">
-                    Generate Secret
+                    Create New Key
                   </button>
                 </form>
                 <% } %>
@@ -269,14 +516,7 @@
               <% } else { %>
               <div class="rounded-2xl bg-slate-200/40 dark:bg-[#050811]/60 border border-slate-200/80 dark:border-slate-800/80 p-4 shadow-xs">
                 <p class="text-xs font-bold text-slate-800 dark:text-slate-200">No active secret visible</p>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-normal mt-0.5">Secrets are protected on client endpoints. Generate or rotate your key below if you need a new credential for confidential flows.</p>
-                
-                <form action="/client/rotate-secret" method="POST" class="mt-3">
-                  <input type="hidden" name="client_id" value="<%= client.id %>" />
-                  <button type="submit" class="btn-outline-sky text-xs py-2 px-4 cursor-pointer">
-                    Rotate Secret Key
-                  </button>
-                </form>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-normal mt-0.5">Secrets are hashed and stored securely. Click "Create New Key" above if you need to generate a new client secret for confidential flows.</p>
               </div>
               <% } %>
             </div>
@@ -334,15 +574,31 @@
             <input type="hidden" name="action" value="add" />
 
             <div class="flex flex-col sm:flex-row gap-3">
-              <input name="redirect_uri" type="url" required placeholder="https://myapp.com/oauth/callback" class="input-field shadow-xs">
+              <input name="redirect_uri" type="url" required placeholder="<%= client.environment === 'development' && (client.domain === 'localhost' || (!isVercelDomain && client.domainStatus !== 'VERIFIED')) ? 'http://localhost:3000/oauth/callback' : 'https://' + client.domain + '/oauth/callback' %>" class="input-field shadow-xs">
               <button type="submit" class="btn-orange !py-3 !px-5 !text-xs shrink-0 font-bold">
                 Add URI
               </button>
             </div>
             
+            <% if (client.environment === 'development') { %>
+              <% if (isVercelDomain) { %>
+              <p class="text-[11px] text-emerald-700 dark:text-emerald-400 leading-normal font-semibold">
+                Development Vercel domain. You can use <span class="font-mono">localhost</span>, <span class="font-mono">127.0.0.1</span>, <span class="font-mono"><%= client.domain %></span>, or <span class="font-mono">*.vercel.app</span> callbacks without DNS verification.
+              </p>
+              <% } else if (client.domainStatus === 'VERIFIED') { %>
+              <p class="text-[11px] text-emerald-700 dark:text-emerald-400 leading-normal font-semibold">
+                You can use <span class="font-mono">localhost</span>, <span class="font-mono">127.0.0.1</span>, <span class="font-mono"><%= client.domain %></span>, or <span class="font-mono">*.vercel.app</span> callbacks.
+              </p>
+              <% } else { %>
+              <p class="text-[11px] text-amber-900/90 dark:text-brand-orange/90 leading-normal font-semibold">
+                In development mode: only <span class="font-mono">localhost</span>, <span class="font-mono">127.0.0.1</span>, or <span class="font-mono">*.vercel.app</span> callbacks are allowed until domain <span class="font-mono"><%= client.domain %></span> is verified via DNS TXT record.
+              </p>
+              <% } %>
+            <% } else { %>
             <p class="text-[11px] text-amber-900/90 dark:text-brand-orange/90 leading-normal font-semibold">
-              ⚠️ Callback URLs must exactly match parameter values and conform to secure protocol policies.
+              In production mode: callbacks must use secure <span class="font-mono">https://</span> and match your verified custom domain <span class="font-mono"><%= client.domain %></span>.
             </p>
+            <% } %>
           </form>
         </div>
       </section>
@@ -446,22 +702,4 @@
 </div>
 
 <script src="/js/copyBtn.js" defer></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const editBtn = document.getElementById('edit-details-btn');
-    const form = document.getElementById('edit-details-form');
-    const cancelBtn = document.getElementById('cancel-edit-details-btn');
-
-    if (editBtn && form && cancelBtn) {
-      editBtn.addEventListener('click', () => {
-        form.classList.toggle('hidden');
-        if (!form.classList.contains('hidden')) {
-          document.getElementById('edit-name')?.focus();
-        }
-      });
-      cancelBtn.addEventListener('click', () => {
-        form.classList.add('hidden');
-      });
-    }
-  });
-</script>
+<script src="/js/client-dashboard.js" defer></script>

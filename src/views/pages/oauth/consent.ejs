@@ -5,6 +5,27 @@
   const _appName = clientName || 'Application';
   const _initials = _appName.trim().slice(0, 2).toUpperCase();
   const _user = typeof user !== 'undefined' && user ? user : null;
+  const _environment = typeof clientEnvironment !== 'undefined' && clientEnvironment ? clientEnvironment : (typeof client !== 'undefined' && client?.environment ? client.environment : 'development');
+  const _domainStatus = typeof domainStatus !== 'undefined' && domainStatus ? domainStatus : (typeof client !== 'undefined' && client?.domainStatus ? client.domainStatus : 'PENDING');
+  const _domain = clientDomain || (typeof client !== 'undefined' && client?.domain ? client.domain : 'localhost');
+  const _redirectUri = typeof redirectUri !== 'undefined' && redirectUri ? redirectUri : '';
+
+  let _redirectHost = '';
+  let _isHttpsRedirect = false;
+  try {
+    if (_redirectUri) {
+      const parsed = new URL(_redirectUri);
+      _redirectHost = parsed.host;
+      _isHttpsRedirect = parsed.protocol === 'https:';
+    }
+  } catch {
+    _redirectHost = _domain;
+  }
+
+  const isLocalhost = _domain === 'localhost' || _domain.endsWith('.localhost') || _redirectHost.startsWith('localhost') || _redirectHost.startsWith('127.0.0.1');
+  const isVercel = _domain.toLowerCase().endsWith('.vercel.app') || _redirectHost.toLowerCase().endsWith('.vercel.app');
+  const isDevApp = _environment === 'development' || isLocalhost;
+  const isVerifiedProduction = _environment === 'production' && _domainStatus === 'VERIFIED' && !isLocalhost;
 
   const scopeDetails = {
     openid: {
@@ -14,7 +35,7 @@
     },
     email: {
       title: 'View your email address',
-      desc: _user ? `Access ${_user.email}` : 'Access the primary email address on your account',
+      desc: _user ? `Access your primary email (${_user.email})` : 'Access the primary email address on your account',
       icon: '<svg class="w-5 h-5 text-sky-500 dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>'
     },
     profile: {
@@ -36,16 +57,31 @@
     <!-- Main Card -->
     <div class="glass-card overflow-hidden shadow-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-[#0f121d]/95 backdrop-blur-2xl">
 
-      <!-- Header: Connect Logos -->
-      <div class="p-8 pb-4 text-center">
-        <!-- Two Connected App Avatars -->
+      <!-- Header: Connected Apps -->
+      <div class="p-8 pb-5 text-center">
+        <!-- Connected App Avatars -->
         <div class="flex items-center justify-center gap-3 mb-5">
           <!-- Client App Avatar -->
-          <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center border border-slate-300/60 dark:border-slate-600/50 shadow-md">
-            <span class="text-base font-black tracking-wider text-slate-800 dark:text-slate-100"><%= _initials %></span>
+          <div class="relative">
+            <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center border border-slate-300/60 dark:border-slate-600/50 shadow-md">
+              <span class="text-base font-black tracking-wider text-slate-800 dark:text-slate-100"><%= _initials %></span>
+            </div>
+            <% if (isVerifiedProduction) { %>
+            <!-- Verified Checkmark Badge Overlay (Production Only) -->
+            <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center ring-2 ring-white dark:ring-[#0f121d] shadow-xs" title="Verified App">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <% } else { %>
+            <!-- Dev Yellow Badge Overlay -->
+            <div class="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[9px] font-extrabold ring-2 ring-white dark:ring-[#0f121d] shadow-xs" title="Developer Mode">
+              DEV
+            </div>
+            <% } %>
           </div>
 
-          <!-- Connected Arrow -->
+          <!-- Connection Link -->
           <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800/80 flex items-center justify-center text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700/60 shadow-xs">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -64,23 +100,84 @@
         <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
           Sign in to <span class="text-transparent bg-clip-text bg-linear-to-r from-brand-orange to-orange-500"><%= _appName %></span>
         </h1>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 font-medium">
+        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1.5 font-medium">
           wants to access your <span class="font-bold text-slate-850 dark:text-slate-200">Pramaan Account</span>
         </p>
 
-        <!-- Requesting Domain Badge -->
-        <div class="inline-flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-[11px] font-mono font-semibold text-slate-600 dark:text-slate-300">
-          <svg class="w-3.5 h-3.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-          </svg>
-          <span><%= clientDomain %></span>
+        <!-- Status Indicator Pill -->
+        <div class="mt-3 flex items-center justify-center">
+          <% if (isVerifiedProduction) { %>
+          <!-- Verified App (Production verified) -->
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/80 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-semibold shadow-2xs">
+            <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>Verified App</span>
+            <span class="text-emerald-400 dark:text-emerald-600 font-normal">·</span>
+            <span class="font-mono text-[11px] font-bold text-emerald-800 dark:text-emerald-200"><%= _domain %></span>
+          </div>
+          <% } else if (isLocalhost) { %>
+          <!-- Localhost Dev Indicator (NO green tick) -->
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span>Local App</span>
+            <span class="text-amber-400 dark:text-amber-600 font-normal">·</span>
+            <span class="font-mono text-[11px] font-bold text-amber-900 dark:text-amber-200">localhost</span>
+          </div>
+          <% } else if (isDevApp) { %>
+          <!-- Developer App Indicator (NO green tick) -->
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span>Developer App</span>
+            <span class="text-amber-400 dark:text-amber-600 font-normal">·</span>
+            <span class="font-mono text-[11px] font-bold text-amber-900 dark:text-amber-200"><%= _domain %></span>
+          </div>
+          <% } else { %>
+          <!-- Unverified App Indicator (NO green tick) -->
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            <span>App Not Verified</span>
+            <span class="text-amber-400 dark:text-amber-600 font-normal">·</span>
+            <span class="font-mono text-[11px] font-bold text-amber-900 dark:text-amber-200"><%= _domain %></span>
+          </div>
+          <% } %>
         </div>
       </div>
 
-      <!-- User Identity Pill (Google Style) -->
+      <!-- Developer / Unverified Warning Banner (Clear & Short Warning For User) -->
+      <% if (!isVerifiedProduction) { %>
+      <div class="mx-6 sm:mx-8 mb-4 p-3.5 rounded-2xl bg-amber-50/90 dark:bg-amber-500/10 border border-amber-300/80 dark:border-amber-500/30 text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-7 h-7 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <p class="text-xs font-bold text-amber-900 dark:text-amber-200">
+                <%= isLocalhost ? 'Developer Mode (Localhost)' : 'Developer Mode App' %>
+              </p>
+              <span class="text-[9px] font-extrabold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-amber-200/80 dark:bg-amber-500/30 text-amber-900 dark:text-amber-200">
+                DEV
+              </span>
+            </div>
+            <p class="text-[11px] text-amber-800/90 dark:text-amber-300/90 mt-0.5 font-medium leading-relaxed">
+              <% if (isLocalhost) { %>
+                This app is running on localhost in developer mode. Only continue if you trust this developer.
+              <% } else { %>
+                This app is in developer mode and has not been verified. Only continue if you trust this developer.
+              <% } %>
+            </p>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- User Identity Card (Account Being Authorized) -->
       <% if (_user) { %>
-      <div class="px-8 py-2">
-        <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-700/60">
+      <div class="px-6 sm:px-8 py-1">
+        <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-800/80">
           <% if (_user.avatar) { %>
           <img src="<%= _user.avatar %>" alt="<%= _user.name %>" class="w-10 h-10 rounded-full object-cover ring-2 ring-brand-orange/30 shrink-0" />
           <% } else { %>
@@ -92,22 +189,31 @@
             <p class="text-xs font-bold text-slate-900 dark:text-white truncate"><%= _user.name %></p>
             <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate"><%= _user.email %></p>
           </div>
-          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/40">Active</span>
+          <% if (isLocalhost || isDevApp || !isVerifiedProduction) { %>
+          <!-- Yellow Pill DEV -->
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300/50 dark:border-amber-500/30">
+            DEV
+          </span>
+          <% } else { %>
+          <!-- Emerald Pill Active -->
+          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300/50 dark:border-emerald-500/30">
+            Active
+          </span>
+          <% } %>
         </div>
       </div>
       <% } %>
 
-      <!-- Content: Scopes & Permissions -->
-      <div class="p-8 pt-4 space-y-4">
-
+      <!-- Scopes & Permissions Section -->
+      <div class="p-6 sm:p-8 pt-4 space-y-4">
         <p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          This will allow <%= _appName %> to:
+          <%= _appName %> will receive permission to:
         </p>
 
         <!-- Permissions List -->
         <div class="space-y-2.5">
           <% if (_scopes.length === 0) { %>
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-700/60 text-center">
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-800/80 text-center">
             <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Basic authentication only</p>
           </div>
           <% } else { %>
@@ -117,8 +223,8 @@
                 desc: 'Access requested permissions on your account',
                 icon: '<svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>'
               }; %>
-              <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-700/50 hover:border-slate-300 dark:hover:border-slate-600/70 transition-colors">
-                <div class="w-9 h-9 rounded-xl bg-white dark:bg-slate-800/80 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-700/50 shadow-xs">
+              <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-800/80 hover:border-slate-350 dark:hover:border-slate-700 transition-colors">
+                <div class="w-9 h-9 rounded-xl bg-white dark:bg-slate-800/80 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-700/50 shadow-2xs">
                   <%- detail.icon %>
                 </div>
                 <div class="flex-1 min-w-0 mt-0.5">
@@ -130,22 +236,32 @@
           <% } %>
         </div>
 
-        <!-- Trust & Revocation Notice (Google Standard) -->
-        <div class="p-3.5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/20 border border-amber-200/70 dark:border-amber-800/30">
-          <div class="flex items-start gap-2.5">
-            <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <p class="text-[11px] text-amber-900 dark:text-amber-300 font-medium leading-relaxed">
-              You can review or revoke this app's access anytime in your <a href="/account" class="font-bold underline hover:text-amber-950 dark:hover:text-amber-200">Pramaan Account Dashboard</a>.
-            </p>
-          </div>
-        </div>
-
+        <!-- Security Guarantee Notice -->
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-normal pt-1">
+          🔒 <span class="font-semibold text-slate-700 dark:text-slate-300"><%= _appName %></span> will never have access to your password, payment methods, or security keys.
+        </p>
       </div>
 
-      <!-- Actions (Google Style: Cancel left, Allow right) -->
-      <form method="POST" action="/oauth/consent" class="p-6 bg-slate-50/90 dark:bg-[#121524] border-t border-slate-200/70 dark:border-slate-800">
+      <!-- Redirect Context Bar -->
+      <% if (_redirectHost) { %>
+      <div class="px-6 sm:px-8 py-3 bg-slate-50/80 dark:bg-[#0c0f1a] border-t border-slate-200/70 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+        <div class="flex items-center gap-1.5 truncate">
+          <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+          <span class="truncate">
+            Redirecting to:
+            <span class="font-mono font-bold text-slate-700 dark:text-slate-300"><%= _redirectHost %></span>
+          </span>
+        </div>
+        <span class="shrink-0 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          <%= _isHttpsRedirect ? 'HTTPS Secure' : 'HTTP' %>
+        </span>
+      </div>
+      <% } %>
+
+      <!-- Form Actions (Cancel / Allow) -->
+      <form method="POST" action="/oauth/consent" class="p-6 sm:p-8 bg-slate-50/90 dark:bg-[#121524] border-t border-slate-200/70 dark:border-slate-800/80">
         <input type="hidden" name="request_id" value="<%= requestId %>" />
 
         <div class="flex items-center justify-end gap-3">
@@ -153,7 +269,7 @@
             type="submit"
             name="decision"
             value="deny"
-            class="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-semibold transition-all duration-200 cursor-pointer"
+            class="px-5 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold transition-all duration-200 cursor-pointer shadow-2xs"
           >
             Cancel
           </button>
@@ -162,7 +278,7 @@
             type="submit"
             name="decision"
             value="approve"
-            class="px-6 py-2.5 rounded-xl bg-linear-to-r from-brand-orange via-brand-orange to-brand-orangeDark text-white text-sm font-bold shadow-md shadow-brand-orange/20 hover:shadow-lg hover:shadow-brand-orange/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            class="px-6 py-2.5 rounded-xl bg-linear-to-r from-brand-orange via-brand-orange to-brand-orangeDark text-white text-xs font-extrabold shadow-md shadow-brand-orange/20 hover:shadow-lg hover:shadow-brand-orange/30 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 cursor-pointer"
           >
             Allow Access
           </button>
@@ -171,13 +287,16 @@
 
     </div>
 
-    <!-- Security Indicator -->
-    <div class="text-center mt-5">
+    <!-- Security Footnote -->
+    <div class="text-center mt-5 space-y-1">
       <p class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-center gap-1.5 font-medium">
         <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
         <span>Secured with Pramaan OpenID Connect</span>
+      </p>
+      <p class="text-[10px] text-slate-400 dark:text-slate-500">
+        You can revoke access anytime in your <a href="/account" class="underline hover:text-brand-orange">Pramaan Account</a>.
       </p>
     </div>
 

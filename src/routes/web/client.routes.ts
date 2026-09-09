@@ -94,6 +94,15 @@ router.post(
 );
 
 router.post(
+  '/client/:client_id/domain/verify',
+  Authentication.ssr('default'),
+  Authorize.role([ROLES.USER, ROLES.DEVELOPER]),
+  Authorize.clientOwnership,
+  validateRequest(ClientZSchema.verifyDomainSchema),
+  clientController.verifyDomain,
+);
+
+router.post(
   '/client/:client_id/type',
   Authentication.ssr('default'),
   Authorize.role([ROLES.USER, ROLES.DEVELOPER]),

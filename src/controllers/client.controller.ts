@@ -45,6 +45,7 @@ export class ClientController extends BaseController {
       title: 'Add Client',
       formData: {
         name: typeof req.body?.name === 'string' ? req.body.name : '',
+        has_domain: typeof req.body?.has_domain === 'string' ? req.body.has_domain : 'yes',
         domain:
           typeof req.body?.domain === 'string'
             ? req.body.domain
@@ -52,9 +53,6 @@ export class ClientController extends BaseController {
               ? req.body.slug
               : '',
         client_type: typeof req.body?.client_type === 'string' ? req.body.client_type : 'CONFIDENTIAL',
-        client_environment:
-          typeof req.body?.client_environment === 'string' ? req.body.client_environment : 'development',
-        redirect_uri: typeof req.body?.redirect_uri === 'string' ? req.body.redirect_uri : '',
       },
       success: typeof req.query.success === 'string' ? req.query.success : null,
       error: typeof req.query.error === 'string' ? req.query.error : null,
@@ -70,25 +68,21 @@ export class ClientController extends BaseController {
   addClient = this.handleViewRequest(
     async (req, res) => {
       const name = this.getString(req.body?.name);
-      const domainInput = this.getString(req.body?.domain) || this.getString(req.body?.slug);
-      const redirect_uri = this.getString(req.body?.redirect_uri);
-      const client_type = req.body?.client_type;
-      const client_environment = req.body?.client_environment;
+      const domainInput = this.getString(req.body?.domain) || this.getString(req.body?.slug) || 'localhost';
+      const client_type = req.body?.client_type || OAUTH_CLIENT_TYPES.CONFIDENTIAL;
 
-      if (!name || !domainInput || !redirect_uri) {
-        throw new AppError('Invalid client data', 400, ErrorCode.INVALID_REQUEST);
+      if (!name) {
+        throw new AppError('Client name is required', 400, ErrorCode.INVALID_REQUEST);
       }
 
-      const domain = this.clientService.normalizeAndValidateDomain(domainInput);
+      const domain = this.clientService.normalizeAndValidateDomain(domainInput, true);
 
-      const sanitizedRedirectUri = this.validateRedirectUriInput(redirect_uri);
       const data = await this.clientService.createClient({
         userId: req.user.id,
         name,
         domain,
-        redirectURI: sanitizedRedirectUri,
-        clientType: client_type || OAUTH_CLIENT_TYPES.CONFIDENTIAL,
-        environment: client_environment || OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT,
+        clientType: client_type,
+        environment: OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT,
       });
 
       // flash secret
@@ -138,6 +132,8 @@ export class ClientController extends BaseController {
       error: typeof req.query.error === 'string' ? req.query.error : undefined,
       success: typeof req.query.success === 'string' ? req.query.success : undefined,
       warning: typeof req.query.warning === 'string' ? req.query.warning : undefined,
+      edit: req.query.edit === 'true' || req.query.action === 'edit',
+      target: typeof req.query.target === 'string' ? req.query.target : undefined,
     };
   }
 
@@ -172,6 +168,7 @@ export class ClientController extends BaseController {
         sanitizedRedirectUri,
         client.environment,
         client.domain,
+        client.domainStatus,
       );
 
       const exists = client.redirectURIs.includes(normalizedURI);
@@ -245,14 +242,46 @@ export class ClientController extends BaseController {
     }
 
     try {
+      if (!name || !name.trim()) {
+        throw new AppError('Client name cannot be empty', 400, ErrorCode.INVALID_INPUT);
+      }
+      if (!domain || !domain.trim()) {
+        throw new AppError('Domain cannot be empty', 400, ErrorCode.INVALID_DOMAIN);
+      }
+
       await this.clientService.updateClientDetails(client_id, req.user.id, {
-        name,
-        domain,
+        name: name.trim(),
+        domain: domain.trim(),
       });
 
       return res.redirect(
         303,
         `/client/${client_id}?success=${encodeURIComponent('Client settings updated successfully')}`,
+      );
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.redirect(303, `/client/${client_id}?error=${encodeURIComponent(error.message)}`);
+      }
+      throw error;
+    }
+  });
+
+  // ---------------- VERIFY DOMAIN OWNERSHIP (DNS TXT) ----------------
+
+  verifyDomain = this.handleViewRequest(async (req, res) => {
+    const client_id = this.getString(req.params.client_id);
+
+    if (!client_id) {
+      throw new AppError('Client ID is required', 400, ErrorCode.INVALID_REQUEST);
+    }
+
+    try {
+      const result = await this.clientService.verifyDomainOwnership(client_id, req.user.id);
+      return res.redirect(
+        303,
+        `/client/${client_id}?success=${encodeURIComponent(
+          `Domain "${result.domain}" verified successfully! You can now use it for callbacks and switch to production mode.`,
+        )}`,
       );
     } catch (error) {
       if (error instanceof AppError) {
@@ -423,6 +452,23 @@ export class ClientController extends BaseController {
       ) {
         throw new AppError('Invalid environment', 400, ErrorCode.INVALID_REQUEST);
       }
+      if (targetEnvironment === OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION) {
+        if (this.clientService.isVercelDomain(client.domain)) {
+          throw new AppError(
+            'Cannot switch to production: Vercel domains (*.vercel.app) are only permitted in development mode. Please configure and verify a custom domain for production.',
+            400,
+            ErrorCode.INVALID_REQUEST,
+          );
+        }
+        if (client.domainStatus !== 'VERIFIED') {
+          throw new AppError(
+            `Cannot switch to production: domain "${client.domain}" must be verified via DNS TXT record first.`,
+            400,
+            ErrorCode.INVALID_REQUEST,
+          );
+        }
+      }
+
       let httpRedirectCount = 0;
       let httpsRedirectCount = 0;
 
@@ -459,8 +505,15 @@ export class ClientController extends BaseController {
   }
 
   renderClientConfirmation = this.handleViewRequest(async (req, res) => {
-    const viewData = await this.buildClientConfirmationViewData(req);
-
-    res.render('pages/app/confirm-action/client', viewData);
+    try {
+      const viewData = await this.buildClientConfirmationViewData(req);
+      res.render('pages/app/confirm-action/client', viewData);
+    } catch (error) {
+      const clientId = this.getString(req.params.client_id);
+      if (error instanceof AppError && clientId) {
+        return res.redirect(303, `/client/${clientId}?error=${encodeURIComponent(error.message)}`);
+      }
+      throw error;
+    }
   });
 }
