@@ -78,50 +78,57 @@ jobs:
             cd /srv/pramaan
 
             cat <<'EOF' > .env
-            NODE_ENV=${{ secrets.NODE_ENV }}
-            PORT=${{ secrets.PORT }}
-            RUN_SEEDS=${{ secrets.RUN_SEEDS }}
+            # Server Environment
+            NODE_ENV=production
+            PORT=8080
+            RUN_SEEDS=false
 
-            APP_NAME=${{ secrets.APP_NAME }}
-            APP_DOMAIN=${{ secrets.APP_DOMAIN }}
-            APP_DOC_URL=${{ secrets.APP_DOC_URL }}
+            # Application Configuration
+            APP_NAME=pramaan
+            APP_DOMAIN=pramaan.anujacharjee.com
+            APP_DOC_URL=https://github.com/AnujAcharjee/pramaan/blob/main/readme.md
+            AUTH_ISSUER=https://pramaan.anujacharjee.com
+            EMAIL_FROM=no-reply@pramaan.anujacharjee.com
 
+            # Session & Token Lifespans (seconds)
+            ACTIVE_SESSION_EX=900
+            IDENTITY_SESSION_EX=15552000
+            EMAIL_VERIFICATION_TOKEN_EX=86400
+            SIGN_VERIFICATION_TOKEN_EX=86400
+            SIGN_IN_FAIL_COUNT_EX=86400
+            RESET_PASSWORD_EX=3600
+
+            # OAuth Lifespans
+            AUTH_CODE_EX=300
+            AUTH_TOKENS_EX=10m
+            AUTH_REQUEST_EX=300
+
+            # Security & Rate Limits
+            MAX_SIGNIN_FAILURES=20
+            SIGNIN_LOCK_UNTIL=21600
+
+            # Cache Lifespans
+            CLIENT_CACHE_EX=900
+            PROFILE_CACHE_EX=900
+
+            # DNS TXT Verification Resolvers
+            PRAMAAN_DNS_SERVERS=1.1.1.1,8.8.8.8
+
+            # Sensitive Secrets (from GitHub Secrets)
             NEON_PG_DATABASE_URL=${{ secrets.NEON_PG_DATABASE_URL }}
             COOKIE_SECRET=${{ secrets.COOKIE_SECRET }}
-
             REDIS_URL=${{ secrets.REDIS_URL }}
-
             RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
-            EMAIL_FROM=${{ secrets.EMAIL_FROM }}
-
-            AUTH_ISSUER=${{ secrets.AUTH_ISSUER }}
-            AUTH_CODE_EX=${{ secrets.AUTH_CODE_EX }}
-            AUTH_REQUEST_EX=${{ secrets.AUTH_REQUEST_EX }}
-            AUTH_TOKENS_EX=${{ secrets.AUTH_TOKENS_EX }}
-
-            ACTIVE_SESSION_EX=${{ secrets.ACTIVE_SESSION_EX }}
-            IDENTITY_SESSION_EX=${{ secrets.IDENTITY_SESSION_EX }}
-
-            EMAIL_VERIFICATION_TOKEN_EX=${{ secrets.EMAIL_VERIFICATION_TOKEN_EX }}
-            SIGN_VERIFICATION_TOKEN_EX=${{ secrets.SIGN_VERIFICATION_TOKEN_EX }}
-            RESET_PASSWORD_EX=${{ secrets.RESET_PASSWORD_EX }}
-
-            MAX_SIGNIN_FAILURES=${{ secrets.MAX_SIGNIN_FAILURES }}
-            SIGNIN_LOCK_UNTIL=${{ secrets.SIGNIN_LOCK_UNTIL }}
-            SIGN_IN_FAIL_COUNT_EX=${{ secrets.SIGN_IN_FAIL_COUNT_EX }}
-
-            CLIENT_CACHE_EX=${{ secrets.CLIENT_CACHE_EX }}
-            CLIENT_SECRET_KEY=${{ secrets.CLIENT_SECRET_KEY }}
-            PROFILE_CACHE_EX=${{ secrets.PROFILE_CACHE_EX }}
-
             KEY_ENC_SECRET=${{ secrets.KEY_ENC_SECRET }}
-            INIT_ADMIN_EMAIL=${{ secrets.INIT_ADMIN_EMAIL }}
+            CLIENT_SECRET_KEY=${{ secrets.CLIENT_SECRET_KEY }}
             LOGTAIL_SOURCE_TOKEN=${{ secrets.LOGTAIL_SOURCE_TOKEN }}
+
+            INIT_ADMIN_EMAIL=${{ secrets.INIT_ADMIN_EMAIL }}
+            INIT_ADMIN_PASSWORD=${{ secrets.INIT_ADMIN_PASSWORD }}
 
             CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
             CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
             CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
-            
             EOF
 
             docker compose --project-name pramaan pull
