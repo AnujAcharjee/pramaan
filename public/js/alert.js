@@ -34,25 +34,30 @@
     const wrapper = document.createElement('div');
     wrapper.className =
       type === 'error'
-        ? 'mb-6 rounded-xl border-l-4 border-rose-500 bg-linear-to-r from-rose-50 to-rose-50/50 p-4 shadow-sm animate-slideIn'
-        : 'mb-6 rounded-xl border-l-4 border-green-500 bg-linear-to-r from-green-50 to-green-50/50 p-4 shadow-sm animate-slideIn';
+        ? 'mb-6 rounded-2xl border border-rose-100 dark:border-rose-500/15 bg-rose-50/50 dark:bg-rose-500/5 backdrop-blur-md p-4 shadow-md shadow-rose-100/20 dark:shadow-black/10 animate-slideIn'
+        : 'mb-6 rounded-2xl border border-green-100 dark:border-emerald-500/15 bg-green-50/50 dark:bg-emerald-500/5 backdrop-blur-md p-4 shadow-md shadow-green-100/20 dark:shadow-black/10 animate-slideIn';
     wrapper.setAttribute('role', 'alert');
     wrapper.setAttribute('data-alert', '');
     wrapper.setAttribute('data-alert-type', type);
     if (source) wrapper.setAttribute('data-alert-source', source);
 
     const icon = type === 'error'
-      ? '<svg class="w-5 h-5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>'
-      : '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
+      ? '<div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-500/15 flex items-center justify-center"><svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>'
+      : '<div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-emerald-500/15 flex items-center justify-center"><svg class="w-5 h-5 text-green-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>';
 
-    const textClass = type === 'error' ? 'text-rose-700' : 'text-green-700';
+    const titleText = type === 'error' ? 'Error' : 'Success';
+    const titleClass = type === 'error' ? 'text-rose-900 dark:text-rose-300' : 'text-green-900 dark:text-emerald-300';
+    const textClass = type === 'error' ? 'text-rose-700 dark:text-emerald-400/80' : 'text-green-700 dark:text-emerald-400/80';
+    const closeClass = type === 'error' ? 'text-rose-400 dark:text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300' : 'text-green-400 dark:text-emerald-500 hover:bg-green-100 dark:hover:bg-emerald-500/10 hover:text-green-600 dark:hover:text-emerald-300';
+
     wrapper.innerHTML = `
       <div class="flex items-start gap-3">
-        <div class="shrink-0">${icon}</div>
-        <div class="flex-1">
-          <p class="text-sm ${textClass} mt-1" data-alert-message></p>
+        <div class="shrink-0 mt-0.5">${icon}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold ${titleClass} mt-1">${titleText}</p>
+          <p class="text-xs ${textClass} mt-0.5 leading-relaxed" data-alert-message></p>
         </div>
-        <button type="button" class="ml-2 ${type === 'error' ? 'text-rose-500/70 hover:text-rose-600' : 'text-green-500/70 hover:text-green-600'} transition" data-alert-close aria-label="Dismiss alert">
+        <button type="button" class="ml-2 p-1 rounded-lg ${closeClass} transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
