@@ -171,6 +171,7 @@ export class ClientController extends BaseController {
       const normalizedURI = this.clientService.normalizeAndValidateURI(
         sanitizedRedirectUri,
         client.environment,
+        client.domain,
       );
 
       const exists = client.redirectURIs.includes(normalizedURI);
@@ -322,18 +323,16 @@ export class ClientController extends BaseController {
         : client.environment === OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT ? OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION
         : OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT;
 
-      const { removedHttpRedirects } = await this.clientService.setClientEnvironment(
+      const { clearedRedirectsCount } = await this.clientService.setClientEnvironment(
         client_id,
         targetEnvironment as OAuthClientEnvironment,
       );
 
-      if (removedHttpRedirects > 0) {
+      if (targetEnvironment === OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION) {
         return res.redirect(
           303,
           `/client/${client_id}?warning=${encodeURIComponent(
-            `Switched to ${targetEnvironment}. Removed ${removedHttpRedirects} HTTP redirect URI${
-              removedHttpRedirects > 1 ? 's' : ''
-            }.`,
+            `Switched to Production mode. All ${clearedRedirectsCount} previously saved redirect URI(s) have been deleted. Please register your HTTPS redirect URI(s) matching "${client.domain}".`,
           )}`,
         );
       }
@@ -341,7 +340,7 @@ export class ClientController extends BaseController {
       return res.redirect(
         303,
         `/client/${client_id}?success=${encodeURIComponent(
-          `Client environment changed to ${targetEnvironment}`,
+          `Client environment switched to ${targetEnvironment}`,
         )}`,
       );
     } catch (error) {
@@ -442,6 +441,8 @@ export class ClientController extends BaseController {
         clientId,
         action,
         name: client.name,
+        domain: client.domain,
+        redirectCount: client.redirectURIs.length,
         currentEnvironment: client.environment,
         targetEnvironment,
         httpRedirectCount,

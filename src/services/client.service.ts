@@ -506,12 +506,13 @@ export class ClientService {
   async setClientEnvironment(
     clientId: string,
     environment: OAuthClientEnvironment,
-  ): Promise<{ client: ClientView; removedHttpRedirects: number }> {
+  ): Promise<{ client: ClientView; clearedRedirectsCount: number }> {
     const client = await prisma.oAuthClient.findUnique({
       where: { id: clientId },
       select: {
         id: true,
         redirectURIs: true,
+        domain: true,
       },
     });
 
@@ -520,32 +521,15 @@ export class ClientService {
     }
 
     const updates: ClientUpdateInput = { environment };
-    let removedHttpRedirects = 0;
+    let clearedRedirectsCount = 0;
 
     if (environment === OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION) {
-      const httpsOnly = client.redirectURIs.filter((uri) => {
-        try {
-          return new URL(uri).protocol === 'https:';
-        } catch {
-          return false;
-        }
-      });
-
-      removedHttpRedirects = client.redirectURIs.length - httpsOnly.length;
-
-      if (httpsOnly.length === 0) {
-        throw new AppError(
-          'At least one HTTPS redirect URI is required to switch to production.',
-          400,
-          ErrorCode.INVALID_REDIRECT_URI,
-        );
-      }
-
-      updates.redirectURIs = httpsOnly;
+      clearedRedirectsCount = client.redirectURIs.length;
+      updates.redirectURIs = [];
     }
 
     const updatedClient = await this.update(clientId, updates);
-    return { client: updatedClient, removedHttpRedirects };
+    return { client: updatedClient, clearedRedirectsCount };
   }
 }
 

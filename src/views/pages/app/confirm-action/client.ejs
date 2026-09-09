@@ -16,8 +16,7 @@
   const isDeactivate = action === 'deactivate';
   const isEnvironment = action === 'environment';
   const isProdSwitch = isEnvironment && _targetEnvironment === 'production';
-  const willRemoveHttp = isProdSwitch && _httpRedirectCount > 0;
-  const cannotProceed = isProdSwitch && _httpsRedirectCount === 0;
+  const _redirectCount = typeof redirectCount === 'number' ? redirectCount : (_httpRedirectCount + _httpsRedirectCount);
 
   const confirmText =
     isDelete
@@ -85,22 +84,26 @@
       <% } else if (isEnvironment) { %>
       <p class="text-xs text-slate-600 dark:text-slate-200 leading-relaxed font-medium">
         This will switch the environment from
-        <span class="font-extrabold text-slate-900 dark:text-white"><%= _currentEnvironment %></span>
+        <span class="font-extrabold text-slate-900 dark:text-white uppercase"><%= _currentEnvironment %></span>
         to
-        <span class="font-extrabold text-slate-900 dark:text-white"><%= _targetEnvironment %></span>.
+        <span class="font-extrabold text-slate-900 dark:text-white uppercase"><%= _targetEnvironment %></span>.
       </p>
-      <% if (willRemoveHttp) { %>
-      <div class="mt-4 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50/50 dark:bg-amber-500/10 p-3">
-        <p class="text-xs text-amber-800 dark:text-amber-300 font-semibold leading-relaxed">
-          ⚠️ <%= _httpRedirectCount %> HTTP redirect URI<%= _httpRedirectCount > 1 ? 's' : '' %> will be removed in production. Use HTTPS to keep them.
-        </p>
-      </div>
-      <% } %>
-      <% if (cannotProceed) { %>
-      <div class="mt-3 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50/50 dark:bg-rose-500/10 p-3">
-        <p class="text-xs text-rose-700 dark:text-rose-300 font-semibold leading-relaxed">
-          🚫 Add at least one HTTPS redirect URI before switching to production.
-        </p>
+      <% if (isProdSwitch) { %>
+      <div class="mt-4 rounded-xl border border-amber-300 dark:border-amber-500/40 bg-amber-50/70 dark:bg-amber-500/10 p-4">
+        <div class="flex items-start gap-2.5">
+          <span class="text-base select-none mt-0.5">⚠️</span>
+          <div>
+            <p class="text-xs text-amber-900 dark:text-amber-200 font-bold leading-relaxed">
+              All saved redirect URIs will be deleted upon switching to Production.
+            </p>
+            <p class="text-[11px] text-amber-800 dark:text-amber-300/90 leading-relaxed mt-1">
+              <% if (_redirectCount > 0) { %>
+              You currently have <span class="font-bold"><%= _redirectCount %></span> saved redirect URI(s) that will be removed.
+              <% } %>
+              In Production mode, you will need to re-add redirect URIs that use HTTPS and strictly match your registered domain (<span class="font-bold font-mono"><%= typeof domain !== 'undefined' && domain ? domain : 'xyz.com' %></span>).
+            </p>
+          </div>
+        </div>
       </div>
       <% } %>
       <% } else { %>
@@ -142,7 +145,7 @@
         <input type="hidden" name="environment" value="<%= _targetEnvironment %>">
         <% } %>
 
-        <button type="submit" <%= cannotProceed ? 'disabled' : '' %> class="inline-flex items-center justify-center font-bold transition-all duration-300 active:scale-[0.98] border-2 rounded-xl py-2 px-5 text-xs cursor-pointer
+        <button type="submit" class="inline-flex items-center justify-center font-bold transition-all duration-300 active:scale-[0.98] border-2 rounded-xl py-2 px-5 text-xs cursor-pointer
             <%= isDelete
                 ? 'border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white'
                 : isActivate
@@ -150,7 +153,7 @@
                   : isEnvironment
                     ? 'border-sky-500 text-sky-600 hover:bg-sky-500 hover:text-white'
                     : 'border-slate-500 text-slate-650 hover:bg-slate-500 hover:text-white'
-            %> <%= cannotProceed ? 'opacity-50 cursor-not-allowed' : '' %>">
+            %>">
           <%= confirmText %>
         </button>
 
