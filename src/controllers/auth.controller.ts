@@ -30,8 +30,17 @@ export class AuthController extends BaseController {
 
   // Used when user not authenticated and tries OAuth
   private async handleOAuthFlow(res: Response, requestId: string, userId: string): Promise<void> {
-    const redirectURL = await this.oauthService.authorize(requestId, userId);
-    return res.redirect(303, redirectURL);
+    try {
+      const redirectURL = await this.oauthService.authorize(requestId, userId);
+      return res.redirect(303, redirectURL);
+    } catch {
+      return res.redirect(
+        303,
+        `/account?warning=${encodeURIComponent(
+          'OAuth authorization request expired. Your email is verified; please sign in from your application again.',
+        )}`,
+      );
+    }
   }
 
   /** ------------------------ SIGN UP ------------------------ */

@@ -258,7 +258,13 @@ export class AuthService {
     );
 
     if (updated.count === 0) {
-      throw new AppError('Email already verified', 409, ErrorCode.INVALID_REQUEST);
+      const existingUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, isEmailVerified: true },
+      });
+      if (!existingUser) {
+        throw new AppError('User not found', 404, ErrorCode.NOT_FOUND);
+      }
     }
 
     const identitySessionId = await sessionService.createIdentitySession(userId);
