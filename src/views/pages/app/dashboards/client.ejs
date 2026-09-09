@@ -71,19 +71,50 @@
       
       <!-- App Overview -->
       <section class="dashboard-section">
-        <div class="flex items-start sm:items-center gap-4 mb-6">
-          <div class="dashboard-icon bg-slate-900 dark:bg-slate-200">
-            <svg class="w-6 h-6 text-white dark:text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+        <div class="flex items-start sm:items-center justify-between gap-4 mb-6 flex-wrap">
+          <div class="flex items-start sm:items-center gap-4">
+            <div class="dashboard-icon bg-slate-900 dark:bg-slate-200">
+              <svg class="w-6 h-6 text-white dark:text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+              </svg>
+            </div>
+            <div id="overview-static" class="min-w-0">
+              <h2 class="text-2xl font-extrabold text-slate-900 dark:text-slate-100 truncate"><%= client.name %></h2>
+              <% if (client.domain) { %>
+              <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold tracking-wide lowercase mt-0.5"><%= client.domain %></p>
+              <% } %>
+            </div>
+          </div>
+
+          <button id="edit-details-btn" type="button" class="btn-outline-sky !py-1.5 !px-3.5 !text-xs rounded-xl inline-flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-          </div>
-          <div class="min-w-0">
-            <h2 class="text-2xl font-extrabold text-slate-900 dark:text-slate-100 truncate"><%= client.name %></h2>
-            <% if (client.domain) { %>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold tracking-wide lowercase mt-0.5"><%= client.domain %></p>
-            <% } %>
-          </div>
+            <span>Edit App Info</span>
+          </button>
         </div>
+
+        <!-- Inline Edit Form (Hidden by default) -->
+        <form id="edit-details-form" action="/client/<%= client.id %>/settings" method="POST" class="hidden mb-6 p-4 rounded-2xl bg-slate-100/70 dark:bg-[#0c1222] border border-slate-200 dark:border-slate-800 space-y-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label for="edit-name" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Client Name</label>
+              <input type="text" id="edit-name" name="name" value="<%= client.name %>" required class="input-field text-xs py-2 px-3" placeholder="App Name" />
+            </div>
+            <div>
+              <label for="edit-domain" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Registered Domain</label>
+              <input type="text" id="edit-domain" name="domain" value="<%= client.domain %>" required class="input-field text-xs py-2 px-3 font-mono" placeholder="xyz.com" />
+            </div>
+          </div>
+          <div class="flex items-center justify-end gap-2 pt-1">
+            <button type="button" id="cancel-edit-details-btn" class="btn-outline-gray !py-1.5 !px-3 !text-xs rounded-lg cursor-pointer">
+              Cancel
+            </button>
+            <button type="submit" class="btn-orange !py-1.5 !px-4 !text-xs font-bold rounded-lg cursor-pointer shadow-sm">
+              Save Changes
+            </button>
+          </div>
+        </form>
 
         <div class="space-y-4">
           <!-- Client ID -->
@@ -124,11 +155,11 @@
           <!-- Client Type -->
           <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-all duration-300">
             <div class="flex items-center justify-between gap-4 flex-wrap">
-              <div>
+              <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2.5">
                   <p class="text-sm font-bold text-slate-800 dark:text-slate-200">Client Type</p>
                   <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-bold uppercase
-              <%= client.clientType === 'confidential'
+              <%= client.clientType?.toLowerCase() === 'confidential'
                 ? 'bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300/30'
                 : 'bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-300/30' %>">
                     <%= client.clientType %>
@@ -138,6 +169,13 @@
                   Confidential clients can keep secrets secure on their backend. Public clients run in the browser or mobile devices and do not use secrets.
                 </p>
               </div>
+
+              <form action="/client/<%= client.id %>/type" method="POST" class="shrink-0">
+                <input type="hidden" name="client_type" value="<%= client.clientType?.toUpperCase() === 'CONFIDENTIAL' ? 'PUBLIC' : 'CONFIDENTIAL' %>" />
+                <button type="submit" class="btn-outline-orange text-xs py-2 px-3.5 cursor-pointer">
+                  Switch to <%= client.clientType?.toUpperCase() === 'CONFIDENTIAL' ? 'Public' : 'Confidential' %>
+                </button>
+              </form>
             </div>
           </div>
 
@@ -408,3 +446,22 @@
 </div>
 
 <script src="/js/copyBtn.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const editBtn = document.getElementById('edit-details-btn');
+    const form = document.getElementById('edit-details-form');
+    const cancelBtn = document.getElementById('cancel-edit-details-btn');
+
+    if (editBtn && form && cancelBtn) {
+      editBtn.addEventListener('click', () => {
+        form.classList.toggle('hidden');
+        if (!form.classList.contains('hidden')) {
+          document.getElementById('edit-name')?.focus();
+        }
+      });
+      cancelBtn.addEventListener('click', () => {
+        form.classList.add('hidden');
+      });
+    }
+  });
+</script>

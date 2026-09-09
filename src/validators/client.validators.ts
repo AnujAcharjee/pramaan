@@ -69,6 +69,31 @@ export class ClientZSchema {
     }),
   });
 
+  static updateClientSettingsSchema = z.object({
+    params: z.object({
+      client_id: UtilFields.clientIdField,
+    }),
+    body: z.object({
+      name: z.string().min(1, 'Client name cannot be empty').optional(),
+      domain: z
+        .string()
+        .min(1, 'Domain cannot be empty')
+        .regex(domainRegex, 'Domain must be a valid domain name like "xyz.com"')
+        .optional(),
+    }),
+  });
+
+  static updateClientTypeSchema = z.object({
+    params: z.object({
+      client_id: UtilFields.clientIdField,
+    }),
+    body: z.object({
+      client_type: z.enum(
+        Object.values(OAUTH_CLIENT_TYPES) as [OAuthClientType, ...OAuthClientType[]],
+      ),
+    }),
+  });
+
   // JWKS
 
   static jwksSchema = z.object({

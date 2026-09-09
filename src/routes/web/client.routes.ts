@@ -85,6 +85,24 @@ router.post(
 );
 
 router.post(
+  '/client/:client_id/settings',
+  Authentication.ssr('default'),
+  Authorize.role([ROLES.USER, ROLES.DEVELOPER]),
+  Authorize.clientOwnership,
+  validateRequest(ClientZSchema.updateClientSettingsSchema),
+  clientController.updateClientSettings,
+);
+
+router.post(
+  '/client/:client_id/type',
+  Authentication.ssr('default'),
+  Authorize.role([ROLES.USER, ROLES.DEVELOPER]),
+  Authorize.clientOwnership,
+  validateRequest(ClientZSchema.updateClientTypeSchema),
+  clientController.updateClientType,
+);
+
+router.post(
   '/client/rotate-secret',
   Authentication.ssr('default'),
   Authorize.role([ROLES.USER, ROLES.DEVELOPER]),

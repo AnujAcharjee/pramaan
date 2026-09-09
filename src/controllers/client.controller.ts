@@ -232,6 +232,73 @@ export class ClientController extends BaseController {
     );
   });
 
+  // ---------------- UPDATE SETTINGS (NAME / DOMAIN) ----------------
+
+  updateClientSettings = this.handleViewRequest(async (req, res) => {
+    const client_id = this.getString(req.params.client_id);
+    const name = this.getString(req.body?.name);
+    const domain = this.getString(req.body?.domain);
+
+    if (!client_id) {
+      throw new AppError('Client ID is required', 400, ErrorCode.INVALID_REQUEST);
+    }
+
+    try {
+      await this.clientService.updateClientDetails(client_id, req.user.id, {
+        name,
+        domain,
+      });
+
+      return res.redirect(
+        303,
+        `/client/${client_id}?success=${encodeURIComponent('Client settings updated successfully')}`,
+      );
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.redirect(303, `/client/${client_id}?error=${encodeURIComponent(error.message)}`);
+      }
+      throw error;
+    }
+  });
+
+  // ---------------- UPDATE CLIENT TYPE ----------------
+
+  updateClientType = this.handleViewRequest(async (req, res) => {
+    const client_id = this.getString(req.params.client_id);
+    const client_type = req.body?.client_type;
+
+    if (!client_id || !client_type) {
+      throw new AppError('Client type is required', 400, ErrorCode.INVALID_REQUEST);
+    }
+
+    try {
+      const { clientSecret } = await this.clientService.updateClientType(
+        client_id,
+        req.user.id,
+        client_type,
+      );
+
+      if (clientSecret) {
+        res.cookie('__flash_client_secret', clientSecret, {
+          httpOnly: true,
+          secure: ENV.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 60 * 1000,
+        });
+      }
+
+      return res.redirect(
+        303,
+        `/client/${client_id}?success=${encodeURIComponent(`Client type updated to ${client_type}`)}`,
+      );
+    } catch (error) {
+      if (error instanceof AppError) {
+        return res.redirect(303, `/client/${client_id}?error=${encodeURIComponent(error.message)}`);
+      }
+      throw error;
+    }
+  });
+
   // ---------------- UPDATE ENVIRONMENT ----------------
 
   updateClientEnvironment = this.handleViewRequest(async (req, res) => {

@@ -33,8 +33,11 @@ export type AllClientsView = {
 };
 
 export interface ClientUpdateInput {
+  name?: string;
+  domain?: string;
+  clientType?: OAuthClientType;
   redirectURIs?: string[];
-  clientSecretHash?: string;
+  clientSecretHash?: string | null;
   environment?: OAuthClientEnvironment;
   isActive?: boolean;
   revokedAt?: Date | null;
@@ -323,6 +326,9 @@ export class ClientService {
     const client = await prisma.oAuthClient.update({
       where: { id: clientId },
       data: {
+        ...(updates.name !== undefined && { name: updates.name }),
+        ...(updates.domain !== undefined && { domain: updates.domain }),
+        ...(updates.clientType !== undefined && { clientType: updates.clientType }),
         ...(updates.redirectURIs !== undefined && { redirectURIs: updates.redirectURIs }),
         ...(updates.clientSecretHash !== undefined && { clientSecretHash: updates.clientSecretHash }),
         ...(updates.environment !== undefined && { environment: updates.environment }),
@@ -350,6 +356,79 @@ export class ClientService {
 
     await redis.del(this.clientCacheKey(clientId));
     return client;
+  }
+
+  async updateClientDetails(
+    clientId: string,
+    userId: string,
+    input: { name?: string; domain?: string },
+  ): Promise<ClientView> {
+    const existing = await prisma.oAuthClient.findUnique({
+      where: { id: clientId },
+    });
+    if (!existing || existing.userId !== userId) {
+      throw new AppError('Client not found', 404, ErrorCode.NOT_FOUND);
+    }
+
+    const updates: ClientUpdateInput = {};
+
+    if (input.name !== undefined) {
+      const normalizedName = input.name.trim();
+      if (!normalizedName) {
+        throw new AppError('Client name cannot be empty', 400, ErrorCode.INVALID_INPUT);
+      }
+      if (normalizedName.toLowerCase() !== existing.name.toLowerCase()) {
+        const userClients = await prisma.oAuthClient.findMany({
+          where: { userId },
+          select: { id: true, name: true },
+        });
+        const hasDuplicate = userClients.some(
+          (c) => c.id !== clientId && c.name.toLowerCase() === normalizedName.toLowerCase(),
+        );
+        if (hasDuplicate) {
+          throw new AppError('Client name already exists', 409, ErrorCode.ALREADY_EXISTS);
+        }
+      }
+      updates.name = normalizedName;
+    }
+
+    if (input.domain !== undefined) {
+      const normalizedDomain = this.normalizeAndValidateDomain(input.domain);
+      updates.domain = normalizedDomain;
+    }
+
+    return this.update(clientId, updates);
+  }
+
+  async updateClientType(
+    clientId: string,
+    userId: string,
+    targetType: OAuthClientType,
+  ): Promise<{ client: ClientView; clientSecret?: string }> {
+    const existing = await prisma.oAuthClient.findUnique({
+      where: { id: clientId },
+    });
+    if (!existing || existing.userId !== userId) {
+      throw new AppError('Client not found', 404, ErrorCode.NOT_FOUND);
+    }
+
+    if (existing.clientType === targetType) {
+      return { client: existing as unknown as ClientView };
+    }
+
+    let generatedSecret: string | undefined;
+    const updates: ClientUpdateInput = { clientType: targetType };
+
+    if (targetType === OAUTH_CLIENT_TYPES.CONFIDENTIAL) {
+      const { clientSecret, clientSecretHash } = await this.generateClientSecret();
+      updates.clientSecretHash = clientSecretHash;
+      generatedSecret = clientSecret;
+    } else {
+      updates.clientSecretHash = null;
+    }
+
+    const updated = await this.update(clientId, updates);
+    return { client: updated, clientSecret: generatedSecret };
   }
 
   // -------- ADD REDIRECT URI --------
