@@ -8,6 +8,7 @@ import type { Request, Response } from 'express';
 import type { ClientService } from '../services/client.service.js';
 import type { AccountService } from '../services/account.service.js';
 import { OAuthClientEnvironment } from '../../generated/prisma/index.js';
+import { ClientZSchema } from '../validators/client.validators.js';
 
 export class ClientController extends BaseController {
   constructor(
@@ -42,6 +43,19 @@ export class ClientController extends BaseController {
   private buildAddClientViewData(req: Request) {
     return {
       title: 'Add Client',
+      formData: {
+        name: typeof req.body?.name === 'string' ? req.body.name : '',
+        domain:
+          typeof req.body?.domain === 'string'
+            ? req.body.domain
+            : typeof req.body?.slug === 'string'
+              ? req.body.slug
+              : '',
+        client_type: typeof req.body?.client_type === 'string' ? req.body.client_type : 'CONFIDENTIAL',
+        client_environment:
+          typeof req.body?.client_environment === 'string' ? req.body.client_environment : 'development',
+        redirect_uri: typeof req.body?.redirect_uri === 'string' ? req.body.redirect_uri : '',
+      },
       success: typeof req.query.success === 'string' ? req.query.success : null,
       error: typeof req.query.error === 'string' ? req.query.error : null,
     };
@@ -56,20 +70,16 @@ export class ClientController extends BaseController {
   addClient = this.handleViewRequest(
     async (req, res) => {
       const name = this.getString(req.body?.name);
-      const slug = this.getString(req.body?.slug);
+      const domainInput = this.getString(req.body?.domain) || this.getString(req.body?.slug);
       const redirect_uri = this.getString(req.body?.redirect_uri);
       const client_type = req.body?.client_type;
       const client_environment = req.body?.client_environment;
 
-      if (!name || !slug || !redirect_uri) {
+      if (!name || !domainInput || !redirect_uri) {
         throw new AppError('Invalid client data', 400, ErrorCode.INVALID_REQUEST);
       }
 
-      if (!this.clientService.isValidSlug(slug)) {
-        throw new AppError('Invalid domain', 400, ErrorCode.INVALID_DOMAIN);
-      }
-
-      const domain = this.clientService.getClientDomain(slug);
+      const domain = this.clientService.normalizeAndValidateDomain(domainInput);
 
       const sanitizedRedirectUri = this.validateRedirectUriInput(redirect_uri);
       const data = await this.clientService.createClient({
@@ -99,6 +109,7 @@ export class ClientController extends BaseController {
     },
     'pages/app/forms/create-client',
     (req) => this.buildAddClientViewData(req),
+    ClientZSchema.addClientSchema,
   );
 
   // ---------------- DASHBOARD ----------------

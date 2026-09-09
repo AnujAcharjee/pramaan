@@ -58,50 +58,46 @@ export class ClientService {
   }
 
   getClientDomain(slug: string): string {
-    return `https://${slug}.${this.appDomain}`;
+    return slug;
+  }
+
+  isValidDomain(domain: string): boolean {
+    if (!domain) return false;
+    const normalized = domain.trim().toLowerCase();
+    if (normalized.length < 3 || normalized.length > 253) return false;
+    if (normalized.includes('://') || normalized.includes('/') || normalized.includes(':') || normalized.includes('?') || normalized.includes('#')) {
+      return false;
+    }
+    return /^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i.test(normalized);
+  }
+
+  normalizeAndValidateDomain(domainInput: string): string {
+    const trimmed = domainInput?.trim().toLowerCase();
+    if (!trimmed) {
+      throw new AppError('Domain is required', 400, ErrorCode.INVALID_DOMAIN);
+    }
+    if (trimmed.includes('://') || trimmed.includes('/') || trimmed.includes(':') || trimmed.includes('?') || trimmed.includes('#')) {
+      throw new AppError(
+        'Domain must be a domain name like "xyz.com" (do not include http://, https://, ports, or paths)',
+        400,
+        ErrorCode.INVALID_DOMAIN,
+      );
+    }
+    if (!this.isValidDomain(trimmed)) {
+      throw new AppError(
+        'Domain must be a valid domain name like "xyz.com" (not a URL or single name)',
+        400,
+        ErrorCode.INVALID_DOMAIN,
+      );
+    }
+    return trimmed;
   }
 
   isValidSlug(slug: string): boolean {
-    if (!slug) return false;
-
-    const normalized = slug.trim().toLowerCase();
-
-    // Length rules (DNS label rules)
-    if (normalized.length < 3 || normalized.length > 63) return false;
-
-    // Only lowercase letters, numbers, hyphens
-    if (!/^[a-z0-9-]+$/.test(normalized)) return false;
-
-    // Cannot start or end with hyphen
-    if (normalized.startsWith('-') || normalized.endsWith('-')) return false;
-
-    // Must start with a letter (Auth0 rule – optional but recommended)
-    if (!/^[a-z]/.test(normalized)) return false;
-
-    // Must not contain consecutive hyphens
-    if (normalized.includes('--')) return false;
-
-    // Reserved / blocked names
-    const reserved = new Set([
-      'www',
-      'api',
-      'admin',
-      'auth',
-      'login',
-      'oauth',
-      'id',
-      'internal',
-      'local',
-      'localhost',
-      'root',
-      'support',
-      'help',
-    ]);
-
-    return !reserved.has(normalized);
+    return this.isValidDomain(slug);
   }
 
-  normalizeAndValidateURI(uri: string, environment: OAuthClientEnvironment): string {
+  normalizeAndValidateURI(uri: string, environment: OAuthClientEnvironment, clientDomain?: string): string {
     const trimmed = uri.trim();
     if (!trimmed) {
       throw new AppError('Invalid URI format', 400, ErrorCode.INVALID_REDIRECT_URI);
@@ -140,6 +136,29 @@ export class ClientService {
 
     if (trimmed.includes('*')) {
       throw new AppError('Wildcard URIs are not allowed', 400, ErrorCode.INVALID_REDIRECT_URI);
+    }
+
+    const hostname = url.hostname.toLowerCase();
+    const normalizedDomain = clientDomain?.trim().toLowerCase();
+
+    if (environment === OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION) {
+      if (normalizedDomain && hostname !== normalizedDomain) {
+        throw new AppError(
+          `In production, redirect URI domain must match registered domain "${normalizedDomain}" (got "${hostname}")`,
+          400,
+          ErrorCode.INVALID_REDIRECT_URI,
+        );
+      }
+    } else {
+      const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+      const isRegisteredDomain = Boolean(normalizedDomain && hostname === normalizedDomain);
+      if (!isLocalhost && !isRegisteredDomain) {
+        throw new AppError(
+          `In development mode, redirect URIs must use localhost, 127.0.0.1, or registered domain "${normalizedDomain || 'xyz.com'}" (got "${hostname}")`,
+          400,
+          ErrorCode.INVALID_REDIRECT_URI,
+        );
+      }
     }
 
     return url.toString();
@@ -227,7 +246,7 @@ export class ClientService {
       throw new AppError('Client name already exists', 409, ErrorCode.ALREADY_EXISTS);
     }
 
-    const redirectURI = this.normalizeAndValidateURI(input.redirectURI, input.environment);
+    const redirectURI = this.normalizeAndValidateURI(input.redirectURI, input.environment, input.domain);
 
     const { clientSecret, clientSecretHash } =
       input.clientType === OAUTH_CLIENT_TYPES.CONFIDENTIAL ?

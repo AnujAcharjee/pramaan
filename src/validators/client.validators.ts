@@ -7,21 +7,29 @@ import {
 } from '../utils/constant.js';
 import { UtilFields } from './util.fields.js';
 
+export const domainRegex = /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+
 export class ClientZSchema {
   static addClientSchema = z.object({
-    body: z.object({
-      name: z.string(),
-      slug: z.string().min(1, 'Domain is required'),
-      client_type: z
-        .enum(Object.values(OAUTH_CLIENT_TYPES) as [OAuthClientType, ...OAuthClientType[]])
-        .optional(),
-      client_environment: z
-        .enum(
-          Object.values(OAUTH_CLIENT_ENVIRONMENTS) as [OAuthClientEnvironment, ...OAuthClientEnvironment[]],
-        )
-        .optional(),
-      redirect_uri: UtilFields.redirectUriField,
-    }),
+    body: z
+      .object({
+        name: z.string().min(1, 'Client name is required'),
+        domain: z.string().optional(),
+        slug: z.string().optional(),
+        client_type: z
+          .enum(Object.values(OAUTH_CLIENT_TYPES) as [OAuthClientType, ...OAuthClientType[]])
+          .optional(),
+        client_environment: z
+          .enum(
+            Object.values(OAUTH_CLIENT_ENVIRONMENTS) as [OAuthClientEnvironment, ...OAuthClientEnvironment[]],
+          )
+          .optional(),
+        redirect_uri: UtilFields.redirectUriField,
+      })
+      .refine((data) => Boolean(data.domain || data.slug), {
+        message: 'Domain is required',
+        path: ['domain'],
+      }),
   });
 
   static manageRedirectsSchema = z.object({
