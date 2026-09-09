@@ -29,6 +29,7 @@ export class AuthZSchema {
     .object({
       query: z.object({
         token: UtilFields.tokenField(),
+        email: z.string().optional(),
         flow: z.enum(['oauth', 'default']).optional(),
         request_id: z.string().optional(),
       }),

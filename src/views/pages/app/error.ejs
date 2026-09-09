@@ -9,17 +9,17 @@
     </div>
 
     <!-- Heading -->
-    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight font-brand-hero">
-      Internal Server Error
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white mb-4 tracking-tight font-brand-hero">
+      <%= typeof statusCode !== 'undefined' && statusCode < 500 ? (typeof title !== 'undefined' && title !== 'Error-Page' ? title : 'Request Error') : 'Internal Server Error' %>
     </h1>
 
-    <p class="text-slate-500 mb-8 font-semibold">
-      Something went wrong on our side.
+    <p class="text-slate-500 dark:text-slate-400 mb-8 font-semibold">
+      <%= typeof message !== 'undefined' && message ? message : 'Something went wrong on our side.' %>
     </p>
 
-    <% if (typeof error !== 'undefined' && error) { %>
-    <div class="mb-8 p-4 rounded-2xl bg-rose-50/50 border border-rose-100 text-left shadow-xs">
-      <code class="text-xs font-mono text-rose-700 wrap-break-words block"><%= error %></code>
+    <% if (typeof error !== 'undefined' && error && error !== message) { %>
+    <div class="mb-8 p-4 rounded-2xl bg-rose-50/50 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40 text-left shadow-xs">
+      <code class="text-xs font-mono text-rose-700 dark:text-rose-400 wrap-break-words block"><%= error %></code>
     </div>
     <% } %>
 

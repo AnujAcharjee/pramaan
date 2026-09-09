@@ -276,9 +276,12 @@ class EmailService {
   // HELPERS
   // -----------------------
 
-  private buildUrl(path: string, token: string, flow: AuthenticationFlow, requestId?: string) {
+  private buildUrl(path: string, token: string, flow: AuthenticationFlow, requestId?: string, email?: string) {
     const url = new URL(`${SERVER_URL}${path}`);
     url.searchParams.append('token', token);
+    if (email) {
+      url.searchParams.append('email', email);
+    }
 
     if (flow === 'oauth') {
       url.searchParams.append('flow', flow);
@@ -303,7 +306,7 @@ class EmailService {
 
     await this.checkRateLimit(`verify:${to}`);
 
-    const url = this.buildUrl('/email/verify', token, flow, requestId);
+    const url = this.buildUrl('/email/verify', token, flow, requestId, to);
 
     await this.sendWithRetry({
       to,
@@ -326,7 +329,7 @@ class EmailService {
 
     await this.checkRateLimit(`signin:${to}`);
 
-    const url = this.buildUrl('/signin/verify', token, flow, requestId);
+    const url = this.buildUrl('/signin/verify', token, flow, requestId, to);
 
     await this.sendWithRetry({
       to,
@@ -349,7 +352,7 @@ class EmailService {
 
     await this.checkRateLimit(`reset:${to}`);
 
-    const url = this.buildUrl('/reset-password', token, flow, requestId);
+    const url = this.buildUrl('/reset-password', token, flow, requestId, to);
 
     await this.sendWithRetry({
       to,

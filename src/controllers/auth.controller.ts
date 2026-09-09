@@ -85,17 +85,29 @@ export class AuthController extends BaseController {
     AuthZSchema.signupSchema,
   );
 
-  /** Called by email */
-  renderEmailVerificationPage = this.handleViewRequest(async (req, res) => {
+  private buildEmailVerificationViewData(req: Request) {
     const { flow, requestId, isOAuthFlow } = this.getFlow(req);
+    const email =
+      typeof req.query.email === 'string'
+        ? req.query.email
+        : typeof req.body?.email === 'string'
+          ? req.body.email
+          : '';
 
-    res.status(200).render('pages/auth/emailVerification', {
+    return {
       title: 'Email Verification',
-      email: typeof req.query.email === 'string' ? req.query.email : '',
+      email,
       flow,
       requestId: isOAuthFlow ? requestId : undefined,
       success: typeof req.query.success === 'string' ? req.query.success : null,
       error: typeof req.query.error === 'string' ? req.query.error : null,
+    };
+  }
+
+  /** Called by email */
+  renderEmailVerificationPage = this.handleViewRequest(async (req, res) => {
+    res.status(200).render('pages/auth/emailVerification', {
+      ...this.buildEmailVerificationViewData(req),
     });
   });
 
@@ -105,7 +117,7 @@ export class AuthController extends BaseController {
       const { requestId, isOAuthFlow } = this.getFlow(req);
 
       if (isOAuthFlow && !requestId) {
-        throw new AppError('Missing request_id for OAuth flow', 400, ErrorCode.INVALID_REQUEST, false);
+        throw new AppError('Missing request_id for OAuth flow', 400, ErrorCode.INVALID_REQUEST, true);
       }
 
       const data = await this.authService.verifyEmail(token);
@@ -118,8 +130,8 @@ export class AuthController extends BaseController {
 
       res.redirect(303, `/account`);
     },
-    'pages/auth/signup',
-    (req) => this.buildSignupViewData(req),
+    'pages/auth/emailVerification',
+    (req) => this.buildEmailVerificationViewData(req),
     AuthZSchema.verifyEmailSchema,
   );
 
@@ -143,8 +155,8 @@ export class AuthController extends BaseController {
 
       return res.redirect(303, `/verify?${params.toString()}`);
     },
-    'pages/auth/signup',
-    (req) => this.buildSignupViewData(req),
+    'pages/auth/emailVerification',
+    (req) => this.buildEmailVerificationViewData(req),
     AuthZSchema.resendVerificationEmailSchema,
   );
 
