@@ -1,45 +1,59 @@
-<div data-alert-container>
+<!-- Dynamic React-Like Toast Notifications Container (Fixed at top of screen) -->
+<div data-alert-container class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-md px-4 pointer-events-none flex flex-col items-center gap-3">
   <% if (typeof error === "string" && error && error !== 'Session_expired') { %>
-  <div class="mb-6 rounded-2xl border border-rose-100 dark:border-rose-500/15 bg-rose-50/50 dark:bg-rose-500/5 backdrop-blur-md p-4 shadow-md shadow-rose-100/20 dark:shadow-black/10 animate-slideIn" role="alert" data-alert data-alert-type="error">
-    <div class="flex items-start gap-3">
-      <div class="shrink-0 mt-0.5">
-        <div class="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-500/15 flex items-center justify-center">
-          <svg class="w-5 h-5 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold text-rose-900 dark:text-rose-300 mt-1">Error</p>
-        <p class="text-xs text-rose-700 dark:text-rose-400/80 mt-0.5 leading-relaxed" data-alert-message><%= error %></p>
-      </div>
-      <button type="button" class="ml-2 p-1 rounded-lg text-rose-400 dark:text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-300 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+  <div class="pointer-events-auto w-full rounded-2xl border border-rose-200/80 dark:border-rose-500/30 bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-rose-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="error" data-alert-dismiss="5000">
+    <div class="w-8 h-8 rounded-xl bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
     </div>
+    <div class="flex-1 min-w-0 pt-0.5">
+      <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400">Error</p>
+      <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-normal" data-alert-message><%= error %></p>
+    </div>
+    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
   </div>
-  <% } else if (typeof success === "string" && success && success !== 'Session_expired') { %>
-  <div class="mb-6 rounded-2xl border border-green-100 dark:border-emerald-500/15 bg-green-50/50 dark:bg-emerald-500/5 backdrop-blur-md p-4 shadow-md shadow-green-100/20 dark:shadow-black/10 animate-slideIn" role="alert" data-alert data-alert-type="success">
-    <div class="flex items-start gap-3">
-      <div class="shrink-0 mt-0.5">
-        <div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-emerald-500/15 flex items-center justify-center">
-          <svg class="w-5 h-5 text-green-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold text-green-900 dark:text-emerald-300 mt-1">Success</p>
-        <p class="text-xs text-green-700 dark:text-emerald-400/80 mt-0.5 leading-relaxed" data-alert-message><%= success %></p>
-      </div>
-      <button type="button" class="ml-2 p-1 rounded-lg text-green-400 dark:text-emerald-500 hover:bg-green-100 dark:hover:bg-emerald-500/10 hover:text-green-600 dark:hover:text-emerald-300 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+  <% } %>
+
+  <% if (typeof success === "string" && success && success !== 'Session_expired') { %>
+  <div class="pointer-events-auto w-full rounded-2xl border border-emerald-200/80 dark:border-emerald-500/30 bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-emerald-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="success" data-alert-dismiss="5000">
+    <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+      </svg>
     </div>
+    <div class="flex-1 min-w-0 pt-0.5">
+      <p class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Success</p>
+      <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-normal" data-alert-message><%= success %></p>
+    </div>
+    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <% } %>
+
+  <% if (typeof warning === "string" && warning) { %>
+  <div class="pointer-events-auto w-full rounded-2xl border border-amber-200/80 dark:border-amber-500/30 bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-amber-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="warning" data-alert-dismiss="6000">
+    <div class="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    </div>
+    <div class="flex-1 min-w-0 pt-0.5">
+      <p class="text-[11px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">Notice</p>
+      <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-normal" data-alert-message><%= warning %></p>
+    </div>
+    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
   </div>
   <% } %>
 </div>

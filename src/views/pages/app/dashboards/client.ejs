@@ -22,9 +22,16 @@
     client.domain.trim().toLowerCase().endsWith('.vercel.app') &&
     client.domain.trim().toLowerCase().length > '.vercel.app'.length
   );
+
+  const _warning = typeof warning !== 'undefined' ? warning : undefined;
 %>
 
+<% if (_renderPartial) { %>
+<%- _renderPartial("../../../partials/alert", { success, error, warning: _warning }) %>
+<% } %>
+
 <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 animate-slideIn relative z-10">
+  <script src="/js/dashboard-scroll.js"></script>
 
   <!-- Back Button -->
   <div class="flex">
@@ -79,13 +86,9 @@
   </div>
 
   <%
-    const _warning = typeof warning !== 'undefined' ? warning : undefined;
     const isEditing = typeof edit !== 'undefined' && edit === true;
     const focusDomain = typeof target !== 'undefined' && target === 'domain';
   %>
-  <% if (_renderPartial) { %>
-  <%- _renderPartial("../../../partials/alert", { success, error, warning: _warning }) %>
-  <% } %>
 
   <% if (client.environment === 'development') { %>
   <div class="p-3.5 rounded-2xl bg-amber-100 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/30 flex items-center justify-between gap-4 text-xs shadow-xs">
