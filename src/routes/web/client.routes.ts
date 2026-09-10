@@ -6,6 +6,7 @@ import { ClientZSchema } from '../../validators/client.validators.js';
 import { validateRequest } from '../../middlewares/validateRequest.js';
 import { Authentication, Authorize } from '../../middlewares/authMiddleware.js';
 import { ROLES } from '../../utils/constant.js';
+import { upload } from '../../middlewares/upload.js';
 
 const router = Router();
 const clientController = new ClientController(clientService, accountService);
@@ -91,6 +92,16 @@ router.post(
   Authorize.clientOwnership,
   validateRequest(ClientZSchema.updateClientSettingsSchema),
   clientController.updateClientSettings,
+);
+
+router.post(
+  '/client/:client_id/avatar',
+  Authentication.ssr('default'),
+  Authorize.role([ROLES.USER, ROLES.DEVELOPER]),
+  Authorize.clientOwnership,
+  validateRequest(ClientZSchema.clientIdSchema),
+  upload.single('avatar'),
+  clientController.updateClientAvatar,
 );
 
 router.post(

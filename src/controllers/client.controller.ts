@@ -9,6 +9,8 @@ import type { ClientService } from '../services/client.service.js';
 import type { AccountService } from '../services/account.service.js';
 import { OAuthClientEnvironment } from '../../generated/prisma/index.js';
 import { ClientZSchema } from '../validators/client.validators.js';
+import { cloudinary } from '../config/cloudinary.js';
+import streamifier from 'streamifier';
 
 export class ClientController extends BaseController {
   constructor(
@@ -263,6 +265,62 @@ export class ClientController extends BaseController {
         return res.redirect(303, `/client/${client_id}?error=${encodeURIComponent(error.message)}`);
       }
       throw error;
+    }
+  });
+
+  // ---------------- UPDATE CLIENT AVATAR ----------------
+
+  updateClientAvatar = this.handleViewRequest(async (req, res) => {
+    const client_id = this.getString(req.params.client_id);
+    const action = this.getString(req.body?.action);
+
+    if (!client_id) {
+      throw new AppError('Client ID is required', 400, ErrorCode.INVALID_REQUEST);
+    }
+
+    // Check if removing avatar
+    if (action === 'remove' || req.body?.remove_avatar === 'true') {
+      await this.clientService.updateClientAvatar(client_id, req.user.id, null);
+      return res.redirect(
+        303,
+        `/client/${client_id}?success=${encodeURIComponent('Client logo removed successfully')}`,
+      );
+    }
+
+    if (!req.file) {
+      return res.redirect(
+        303,
+        `/client/${client_id}?error=${encodeURIComponent('No image file was provided')}`,
+      );
+    }
+
+    try {
+      // Upload image to Cloudinary using streamifier
+      const avatarUrl: string = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'pramaan_client_avatars' },
+          (error, result) => {
+            if (result) resolve(result.secure_url);
+            else reject(error);
+          },
+        );
+        streamifier.createReadStream(req.file!.buffer).pipe(stream);
+      });
+
+      await this.clientService.updateClientAvatar(client_id, req.user.id, avatarUrl);
+
+      return res.redirect(
+        303,
+        `/client/${client_id}?success=${encodeURIComponent('Client logo updated successfully')}`,
+      );
+    } catch (error: any) {
+      console.error('Cloudinary upload error details for client avatar:', error);
+      return res.redirect(
+        303,
+        `/client/${client_id}?error=${encodeURIComponent(
+          'Logo upload failed. Please check Cloudinary configuration.',
+        )}`,
+      );
     }
   });
 

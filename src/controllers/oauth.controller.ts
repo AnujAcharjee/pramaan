@@ -57,6 +57,7 @@ export class OAuthController extends BaseController {
       clientName: client.name,
       clientDomain: client.domain,
       clientEnvironment: client.environment,
+      clientAvatar: client.avatar,
       domainStatus: client.domainStatus,
       redirectUri: authReq.redirectUri,
       scopes: authReq.scopes,

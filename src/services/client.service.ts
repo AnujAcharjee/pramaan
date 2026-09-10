@@ -20,6 +20,7 @@ export type ClientView = {
   id: string;
   name: string;
   domain: string;
+  avatar: string | null;
   domainStatus: 'PENDING' | 'VERIFIED';
   domainVerificationToken: string | null;
   domainVerificationMethod: string;
@@ -37,12 +38,16 @@ export type ClientView = {
 export type AllClientsView = {
   id: string;
   name: string;
+  domain: string;
+  avatar: string | null;
+  environment: OAuthClientEnvironment;
   isActive: boolean;
 };
 
 export interface ClientUpdateInput {
   name?: string;
   domain?: string;
+  avatar?: string | null;
   domainStatus?: 'PENDING' | 'VERIFIED';
   domainVerificationToken?: string | null;
   domainVerificationMethod?: string;
@@ -410,6 +415,7 @@ export class ClientService {
       domainVerifiedAt: client.domainVerifiedAt,
       clientType: client.clientType,
       environment: client.environment,
+      avatar: client.avatar,
       enforcePKCE: client.enforcePKCE,
       redirectURIs: client.redirectURIs,
       isActive: client.isActive,
@@ -431,6 +437,7 @@ export class ClientService {
         id: true,
         name: true,
         domain: true,
+        avatar: true,
         domainStatus: true,
         domainVerificationToken: true,
         domainVerificationMethod: true,
@@ -474,6 +481,7 @@ export class ClientService {
       data: {
         ...(updates.name !== undefined && { name: updates.name }),
         ...(updates.domain !== undefined && { domain: updates.domain }),
+        ...(updates.avatar !== undefined && { avatar: updates.avatar }),
         ...(updates.domainStatus !== undefined && { domainStatus: updates.domainStatus }),
         ...(updates.domainVerificationToken !== undefined && {
           domainVerificationToken: updates.domainVerificationToken,
@@ -493,6 +501,7 @@ export class ClientService {
         id: true,
         name: true,
         domain: true,
+        avatar: true,
         domainStatus: true,
         domainVerificationToken: true,
         domainVerificationMethod: true,
@@ -751,12 +760,32 @@ export class ClientService {
       select: {
         id: true,
         name: true,
+        domain: true,
+        avatar: true,
+        environment: true,
         isActive: true,
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
+  }
+
+  // -------- UPDATE CLIENT AVATAR --------
+
+  async updateClientAvatar(
+    clientId: string,
+    userId: string,
+    avatarUrl: string | null,
+  ): Promise<ClientView> {
+    const existing = await prisma.oAuthClient.findUnique({
+      where: { id: clientId },
+    });
+    if (!existing || existing.userId !== userId) {
+      throw new AppError('Client not found', 404, ErrorCode.NOT_FOUND);
+    }
+
+    return this.update(clientId, { avatar: avatarUrl });
   }
 
   async setClientEnvironment(

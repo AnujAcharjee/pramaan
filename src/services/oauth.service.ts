@@ -34,6 +34,7 @@ export type OAuthConsentView = {
     id: string;
     name: string;
     domain: string;
+    avatar: string | null;
   };
   scopes: string[];
   date: Date;
@@ -375,6 +376,7 @@ export class OAuthService {
             id: true,
             name: true,
             domain: true,
+            avatar: true,
           },
         },
       },
@@ -388,6 +390,7 @@ export class OAuthService {
         id: consent.client.id,
         name: consent.client.name,
         domain: consent.client.domain,
+        avatar: consent.client.avatar,
       },
       scopes: consent.scopes,
       date: consent.createdAt,

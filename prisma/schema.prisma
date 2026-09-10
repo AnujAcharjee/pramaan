@@ -59,8 +59,9 @@ model OAuthClient {
   userId String
 
   // App identity
-  name   String @db.VarChar(99)
-  domain String @db.VarChar(255)
+  name   String  @db.VarChar(99)
+  domain String  @db.VarChar(255)
+  avatar String?
 
   // Domain Verification
   domainStatus             DomainStatus @default(PENDING)

@@ -4,6 +4,7 @@
   const _scopes = Array.isArray(scopes) ? scopes : [];
   const _appName = clientName || 'Application';
   const _initials = _appName.trim().slice(0, 2).toUpperCase();
+  const _clientAvatar = typeof clientAvatar !== 'undefined' && clientAvatar ? clientAvatar : (typeof client !== 'undefined' && client?.avatar ? client.avatar : null);
   const _user = typeof user !== 'undefined' && user ? user : null;
   const _environment = typeof clientEnvironment !== 'undefined' && clientEnvironment ? clientEnvironment : (typeof client !== 'undefined' && client?.environment ? client.environment : 'development');
   const _domainStatus = typeof domainStatus !== 'undefined' && domainStatus ? domainStatus : (typeof client !== 'undefined' && client?.domainStatus ? client.domainStatus : 'PENDING');
@@ -63,8 +64,12 @@
         <div class="flex items-center justify-center gap-3 mb-5">
           <!-- Client App Avatar -->
           <div class="relative">
-            <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center border border-slate-300/60 dark:border-slate-600/50 shadow-md">
-              <span class="text-base font-black tracking-wider text-slate-800 dark:text-slate-100"><%= _initials %></span>
+            <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center border border-slate-300/60 dark:border-slate-600/50 shadow-md overflow-hidden">
+              <% if (_clientAvatar) { %>
+                <img src="<%= _clientAvatar %>" alt="<%= _appName %>" class="w-full h-full object-cover" />
+              <% } else { %>
+                <span class="text-base font-black tracking-wider text-slate-800 dark:text-slate-100"><%= _initials %></span>
+              <% } %>
             </div>
             <% if (isVerifiedProduction) { %>
             <!-- Verified Checkmark Badge Overlay (Production Only) -->

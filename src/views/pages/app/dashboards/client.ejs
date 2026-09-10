@@ -65,7 +65,7 @@
         Disabled
       </span>
       <% } else if (isClientDev) { %>
-      <span class="inline-flex items-center font-bold rounded-full px-3.5 py-1.5 text-xs bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 ring-1 ring-amber-300/60 dark:ring-amber-500/30 shadow-2xs">
+      <span class="inline-flex items-center font-bold rounded-full px-3.5 py-1.5 text-xs bg-amber-100 text-amber-800 ring-1 ring-amber-300/60 shadow-2xs">
         <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
         DEV
       </span>
@@ -88,23 +88,20 @@
   <% } %>
 
   <% if (client.environment === 'development') { %>
-  <div class="p-3.5 rounded-2xl bg-amber-50/90 dark:bg-amber-500/10 border border-amber-300/80 dark:border-amber-500/30 flex items-center justify-between gap-4 text-xs shadow-2xs">
+  <div class="p-3.5 rounded-2xl bg-amber-100 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/30 flex items-center justify-between gap-4 text-xs shadow-xs">
     <div class="flex items-center gap-3 min-w-0">
-      <div class="w-7 h-7 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+      <div class="w-7 h-7 rounded-xl bg-amber-200/80 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       </div>
       <div class="min-w-0">
         <p class="font-bold text-amber-900 dark:text-amber-200">Developer Mode Active</p>
-        <p class="text-amber-800/90 dark:text-amber-300/90 mt-0.5 leading-normal">
+        <p class="text-amber-800 dark:text-amber-300/90 mt-0.5 leading-normal font-medium">
           This client is in development mode. Unverified domains and localhost callbacks are allowed for testing only.
         </p>
       </div>
     </div>
-    <span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-200/80 dark:bg-amber-500/30 text-amber-900 dark:text-amber-200 shrink-0">
-      DEV
-    </span>
   </div>
   <% } %>
 
@@ -115,13 +112,38 @@
       
       <!-- App Overview -->
       <section class="dashboard-section">
+        <!-- Standalone hidden avatar forms for SSR upload and removal -->
+        <form id="client-avatar-upload-form" action="/client/<%= client.id %>/avatar" method="POST" enctype="multipart/form-data" class="hidden">
+          <input type="file" id="client-avatar-file-input" name="avatar" accept="image/*" class="hidden" />
+        </form>
+        <form id="client-remove-avatar-form" action="/client/<%= client.id %>/avatar" method="POST" class="hidden">
+          <input type="hidden" name="action" value="remove" />
+        </form>
+
         <form id="edit-details-form" action="/client/<%= client.id %>/settings" method="POST">
           <div class="flex items-start sm:items-center justify-between gap-4 mb-6 flex-wrap">
             <div class="flex items-start sm:items-center gap-4">
-              <div class="dashboard-icon bg-slate-900 dark:bg-slate-200">
-                <svg class="w-6 h-6 text-white dark:text-slate-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
+              <!-- Client Avatar / Logo (Replacing generic icon, matching its exact position and proportions) -->
+              <div class="relative group/logo shrink-0">
+                <label for="client-avatar-file-input" class="cursor-pointer block relative" title="Click to upload client logo">
+                  <div class="dashboard-icon !p-0 !bg-none bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 shadow-sm overflow-hidden flex items-center justify-center">
+                    <% if (client.avatar) { %>
+                      <img id="client-avatar-preview" src="<%= client.avatar %>" alt="<%= client.name %>" class="w-full h-full object-cover" />
+                    <% } else { %>
+                      <span class="text-sm font-black tracking-wider text-slate-700 dark:text-slate-200">
+                        <%= client.name.trim().slice(0, 2).toUpperCase() %>
+                      </span>
+                    <% } %>
+                  </div>
+
+                  <!-- Camera Icon Badge Overlay on bottom-right -->
+                  <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-brand-orange text-white flex items-center justify-center shadow-xs ring-2 ring-white dark:ring-[#0f121d] group-hover/logo:scale-110 transition-transform" title="Upload Logo">
+                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                </label>
               </div>
 
               <div class="min-w-0 flex-1 space-y-1">
@@ -170,6 +192,12 @@
                       <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                       Unverified
                     </span>
+                  <% } %>
+
+                  <% if (client.avatar) { %>
+                    <button type="button" id="trigger-remove-avatar-btn" class="text-[10px] font-semibold text-rose-500 hover:text-rose-600 hover:underline cursor-pointer inline-flex items-center ml-1" title="Remove Client Logo">
+                      <span>Remove Logo</span>
+                    </button>
                   <% } %>
                 </div>
 

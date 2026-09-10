@@ -157,4 +157,26 @@ document.addEventListener('DOMContentLoaded', () => {
     editDomainInput.focus();
     editDomainInput.select();
   }
+
+  // Client Avatar Upload & Remove Handling
+  const avatarInput = document.getElementById('client-avatar-file-input');
+  const avatarForm = document.getElementById('client-avatar-upload-form');
+  const triggerRemoveAvatarBtn = document.getElementById('trigger-remove-avatar-btn');
+  const removeAvatarForm = document.getElementById('client-remove-avatar-form');
+
+  if (avatarInput && avatarForm) {
+    avatarInput.addEventListener('change', () => {
+      if (avatarInput.files && avatarInput.files.length > 0) {
+        avatarForm.submit();
+      }
+    });
+  }
+
+  if (triggerRemoveAvatarBtn && removeAvatarForm) {
+    triggerRemoveAvatarBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to remove the client logo?')) {
+        removeAvatarForm.submit();
+      }
+    });
+  }
 });

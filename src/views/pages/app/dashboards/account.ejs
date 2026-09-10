@@ -310,15 +310,26 @@
           <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-brand-orange/30 dark:hover:border-slate-700 transition-all duration-300">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div class="space-y-2 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <p class="font-bold text-slate-800 dark:text-slate-100 truncate"><%= consent.client.name %></p>
-                  <%- include("../../../partials/ui/badge", {
-                    variant: consent.revokedAt ? "danger" : "success",
-                    text: `${consent.revokedAt ? 'Revoked' : 'Authorized'} on ${new Date(consent.revokedAt || consent.date).toLocaleDateString()}`,
-                    size: "sm"
-                  }) %>
+                <div class="flex items-center gap-3">
+                  <% if (consent.client.avatar) { %>
+                    <img src="<%= consent.client.avatar %>" alt="<%= consent.client.name %>" class="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700 shrink-0" />
+                  <% } else { %>
+                    <div class="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-500/15 text-sky-700 dark:text-sky-300 font-extrabold text-xs flex items-center justify-center shrink-0">
+                      <%= consent.client.name.trim().slice(0, 2).toUpperCase() %>
+                    </div>
+                  <% } %>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <p class="font-bold text-slate-800 dark:text-slate-100 truncate"><%= consent.client.name %></p>
+                      <%- include("../../../partials/ui/badge", {
+                        variant: consent.revokedAt ? "danger" : "success",
+                        text: `${consent.revokedAt ? 'Revoked' : 'Authorized'} on ${new Date(consent.revokedAt || consent.date).toLocaleDateString()}`,
+                        size: "sm"
+                      }) %>
+                    </div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono truncate"><%= consent.client.domain %></p>
+                  </div>
                 </div>
-                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 font-mono truncate"><%= consent.client.domain %></p>
                 
                 <div class="flex flex-wrap gap-1.5">
                   <% consent.scopes.forEach(scope => { %>
@@ -411,6 +422,13 @@
           <div class="group p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 hover:border-brand-orange/30 dark:hover:border-brand-orange/40 hover:bg-white dark:hover:bg-[#0e1424] hover:shadow-lg dark:hover:shadow-black/25 transition-all duration-300">
             <div class="space-y-3">
               <div class="flex items-center gap-3 flex-wrap">
+                <% if (client.avatar) { %>
+                  <img src="<%= client.avatar %>" alt="<%= client.name %>" class="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-slate-700 shrink-0" />
+                <% } else { %>
+                  <div class="w-8 h-8 rounded-xl bg-linear-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 text-slate-800 dark:text-slate-200 font-black text-xs flex items-center justify-center border border-slate-300/60 dark:border-slate-600/50 shrink-0">
+                    <%= client.name.trim().slice(0, 2).toUpperCase() %>
+                  </div>
+                <% } %>
                 <h3 class="font-extrabold text-slate-900 dark:text-slate-100 text-base truncate"><%= client.name %></h3>
                 <%
                   const isClientDev = client.environment === 'development' || client.domain === 'localhost';
