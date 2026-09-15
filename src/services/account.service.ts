@@ -8,7 +8,7 @@ import type { Gender, Role } from '../utils/constant.js';
 
 interface ProfileUpdateInput {
   name?: string;
-  avatar?: string;
+  avatar?: string | null;
   roles?: Role[];
   email?: string;
   gender?: Gender;

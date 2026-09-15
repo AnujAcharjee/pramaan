@@ -49,7 +49,10 @@ export class AuthController extends BaseController {
     const { flow, requestId, isOAuthFlow } = this.getFlow(req);
 
     return {
-      title: 'Sign up',
+      title: 'Sign Up - Pramaan',
+      description:
+        'Create your free Pramaan account to access modern OAuth 2.0 and OpenID Connect identity services.',
+      canonical: 'https://pramaan.anujacharjee.com/signup',
       email: req.body?.email ?? null,
       name: req.body?.name ?? null,
       gender: req.body?.gender ?? null,
@@ -104,7 +107,8 @@ export class AuthController extends BaseController {
           : '';
 
     return {
-      title: 'Email Verification',
+      title: 'Email Verification - Pramaan',
+      robots: 'noindex, nofollow',
       email,
       flow,
       requestId: isOAuthFlow ? requestId : undefined,
@@ -175,7 +179,10 @@ export class AuthController extends BaseController {
     const { flow, requestId } = this.getFlow(req);
 
     return {
-      title: 'Sign in',
+      title: 'Sign In - Pramaan',
+      description:
+        'Sign in to your Pramaan account for secure OAuth 2.0 and OpenID Connect identity management.',
+      canonical: 'https://pramaan.anujacharjee.com/signin',
       email: req.body?.email ?? null,
       flow,
       requestId,
@@ -268,7 +275,9 @@ export class AuthController extends BaseController {
     const { flow, requestId, isOAuthFlow } = this.getFlow(req);
 
     return {
-      title: 'Forgot Password',
+      title: 'Forgot Password - Pramaan',
+      description: 'Reset your Pramaan account password securely.',
+      canonical: 'https://pramaan.anujacharjee.com/forgot-password',
       email: req.body?.email ?? null,
       flow,
       requestId: isOAuthFlow ? (requestId ?? null) : null,
@@ -317,7 +326,8 @@ export class AuthController extends BaseController {
       : null;
 
     return {
-      title: 'Reset Password',
+      title: 'Reset Password - Pramaan',
+      robots: 'noindex, nofollow',
       resetToken,
       flow,
       requestId: isOAuthFlow ? (requestId ?? null) : null,

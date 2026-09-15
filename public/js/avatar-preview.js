@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const originalName = nameInput ? nameInput.value : '';
   let previewObjectUrl = null;
 
+  const triggerRemoveAvatarBtn = document.getElementById('trigger-remove-avatar-btn');
+  const removeAvatarForm = document.getElementById('remove-avatar-form');
+  const hasServerAvatar = avatarPreview ? avatarPreview.dataset.hasServerAvatar === 'true' : false;
+
   // Toggle Edit Mode
   function setEditMode(isEditing) {
     if (isEditing) {
@@ -50,6 +54,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (editActions) {
         editActions.classList.remove('hidden');
         editActions.classList.add('flex');
+      }
+
+      // Ensure remove button state matches
+      if (triggerRemoveAvatarBtn) {
+        const hasLocalFile = avatarInput.files && avatarInput.files.length > 0;
+        if (hasServerAvatar || hasLocalFile) {
+          triggerRemoveAvatarBtn.classList.remove('hidden');
+          triggerRemoveAvatarBtn.classList.add('inline-flex');
+        } else {
+          triggerRemoveAvatarBtn.classList.add('hidden');
+          triggerRemoveAvatarBtn.classList.remove('inline-flex');
+        }
       }
     } else {
       // Hide edit inputs
@@ -88,6 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
         undoBtn.classList.add('hidden');
         undoBtn.classList.remove('inline-flex');
       }
+
+      if (triggerRemoveAvatarBtn) {
+        if (hasServerAvatar) {
+          triggerRemoveAvatarBtn.classList.remove('hidden');
+          triggerRemoveAvatarBtn.classList.add('inline-flex');
+        } else {
+          triggerRemoveAvatarBtn.classList.add('hidden');
+          triggerRemoveAvatarBtn.classList.remove('inline-flex');
+        }
+      }
     }
   }
 
@@ -111,6 +137,16 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         undoBtn.classList.add('hidden');
         undoBtn.classList.remove('inline-flex');
+      }
+    }
+
+    if (triggerRemoveAvatarBtn) {
+      if (avatarChanged || hasServerAvatar) {
+        triggerRemoveAvatarBtn.classList.remove('hidden');
+        triggerRemoveAvatarBtn.classList.add('inline-flex');
+      } else {
+        triggerRemoveAvatarBtn.classList.add('hidden');
+        triggerRemoveAvatarBtn.classList.remove('inline-flex');
       }
     }
   }
@@ -214,6 +250,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       undoBtn.classList.add('hidden');
       undoBtn.classList.remove('inline-flex');
+
+      checkChanges();
     });
   }
 
@@ -227,5 +265,44 @@ document.addEventListener('DOMContentLoaded', () => {
       if (saveSpinner) saveSpinner.classList.remove('hidden');
       if (saveText) saveText.textContent = 'Saving...';
     });
+  }
+
+  // Handle Avatar Removal
+  function handleRemoveAvatar(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    const hadLocalFile = Boolean(avatarInput.files && avatarInput.files.length > 0);
+
+    if (hadLocalFile) {
+      avatarInput.value = '';
+      if (previewObjectUrl) {
+        URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+      }
+      checkChanges();
+    }
+
+    if (hasServerAvatar) {
+      if (confirm('Are you sure you want to remove your profile avatar?')) {
+        if (removeAvatarForm) {
+          removeAvatarForm.submit();
+        }
+      } else if (hadLocalFile) {
+        avatarPreview.src = originalAvatarUrl;
+      }
+    } else {
+      avatarPreview.src = '/images/default-avatar.png';
+      if (triggerRemoveAvatarBtn) {
+        triggerRemoveAvatarBtn.classList.add('hidden');
+        triggerRemoveAvatarBtn.classList.remove('inline-flex');
+      }
+    }
+  }
+
+  if (triggerRemoveAvatarBtn) {
+    triggerRemoveAvatarBtn.addEventListener('click', handleRemoveAvatar);
   }
 });

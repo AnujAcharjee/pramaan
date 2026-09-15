@@ -2,26 +2,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-<meta name="description" content="Pramaan - Modern OAuth 2.0 and OpenID Connect Identity Provider" />
-<meta name="keywords" content="authentication, identity verification, oauth, login system">
+<meta name="description" content="<%= locals.description ?? 'Pramaan - Modern OAuth 2.0 and OpenID Connect Identity Provider' %>" />
+<meta name="keywords" content="<%= locals.keywords ?? 'authentication, identity verification, oauth, login system' %>">
 <meta name="author" content="Anuj Acharjee">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="<%= locals.robots ?? 'index, follow' %>">
 
-<link rel="canonical" href="https://pramaan.anujacharjee.com/" />
+<link rel="canonical" href="<%= locals.canonical ?? 'https://pramaan.anujacharjee.com/' %>" />
 
 <meta name="theme-color" content="#0f172a">
 
-<title><%= title ?? "Pramaan - Secure Identity Provider" %></title>
+<title><%= locals.title ?? "Pramaan - Secure Identity Provider" %></title>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" as="style">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- Stylesheet -->
 <link rel="stylesheet" href="/css/output.css" />
 <!-- Favicon -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/x-icon" href="/favicon_io/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon_io/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon_io/favicon-16x16.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon_io/apple-touch-icon.png" />
+<link rel="manifest" href="/favicon_io/site.webmanifest" />
 
 <!-- Theme Initializer -->
 <script src="/js/theme-init.js?v=3"></script>

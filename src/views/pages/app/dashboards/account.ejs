@@ -3,9 +3,7 @@
 <%
   const _avatar = user.avatar
     ? user.avatar
-    : user.gender === 'MALE'
-      ? '/images/avatar-m-placeholder.jpg'
-      : '/images/avatar-f-placeholder.png';
+    : '/images/default-avatar.png';
 %>
 
 <%- include("../../../partials/alert", { success, error }) %>
@@ -40,10 +38,15 @@
       
       <!-- Profile Section -->
       <section class="dashboard-section !p-6">
+        <!-- Standalone hidden form for avatar removal -->
+        <form id="remove-avatar-form" action="/account/avatar" method="POST" class="hidden">
+          <input type="hidden" name="action" value="remove" />
+        </form>
+
         <form id="profile-form" action="/account?_method=PUT" method="POST" enctype="multipart/form-data" class="flex flex-col items-center text-center">
           <!-- Avatar -->
           <div id="avatar-container" class="relative mb-4 group/avatar">
-            <img id="avatar-preview" src="<%= _avatar %>" alt="<%= user.name %>" class="h-24 w-24 rounded-3xl object-cover ring-4 ring-brand-orange/20 dark:ring-brand-orange/15 shadow-md transition duration-300" />
+            <img id="avatar-preview" src="<%= _avatar %>" data-has-server-avatar="<%= Boolean(user.avatar) %>" alt="<%= user.name %>" class="h-24 w-24 rounded-3xl object-cover ring-4 ring-brand-orange/20 dark:ring-brand-orange/15 shadow-md transition duration-300" />
             
             <!-- Hover/Camera Icon Overlay (Only shown when editing) -->
             <div id="avatar-edit-overlay" class="hidden absolute inset-0 items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity bg-black/35 rounded-3xl cursor-pointer">
@@ -126,7 +129,15 @@
                 </svg>
                 <span id="save-btn-text">Save</span>
               </button>
-              <button id="cancel-profile-btn" type="button" class="btn-outline-gray !py-1.5 !px-4 !text-xs rounded-lg inline-flex items-center gap-1.5 transition-all duration-350">
+
+              <button type="button" id="trigger-remove-avatar-btn" onclick="handleRemoveAvatarClick(event)" class="<%= user.avatar ? 'inline-flex' : 'hidden' %> btn-outline-rose !py-1.5 !px-3 !text-xs rounded-lg items-center gap-1.5 cursor-pointer transition-all duration-350" title="Remove Avatar">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>Remove Avatar</span>
+              </button>
+
+              <button id="cancel-profile-btn" type="button" class="btn-outline-gray !py-1.5 !px-4 !text-xs rounded-lg inline-flex items-center gap-1.5 transition-all duration-350 cursor-pointer">
                 Cancel
               </button>
             </div>
@@ -464,5 +475,48 @@
 
 </div>
 
+<script>
+  function handleRemoveAvatarClick(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const avatarInput = document.getElementById('avatar-input');
+    const avatarPreview = document.getElementById('avatar-preview');
+    const removeAvatarForm = document.getElementById('remove-avatar-form');
+    const triggerBtn = document.getElementById('trigger-remove-avatar-btn');
+    const undoBtn = document.getElementById('undo-avatar-btn');
+
+    const hadLocalFile = Boolean(avatarInput && avatarInput.files && avatarInput.files.length > 0);
+    const hasServerAvatar = Boolean(avatarPreview && avatarPreview.dataset.hasServerAvatar === 'true');
+
+    if (hadLocalFile) {
+      avatarInput.value = '';
+      if (undoBtn) {
+        undoBtn.classList.add('hidden');
+        undoBtn.classList.remove('inline-flex');
+      }
+    }
+
+    if (hasServerAvatar) {
+      if (confirm('Are you sure you want to remove your profile avatar?')) {
+        if (removeAvatarForm) {
+          removeAvatarForm.submit();
+        }
+      } else if (hadLocalFile && avatarPreview) {
+        avatarPreview.src = '<%= _avatar %>';
+      }
+    } else {
+      if (avatarPreview) {
+        avatarPreview.src = '/images/default-avatar.png';
+      }
+      if (triggerBtn) {
+        triggerBtn.classList.add('hidden');
+        triggerBtn.classList.remove('inline-flex');
+      }
+    }
+  }
+</script>
+
 <script src="/js/copyBtn.js" defer></script>
-<script src="/js/avatar-preview.js" defer></script>
+<script src="/js/avatar-preview.js?v=6" defer></script>

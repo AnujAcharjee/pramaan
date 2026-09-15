@@ -2,35 +2,59 @@
 <html lang="en">
 
 <head>
-  <%- partial("../partials/head", { title }) %>
+  <%- partial("../partials/head", locals) %>
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="<%= title ?? "Pramaan - Secure Identity Provider" %>">
-  <meta property="og:description" content="Authenticate users securely with Pramaan identity platform.">
-  <meta property="og:url" content="https://pramaan.anujacharjee.com/">
+  <meta property="og:title" content="<%= locals.title ?? "Pramaan - Secure Identity Provider" %>">
+  <meta property="og:description" content="<%= locals.description ?? "Authenticate users securely with Pramaan identity platform." %>">
+  <meta property="og:url" content="<%= locals.canonical ?? "https://pramaan.anujacharjee.com/" %>">
   <meta property="og:image" content="https://pramaan.anujacharjee.com/images/landing-preview.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1895">
+  <meta property="og:image:height" content="871">
+  <meta property="og:image:alt" content="Pramaan - Modern OAuth 2.0 & OpenID Connect IdP Preview">
   <meta property="og:site_name" content="Pramaan">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="<%= title ?? "Pramaan - Secure Identity Provider" %>">
-  <meta name="twitter:description" content="Authenticate users securely with Pramaan identity platform.">
+  <meta name="twitter:title" content="<%= locals.title ?? "Pramaan - Secure Identity Provider" %>">
+  <meta name="twitter:description" content="<%= locals.description ?? "Authenticate users securely with Pramaan identity platform." %>">
   <meta name="twitter:image" content="https://pramaan.anujacharjee.com/images/landing-preview.png">
+  <meta name="twitter:image:alt" content="Pramaan - Modern OAuth 2.0 & OpenID Connect IdP Preview">
   <meta name="twitter:creator" content="@anuj_304">
 
   <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "Pramaan",
-      "url": "https://pramaan.anujacharjee.com",
-      "description": "Modern OAuth 2.0 and OpenID Connect identity provider.",
-      "applicationCategory": "SecurityApplication",
-      "operatingSystem": "Web",
-      "creator": {
-        "@type": "Person",
-        "name": "Anuj Acharjee"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Pramaan",
+        "url": "https://pramaan.anujacharjee.com",
+        "description": "Modern OAuth 2.0 and OpenID Connect identity provider.",
+        "publisher": {
+          "@type": "Person",
+          "name": "Anuj Acharjee",
+          "url": "https://anujacharjee.com"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Pramaan",
+        "url": "https://pramaan.anujacharjee.com",
+        "description": "Open-source OAuth 2.0 and OpenID Connect identity provider with PKCE, JWKS, and standards-compliant token management.",
+        "applicationCategory": "SecurityApplication",
+        "operatingSystem": "Web",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "creator": {
+          "@type": "Person",
+          "name": "Anuj Acharjee"
+        }
       }
-    }
+    ]
   </script>
 </head>
 

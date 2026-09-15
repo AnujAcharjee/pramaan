@@ -1,3 +1,11 @@
 User-agent: *
 Allow: /
-Sitemap: https://pramaan.anujacharjee.com/sitemap.xml
+
+Disallow: /account
+Disallow: /client
+Disallow: /api/
+Disallow: /verify
+Disallow: /email/verify
+Disallow: /health
+
+Sitemap: https://pramaan.anujacharjee.com/sitemap.xml

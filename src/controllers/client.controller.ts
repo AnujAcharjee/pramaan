@@ -45,6 +45,7 @@ export class ClientController extends BaseController {
   private buildAddClientViewData(req: Request) {
     return {
       title: 'Add Client',
+      robots: 'noindex, nofollow',
       formData: {
         name: typeof req.body?.name === 'string' ? req.body.name : '',
         has_domain: typeof req.body?.has_domain === 'string' ? req.body.has_domain : 'yes',
@@ -123,6 +124,7 @@ export class ClientController extends BaseController {
 
     return {
       title: 'OAuth Dashboard',
+      robots: 'noindex, nofollow',
       serverUrl: SERVER_URL,
       client: {
         ...client,
@@ -543,6 +545,7 @@ export class ClientController extends BaseController {
 
       return {
         title: 'Confirm Client Action',
+        robots: 'noindex, nofollow',
         clientId,
         action,
         name: client.name,
@@ -557,6 +560,7 @@ export class ClientController extends BaseController {
 
     return {
       title: 'Confirm Client Action',
+      robots: 'noindex, nofollow',
       clientId,
       action,
       name: typeof req.query.name === 'string' ? req.query.name : undefined,

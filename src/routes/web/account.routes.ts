@@ -38,6 +38,13 @@ router
   .delete(Authentication.ssr('default'), Authorize.role([ROLES.USER]), accountController.delete);
 
 router.post(
+  '/account/avatar',
+  Authentication.ssr('default'),
+  Authorize.role([ROLES.USER]),
+  accountController.removeAvatar,
+);
+
+router.post(
   '/account/mfa',
   Authentication.ssr('default'),
   Authorize.role([ROLES.USER]),

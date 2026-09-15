@@ -35,7 +35,13 @@ const setupMiddleware = (app: express.Application) => {
   app.use(express.urlencoded({ extended: false }));
   app.use(express.json({ limit: '10kb' }));
   app.use(cookieParser(ENV.COOKIE_SECRET));
-  app.use(express.static(path.join(process.cwd(), 'public')));
+  app.use(
+    express.static(path.join(process.cwd(), 'public'), {
+      maxAge: '7d',
+      etag: true,
+      lastModified: true,
+    }),
+  );
   app.use(methodOverride('_method'));
 
   // Monitoring

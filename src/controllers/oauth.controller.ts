@@ -52,6 +52,7 @@ export class OAuthController extends BaseController {
 
     res.render('pages/oauth/consent', {
       title: `Authorize ${client.name}`,
+      robots: 'noindex, nofollow',
       requestId: authReq.id,
       clientId: authReq.clientId,
       clientName: client.name,

@@ -30,6 +30,7 @@ export class AccountController extends BaseController {
 
     return {
       title: 'Account Dashboard',
+      robots: 'noindex, nofollow',
       serverUrl: SERVER_URL,
       user,
       createdAtFormatted: new Date(user.createdAt).toLocaleDateString(),
@@ -70,11 +71,6 @@ export class AccountController extends BaseController {
       }
     }
 
-    if (!avatarUrl && !user.avatar) {
-      // Assign default fallback image if not provided
-      avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`;
-    }
-
     if (avatarUrl) {
       req.body.updates = { ...req.body.updates, avatar: avatarUrl };
     }
@@ -82,6 +78,15 @@ export class AccountController extends BaseController {
     await this.accountService.update(req.user.id, req.body.updates);
 
     return res.redirect(303, `/account?success=${encodeURIComponent('Profile updated successfully')}`);
+  });
+
+  removeAvatar = this.handleViewRequest(async (req, res) => {
+    await this.accountService.update(req.user.id, { avatar: null });
+
+    return res.redirect(
+      303,
+      `/account?success=${encodeURIComponent('Avatar removed successfully')}`,
+    );
   });
 
   changePassword = this.handleViewRequest(async (req, res) => {
