@@ -106,6 +106,65 @@ describe('Vercel Domain Identification', () => {
   });
 });
 
+describe('DNS Verification Host Calculation for Subdomains and Apex Domains', () => {
+  it('should return _pramaan-verification for apex domains without subdomain', () => {
+    const res = clientService.getVerificationDnsHost('example.com');
+    assert.strictEqual(res.host, '_pramaan-verification');
+    assert.strictEqual(res.subdomain, '');
+    assert.strictEqual(res.apex, 'example.com');
+    assert.strictEqual(res.fqdn, '_pramaan-verification.example.com');
+  });
+
+  it('should return _pramaan-verification.{subdomain} for a single subdomain', () => {
+    const res = clientService.getVerificationDnsHost('auth.example.com');
+    assert.strictEqual(res.host, '_pramaan-verification.auth');
+    assert.strictEqual(res.subdomain, 'auth');
+    assert.strictEqual(res.apex, 'example.com');
+    assert.strictEqual(res.fqdn, '_pramaan-verification.auth.example.com');
+  });
+
+  it('should return _pramaan-verification.{subdomains} for nested subdomains', () => {
+    const res = clientService.getVerificationDnsHost('api.staging.myapp.io');
+    assert.strictEqual(res.host, '_pramaan-verification.api.staging');
+    assert.strictEqual(res.subdomain, 'api.staging');
+    assert.strictEqual(res.apex, 'myapp.io');
+    assert.strictEqual(res.fqdn, '_pramaan-verification.api.staging.myapp.io');
+  });
+
+  it('should handle multi-part ccTLDs correctly', () => {
+    // Apex domain with multi-part ccTLD
+    const apexRes = clientService.getVerificationDnsHost('example.co.uk');
+    assert.strictEqual(apexRes.host, '_pramaan-verification');
+    assert.strictEqual(apexRes.subdomain, '');
+    assert.strictEqual(apexRes.apex, 'example.co.uk');
+
+    // Subdomain with multi-part ccTLD
+    const subRes = clientService.getVerificationDnsHost('auth.example.co.uk');
+    assert.strictEqual(subRes.host, '_pramaan-verification.auth');
+    assert.strictEqual(subRes.subdomain, 'auth');
+    assert.strictEqual(subRes.apex, 'example.co.uk');
+    assert.strictEqual(subRes.fqdn, '_pramaan-verification.auth.example.co.uk');
+  });
+
+  it('should normalize URLs, ports, paths, and trailing dots', () => {
+    const res = clientService.getVerificationDnsHost('https://auth.example.com:443/callback/');
+    assert.strictEqual(res.host, '_pramaan-verification.auth');
+    assert.strictEqual(res.subdomain, 'auth');
+    assert.strictEqual(res.fqdn, '_pramaan-verification.auth.example.com');
+  });
+
+  it('should handle localhost and empty domains gracefully', () => {
+    const local = clientService.getVerificationDnsHost('localhost');
+    assert.strictEqual(local.host, '_pramaan-verification');
+    assert.strictEqual(local.subdomain, '');
+
+    const empty = clientService.getVerificationDnsHost('');
+    assert.strictEqual(empty.host, '_pramaan-verification');
+    assert.strictEqual(empty.subdomain, '');
+  });
+});
+
+
 describe('Redirect URI Validation Policy', () => {
   const registeredDomain = 'clientapp.com';
   const vercelDomain = 'my-cool-app.vercel.app';

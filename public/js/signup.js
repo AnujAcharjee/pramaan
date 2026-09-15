@@ -71,7 +71,7 @@
       const hasUpper = /[A-Z]/.test(val);
       const hasLower = /[a-z]/.test(val);
       const hasDigit = /\d/.test(val);
-      const hasSpecial = /[@$!%*?&]/.test(val);
+      const hasSpecial = /[@$!%*?&#]/.test(val);
 
       updateCheck(checks.length, hasLength);
       updateCheck(checks.upper, hasUpper);

@@ -128,6 +128,7 @@ export class ClientController extends BaseController {
         ...client,
         client_secret: clientSecret,
       },
+      dnsInfo: this.clientService.getVerificationDnsHost(client.domain),
       createdAtFormatted: new Date(client.createdAt).toLocaleDateString(),
       updatedAtFormatted: new Date(client.updatedAt).toLocaleDateString(),
       revokedAtFormatted: client.revokedAt ? new Date(client.revokedAt).toLocaleDateString() : null,

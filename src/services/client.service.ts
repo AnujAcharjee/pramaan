@@ -186,6 +186,66 @@ export class ClientService {
     );
   }
 
+  getVerificationDnsHost(domain?: string): {
+    host: string;
+    subdomain: string;
+    apex: string;
+    fqdn: string;
+  } {
+    if (!domain) {
+      return { host: '_pramaan-verification', subdomain: '', apex: '', fqdn: '_pramaan-verification' };
+    }
+    let normalized = domain.trim().toLowerCase();
+    if (normalized.startsWith('https://')) normalized = normalized.slice(8);
+    if (normalized.startsWith('http://')) normalized = normalized.slice(7);
+    if (normalized.endsWith('.')) normalized = normalized.slice(0, -1);
+    if (normalized.includes('/')) normalized = normalized.split('/')[0]!;
+    if (normalized.includes(':')) normalized = normalized.split(':')[0]!;
+
+    if (!normalized || normalized === 'localhost' || /^(\d{1,3}\.){3}\d{1,3}$/.test(normalized)) {
+      return {
+        host: '_pramaan-verification',
+        subdomain: '',
+        apex: normalized,
+        fqdn: `_pramaan-verification.${normalized}`,
+      };
+    }
+
+    const parts = normalized.split('.');
+    if (parts.length <= 2) {
+      return {
+        host: '_pramaan-verification',
+        subdomain: '',
+        apex: normalized,
+        fqdn: `_pramaan-verification.${normalized}`,
+      };
+    }
+
+    const isMultiPartCctld = /\.(?:co|com|org|net|edu|gov|ac|biz|ne|or|gen|firm|ind|nic|res)\.[a-z]{2}$/i.test(normalized);
+    const apexPartsCount = isMultiPartCctld ? 3 : 2;
+
+    if (parts.length <= apexPartsCount) {
+      return {
+        host: '_pramaan-verification',
+        subdomain: '',
+        apex: normalized,
+        fqdn: `_pramaan-verification.${normalized}`,
+      };
+    }
+
+    const subdomainParts = parts.slice(0, parts.length - apexPartsCount);
+    const apexParts = parts.slice(parts.length - apexPartsCount);
+    const subdomain = subdomainParts.join('.');
+    const apex = apexParts.join('.');
+
+    return {
+      host: `_pramaan-verification.${subdomain}`,
+      subdomain,
+      apex,
+      fqdn: `_pramaan-verification.${normalized}`,
+    };
+  }
+
   normalizeAndValidateURI(
     uri: string,
     environment: OAuthClientEnvironment,

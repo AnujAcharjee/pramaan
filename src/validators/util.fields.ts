@@ -18,7 +18,7 @@ export class UtilFields {
     .string()
     .min(8, UtilFields.PASSWORD_MESSAGE)
     .max(99, 'Password must be less than 100 characters.')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/, UtilFields.PASSWORD_MESSAGE);
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])/, UtilFields.PASSWORD_MESSAGE);
 
   static tokenField = () => z.string().min(1, `Token is invalid or missing.`);
 

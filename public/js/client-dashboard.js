@@ -1,3 +1,57 @@
+function getDnsHostInfo(rawDomain) {
+  if (!rawDomain) {
+    return { host: '_pramaan-verification', subdomain: '', apex: '', fqdn: '_pramaan-verification' };
+  }
+  let domain = rawDomain.trim().toLowerCase();
+  domain = domain.replace(/^https?:\/\//i, '');
+  domain = domain.split('/')[0];
+  domain = domain.split(':')[0];
+  domain = domain.replace(/\.+$/, '');
+
+  if (!domain || domain === 'localhost' || /^(\d{1,3}\.){3}\d{1,3}$/.test(domain)) {
+    return {
+      host: '_pramaan-verification',
+      subdomain: '',
+      apex: domain,
+      fqdn: `_pramaan-verification.${domain}`,
+    };
+  }
+
+  const parts = domain.split('.');
+  if (parts.length <= 2) {
+    return {
+      host: '_pramaan-verification',
+      subdomain: '',
+      apex: domain,
+      fqdn: `_pramaan-verification.${domain}`,
+    };
+  }
+
+  const isMultiPartCctld = /\.(?:co|com|org|net|edu|gov|ac|biz|ne|or|gen|firm|ind|nic|res)\.[a-z]{2}$/i.test(domain);
+  const apexPartsCount = isMultiPartCctld ? 3 : 2;
+
+  if (parts.length <= apexPartsCount) {
+    return {
+      host: '_pramaan-verification',
+      subdomain: '',
+      apex: domain,
+      fqdn: `_pramaan-verification.${domain}`,
+    };
+  }
+
+  const subdomainParts = parts.slice(0, parts.length - apexPartsCount);
+  const apexParts = parts.slice(parts.length - apexPartsCount);
+  const subdomain = subdomainParts.join('.');
+  const apex = apexParts.join('.');
+
+  return {
+    host: `_pramaan-verification.${subdomain}`,
+    subdomain,
+    apex,
+    fqdn: `_pramaan-verification.${domain}`,
+  };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const nameDisplay = document.getElementById('name-display');
   const nameInputWrapper = document.getElementById('name-input-wrapper');
@@ -23,6 +77,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const originalName = editNameInput.value;
   const originalDomain = editDomainInput.value;
+
+  function updateDomainDnsHostPreview() {
+    if (!editDomainInput) return;
+    const val = editDomainInput.value;
+    const dnsInfo = getDnsHostInfo(val);
+
+    // Dynamic update for the DNS verification card if currently rendered
+    const txtHostInput = document.getElementById('txt-host');
+    if (txtHostInput) {
+      txtHostInput.value = dnsInfo.host;
+    }
+  }
+
+  editDomainInput.addEventListener('input', updateDomainDnsHostPreview);
 
   function setEditMode(isEditing, focusTarget) {
     if (isEditing) {
@@ -52,6 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
         editActions.classList.remove('hidden');
         editActions.classList.add('flex');
       }
+
+      updateDomainDnsHostPreview();
 
       // Focus appropriate input
       if (focusTarget === 'domain') {
@@ -95,8 +165,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // Revert values
       editNameInput.value = originalName;
       editDomainInput.value = originalDomain;
+      updateDomainDnsHostPreview();
     }
   }
+
+  // Initialize preview on load
+  updateDomainDnsHostPreview();
 
   // Bind Edit button
   if (editDetailsBtn) {
