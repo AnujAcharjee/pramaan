@@ -317,7 +317,7 @@
           <p class="text-xs text-slate-450 dark:text-slate-500 mt-0.5">Integrations authorized with Pramaan will be shown here.</p>
         </div>
         <% } else { %>
-        <div class="space-y-3 max-h-80 overflow-y-auto pr-1">
+        <div class="space-y-3 consents-scroll-container scrollbar-thin pr-1.5" style="max-height: 600px; overflow-y: auto;">
           <% for (const consent of oauthConsents) { %>
           <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-brand-orange/30 dark:hover:border-slate-700 transition-all duration-300">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -429,7 +429,7 @@
           </a>
         </div>
         <% } else { %>
-        <div class="space-y-3">
+        <div class="space-y-3 clients-scroll-container scrollbar-thin pr-1.5" style="max-height: 640px; overflow-y: auto;">
           <% for (const client of clients) { %>
           <div class="group p-5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 hover:border-brand-orange/30 dark:hover:border-brand-orange/40 hover:bg-white dark:hover:bg-[#0e1424] hover:shadow-lg dark:hover:shadow-black/25 transition-all duration-300">
             <div class="space-y-3">

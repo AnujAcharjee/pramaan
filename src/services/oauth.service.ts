@@ -370,6 +370,7 @@ export class OAuthService {
       select: {
         scopes: true,
         createdAt: true,
+        updatedAt: true,
         revokedAt: true,
         client: {
           select: {
@@ -380,9 +381,7 @@ export class OAuthService {
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [{ updatedAt: 'desc' }, { createdAt: 'desc' }],
     });
 
     return consents.map((consent) => ({
@@ -393,7 +392,7 @@ export class OAuthService {
         avatar: consent.client.avatar,
       },
       scopes: consent.scopes,
-      date: consent.createdAt,
+      date: consent.updatedAt || consent.createdAt,
       revokedAt: consent.revokedAt,
     }));
   }

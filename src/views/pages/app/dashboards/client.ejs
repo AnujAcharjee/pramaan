@@ -587,7 +587,7 @@
           <p class="text-xs text-slate-500 dark:text-slate-400">You must register at least one URI to accept OAuth code requests.</p>
         </div>
         <% } else { %>
-        <div class="space-y-2 mb-6">
+        <div class="space-y-2 mb-6 redirects-scroll-container scrollbar-thin pr-1.5" style="max-height: 345px; overflow-y: auto;">
           <% for (const uri of client.redirectURIs) { %>
           <div class="flex items-center justify-between gap-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-[#070b14]/80 border border-slate-200/70 dark:border-slate-800/80 shadow-xs dark:shadow-black/20 hover:border-slate-350 dark:hover:border-slate-700 transition-colors">
             <code class="font-mono text-xs text-slate-700 dark:text-slate-200 truncate select-all">

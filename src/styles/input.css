@@ -1,5 +1,8 @@
 @config "../../tailwind.config.js";
 @import 'tailwindcss';
+@source "../../src/views";
+@source "../../src";
+@source "../../public";
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Your custom component classes */
@@ -146,28 +149,92 @@
   .animate-toastIn {
     animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-
-  .code-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 150, 68, 0.45) rgba(15, 23, 42, 0.3);
-  }
-
-  .code-scrollbar::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .code-scrollbar::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.3);
-    border-radius: 9999px;
-  }
-
-  .code-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 150, 68, 0.45);
-    border-radius: 9999px;
-    transition: background-color 0.2s ease;
-  }
-
-  .code-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 150, 68, 0.8);
-  }
 }
+
+.code-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 150, 68, 0.45) rgba(15, 23, 42, 0.3);
+}
+
+.code-scrollbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.code-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 9999px;
+}
+
+.code-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 150, 68, 0.45);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+.code-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 150, 68, 0.8);
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #ff9644 rgba(15, 23, 42, 0.05);
+  overflow-y: auto;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #ff9644;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #fa812f;
+}
+
+:where(.dark, .dark *) .scrollbar-thin {
+  scrollbar-color: #ff9644 rgba(15, 23, 42, 0.4);
+}
+
+:where(.dark, .dark *) .scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 9999px;
+}
+
+:where(.dark, .dark *) .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #ff9644;
+  border-radius: 9999px;
+}
+
+:where(.dark, .dark *) .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #fa812f;
+}
+
+.consents-scroll-container {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.clients-scroll-container {
+  max-height: 640px;
+  overflow-y: auto;
+}
+
+.redirects-scroll-container {
+  max-height: 345px;
+  overflow-y: auto;
+}
+
+
+
+
+
