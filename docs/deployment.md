@@ -17,7 +17,52 @@ A production Pramaan deployment consists of:
 
 ---
 
-## 2. Quick Start with Docker Compose (Recommended)
+## 2. One-Click Setup with AI Agents (Fastest)
+
+If you use an AI coding assistant or agent (such as **Antigravity**, **Cursor**, **Claude Code**, **Windsurf**, or **GitHub Copilot**), you can automate the entire local or server setup by copying and pasting the prompt below into your agent's chat:
+
+```markdown
+Set up and run Pramaan (OAuth 2.0 / OpenID Connect Identity Provider) in this workspace:
+
+1. **Environment Configuration**:
+   - Check if `.env` exists. If not, copy `.env.example` to `.env`.
+   - Generate high-entropy cryptographic secrets:
+     - `KEY_ENC_SECRET`: Generate a 64-character hex string (32 bytes) via:
+       `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+     - `COOKIE_SECRET`: Generate a 64-character random hex string.
+     - `CLIENT_SECRET_KEY`: Generate a 64-character random hex string.
+   - Configure defaults in `.env`:
+     - `NODE_ENV=development` (or `production` for server deployments)
+     - `PORT=8080`
+     - `APP_DOMAIN=localhost:8080` (or your domain, e.g. `auth.yourdomain.com`)
+     - `AUTH_ISSUER=http://localhost:8080` (or `https://auth.yourdomain.com`)
+     - `APP_DOC_URL=https://docs.pramaan.dev`
+     - `NEON_PG_DATABASE_URL`: Ensure a valid PostgreSQL connection string is configured.
+     - `REDIS_URL`: Set to active Redis connection (e.g. `redis://localhost:6379`).
+     - `RESEND_API_KEY`: Set your Resend API key for transactional emails.
+     - `EMAIL_FROM`: Set a valid sender email (e.g. `auth@example.com`).
+     - `LOGTAIL_SOURCE_TOKEN`: Provide token or dummy string for dev logging.
+
+2. **Dependencies & Database Sync**:
+   - Install dependencies: `npm install`
+   - Generate Prisma Client: `npm run prisma:generate`
+   - Push schema to database: `npx prisma db push`
+
+3. **Build Assets & Start Services**:
+   - Build Tailwind CSS: `npm run css:build`
+   - Start development server with concurrent CSS watcher and nodemon:
+     `npx concurrently "npm run css:dev" "npm run dev"`
+     *(Or start via Docker Compose: `npm run docker:dev:up` / `docker compose up -d`)*
+
+4. **Verify Health & Endpoints**:
+   - Verify health check returns 200 OK: `http://localhost:8080/health`
+   - Verify OIDC Discovery: `http://localhost:8080/.well-known/openid-configuration`
+   - Open Web UI / Sign-in: `http://localhost:8080/signin`
+```
+
+---
+
+## 3. Quick Start with Docker Compose (Recommended)
 
 The easiest way to run Pramaan in production is using Docker Compose with Caddy.
 
@@ -36,7 +81,7 @@ Copy the sample environment file:
 cp .env.example .env
 ```
 
-Edit `.env` and fill in your production values (see [Configuration Reference](#4-configuration-reference) below):
+Edit `.env` and fill in your production values (see [Configuration Reference](#5-configuration-reference) below):
 
 ```bash
 # Minimum required settings
@@ -127,7 +172,7 @@ Visit `https://auth.yourdomain.com` in your browser and sign in with your `INIT_
 
 ---
 
-## 3. Manual Node.js Deployment (Bare Metal / VM)
+## 4. Manual Node.js Deployment (Bare Metal / VM)
 
 If deploying directly onto a Linux server without Docker:
 
@@ -159,7 +204,7 @@ pm2 startup
 
 ---
 
-## 4. Configuration Reference
+## 5. Configuration Reference
 
 | Variable | Required | Description |
 | :--- | :--- | :--- |
@@ -182,7 +227,7 @@ pm2 startup
 
 ---
 
-## 5. Production Health & Monitoring
+## 6. Production Health & Monitoring
 
 Pramaan provides a lightweight healthcheck endpoint:
 

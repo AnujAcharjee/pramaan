@@ -30,7 +30,54 @@ Requires Node.js `>= 18.0.0`.
 
 ## Quick Start
 
-### 1. Initialize the Client
+### ⚡ AI Agent Integration Prompt
+
+If you are using an AI coding assistant (like **Antigravity**, **Cursor**, **Claude Code**, **Windsurf**, or **GitHub Copilot**), copy and paste this prompt to integrate `@anuj304/pramaan` into your Node.js application:
+
+```markdown
+Integrate Pramaan OAuth 2.0 / OpenID Connect authentication into this Node.js/TypeScript application using the official `@anuj304/pramaan` SDK:
+
+1. **Clarify Strategy with User First**:
+   Ask the user whether they prefer:
+   - **(A) Session-Based Auth** (stateful in-app sessions via `express-session`)
+   - **(B) JWT-Based Auth** (stateless app JWT in signed httpOnly cookie or Authorization header)
+   Proceed based on their answer.
+
+2. **Install Dependencies & Configure .env**:
+   - Install `@anuj304/pramaan`.
+   - If (A) Session: install `express-session` & `@types/express-session`. Set `SESSION_SECRET` in `.env`.
+   - If (B) JWT: install `cookie-parser`, `jsonwebtoken` (or `jose`) & `@types/jsonwebtoken`. Set `JWT_SECRET` in `.env`.
+   - Add OAuth config to `.env`:
+     `PRAMAAN_ISSUER=https://pramaan.anujacharjee.com` (or `http://localhost:8080` if self-hosting)
+     `PRAMAAN_CLIENT_ID=<client-id>`
+     `PRAMAAN_CLIENT_SECRET=<client-secret>`
+     `PRAMAAN_REDIRECT_URI=http://localhost:3000/pramaan/callback`
+
+3. **Initialize Pramaan Client**:
+   - Instantiate singleton `PramaanClient` with issuer, clientId, clientSecret, and redirectUri.
+
+4. **Implement Auth Routes**:
+   - `/login`: Call `const { url, transaction } = await pramaan.createAuthorizationRequest({ scope: ["openid", "profile", "email"] })`.
+     - *Session*: Store `transaction` in `req.session.oauth`.
+     - *JWT*: Store `transaction` in temporary signed httpOnly cookie (`pramaan_tx`, maxAge 10m).
+     - Redirect to `url`.
+   - `/pramaan/callback`:
+     - Retrieve `transaction` from session or `pramaan_tx` cookie.
+     - Call `const tokens = await pramaan.handleCallback({ code, state, transaction })`.
+     - Clear temporary transaction state.
+     - *Session*: Store user profile / tokens in `req.session.user`.
+     - *JWT*: Sign application JWT with user claims (`jwt.sign(claims, JWT_SECRET, { expiresIn: '7d' })`) and set in secure `httpOnly` cookie (`auth_token`).
+     - Redirect to protected dashboard.
+   - `/user` or `/profile`: Return profile claims (from session, decoded JWT, or `await pramaan.getUserInfo(tokens.accessToken)`).
+   - `/logout`: Destroy session or clear `auth_token` cookie and redirect.
+
+5. **Auth Guard Middleware**:
+   - Create `requireAuth` middleware checking `req.session.user` (Session) or verifying `auth_token` JWT (JWT) to guard private routes.
+```
+
+---
+
+### Manual Setup
 
 ```ts
 import { PramaanClient } from '@anuj304/pramaan';
@@ -39,7 +86,7 @@ export const pramaan = new PramaanClient({
   issuer: 'https://pramaan.anujacharjee.com',
   clientId: process.env.PRAMAAN_CLIENT_ID!,
   clientSecret: process.env.PRAMAAN_CLIENT_SECRET, // required for confidential clients
-  redirectUri: 'http://localhost:3000/callback',
+  redirectUri: process.env.PRAMAAN_REDIRECT_URI || 'http://localhost:3000/pramaan/callback',
 });
 ```
 
@@ -66,7 +113,7 @@ app.get('/login', async (req, res) => {
 Exchange the authorization code for tokens, validate state, and verify the ID token:
 
 ```ts
-app.get('/callback', async (req, res) => {
+app.get('/pramaan/callback', async (req, res) => {
   const tokens = await pramaan.handleCallback({
     code: req.query.code as string,
     state: req.query.state as string,

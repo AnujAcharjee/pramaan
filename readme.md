@@ -8,7 +8,7 @@ It implements the **Authorization Code flow with PKCE** (RFC 7636) and **OpenID 
 
 ## Get Started
 
-Use the hosted Pramaan instance or deploy your own.
+Use the hosted Pramaan instance, self-host on your own infrastructure, or let your AI agent configure everything in one shot.
 
 🌐 **Hosted:** [pramaan.anujacharjee.com](https://pramaan.anujacharjee.com/)
 
@@ -45,7 +45,7 @@ const pramaan = new PramaanClient({
   issuer: "https://pramaan.anujacharjee.com",
   clientId: process.env.PRAMAAN_CLIENT_ID!,
   clientSecret: process.env.PRAMAAN_CLIENT_SECRET,
-  redirectUri: "http://localhost:3000/callback",
+  redirectUri: "http://localhost:3000/pramaan/callback",
 });
 
 // 1. Initiate login
@@ -63,6 +63,8 @@ const tokens = await pramaan.handleCallback({
 // 3. Fetch user profile
 const user = await pramaan.getUserInfo(tokens.accessToken);
 ```
+
+⚡ **One-Click SDK Integration with AI Agents:** Have your AI assistant integrate authentication in seconds. [View AI Agent Prompt →](./docs/03-sdk-guide.md#-quick-setup-with-ai-agents)
 
 ---
 
