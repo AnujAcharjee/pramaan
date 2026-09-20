@@ -185,6 +185,31 @@ describe('Redirect URI Validation Policy', () => {
       'PENDING',
     );
     assert.strictEqual(uri2, 'http://127.0.0.1:8080/callback');
+
+    // When client itself has domain = 'localhost' or '127.0.0.1' and status = 'PENDING'
+    const uri3 = clientService.normalizeAndValidateURI(
+      'http://localhost:3000/auth/callback',
+      OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT,
+      'localhost',
+      'PENDING',
+    );
+    assert.strictEqual(uri3, 'http://localhost:3000/auth/callback');
+
+    const uri4 = clientService.normalizeAndValidateURI(
+      'http://127.0.0.1:8080/callback',
+      OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT,
+      '127.0.0.1',
+      'PENDING',
+    );
+    assert.strictEqual(uri4, 'http://127.0.0.1:8080/callback');
+
+    const uri5 = clientService.normalizeAndValidateURI(
+      'http://sub.localhost:4000/callback',
+      OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT,
+      'sub.localhost',
+      'PENDING',
+    );
+    assert.strictEqual(uri5, 'http://sub.localhost:4000/callback');
   });
 
   it('should block custom registered domain in development mode if domain is unverified', () => {

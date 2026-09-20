@@ -320,10 +320,15 @@ export class ClientService {
         );
       }
     } else {
-      const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+      const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.localhost');
+      const isClientLocalhost =
+        !normalizedDomain ||
+        normalizedDomain === 'localhost' ||
+        normalizedDomain === '127.0.0.1' ||
+        normalizedDomain.endsWith('.localhost');
       const isRegisteredDomain = Boolean(normalizedDomain && hostname === normalizedDomain);
 
-      if (isRegisteredDomain && !isVercelClientDomain && domainStatus !== 'VERIFIED') {
+      if (isRegisteredDomain && !isLocalhost && !isClientLocalhost && !isVercelClientDomain && domainStatus !== 'VERIFIED') {
         throw new AppError(
           `Domain "${normalizedDomain}" is not verified yet. Please verify your domain via DNS TXT record in the dashboard before using it in redirect URIs, or use localhost or *.vercel.app in development.`,
           400,
