@@ -58,7 +58,10 @@ export class JoseService {
   // --------------- Encrypt private key (Envelope Encryption: AES-256-GCM DEK + KEK) ---------------
 
   public async encryptPrivateKey(privateKey: CryptoKey | crypto.KeyObject): Promise<EncryptedPrivateKey> {
-    const pem = await jose.exportPKCS8(privateKey);
+    const pem =
+      privateKey instanceof crypto.KeyObject
+        ? (privateKey.export({ type: 'pkcs8', format: 'pem' }) as string)
+        : await jose.exportPKCS8(privateKey);
 
     // 1. Generate unique single-use Data Encryption Key (DEK) - 256-bit AES
     const dek = crypto.randomBytes(32);

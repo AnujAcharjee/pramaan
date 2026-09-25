@@ -18,6 +18,8 @@
     "dev": "npx nodemon",
     "keys:rotate": "tsx src/scripts/rotate-keys.ts",
     "keys:rotate:prod": "node dist/scripts/rotate-keys.js",
+    "keys:migrate": "tsx src/scripts/migrate-envelope-keys.ts",
+    "keys:migrate:prod": "node dist/scripts/migrate-envelope-keys.js",
     "docker:dev:build": "docker compose --project-name pramaan -f docker-compose.dev.yml build --no-cache",
     "docker:dev:up": "docker compose --project-name pramaan -f docker-compose.dev.yml up -d",
     "docker:dev:down": "docker compose --project-name pramaan -f docker-compose.dev.yml down -v",

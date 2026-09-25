@@ -157,4 +157,45 @@ describe('RSA Private Key Envelope Encryption (KEK + DEK)', () => {
     const { payload } = await jose.jwtVerify(jwt, publicKey);
     assert.strictEqual(payload.legacy, true);
   });
+
+  it('should migrate a legacy single-layer key to v2-envelope without loss of cryptographic capability', async () => {
+    const { privateKey, publicKey } = await generateKey();
+    const pem = await jose.exportPKCS8(privateKey);
+
+    // Create legacy record
+    const masterKey = Buffer.from(ENV.KEY_ENC_SECRET, 'hex');
+    const legacyIv = crypto.randomBytes(12);
+    const legacyCipher = crypto.createCipheriv('aes-256-gcm', masterKey, legacyIv);
+    const legacyEncrypted = Buffer.concat([legacyCipher.update(pem, 'utf8'), legacyCipher.final()]);
+
+    const legacyRecord: EncryptedPrivateKey = {
+      data: legacyEncrypted.toString('base64'),
+      iv: legacyIv.toString('base64'),
+      tag: legacyCipher.getAuthTag().toString('base64'),
+    };
+
+    // 1. Decrypt from legacy record
+    const recoveredKey = joseService.decryptPrivateKey(legacyRecord);
+
+    // 2. Re-encrypt under v2-envelope
+    const newEnvelope = await joseService.encryptPrivateKey(recoveredKey);
+
+    assert.ok(newEnvelope.encryptedDek, 'Migrated envelope must have encryptedDek');
+    assert.ok(newEnvelope.dekIv, 'Migrated envelope must have dekIv');
+    assert.ok(newEnvelope.dekTag, 'Migrated envelope must have dekTag');
+    assert.strictEqual(newEnvelope.version, 'v2-envelope');
+
+    // 3. Decrypt from new envelope
+    const migratedKey = joseService.decryptPrivateKey(newEnvelope);
+    assert.ok(migratedKey);
+
+    // 4. Verify functional parity
+    const jwt = await new jose.SignJWT({ migrated: true })
+      .setProtectedHeader({ alg: 'RS256' })
+      .setExpirationTime('5m')
+      .sign(migratedKey);
+
+    const { payload } = await jose.jwtVerify(jwt, publicKey);
+    assert.strictEqual(payload.migrated, true);
+  });
 });
