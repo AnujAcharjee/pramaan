@@ -14,9 +14,9 @@ RUN npm ci
 COPY . .
 
 RUN npm run prisma:generate \
-  && npm run  build \
+  && npm run build \
   && npm run css:build \
-  npm prune --omit=dev
+  && npm prune --omit=dev
 
 ### ---------- RUNTIME ----------
 FROM node:20-alpine

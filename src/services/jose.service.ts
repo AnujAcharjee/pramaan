@@ -5,10 +5,14 @@ import { Prisma } from '../../generated/prisma/client.js';
 import { ENV } from '../config/env.js';
 import { KEY_ALGORITHMS, KEY_STATUS, KEY_USE, CRYPTO_ALGORITHMS } from '../utils/constant.js';
 
-type EncryptedPrivateKey = {
+export type EncryptedPrivateKey = {
   data: string;
   iv: string;
   tag: string;
+  encryptedDek?: string;
+  dekIv?: string;
+  dekTag?: string;
+  version?: string;
 };
 
 export class JoseService {
@@ -51,35 +55,71 @@ export class JoseService {
     };
   }
 
-  // --------------- Encrypt private key (AES-256-GCM) ---------------
+  // --------------- Encrypt private key (Envelope Encryption: AES-256-GCM DEK + KEK) ---------------
 
-  private async encryptPrivateKey(privateKey: CryptoKey): Promise<EncryptedPrivateKey> {
+  public async encryptPrivateKey(privateKey: CryptoKey | crypto.KeyObject): Promise<EncryptedPrivateKey> {
     const pem = await jose.exportPKCS8(privateKey);
 
-    const iv = crypto.randomBytes(12);
-    const cipher = crypto.createCipheriv('aes-256-gcm', this.ENCRYPTION_KEY, iv);
+    // 1. Generate unique single-use Data Encryption Key (DEK) - 256-bit AES
+    const dek = crypto.randomBytes(32);
 
-    const encrypted = Buffer.concat([cipher.update(pem, 'utf8'), cipher.final()]);
+    // 2. Encrypt the RSA PKCS#8 PEM payload with DEK using AES-256-GCM
+    const dataIv = crypto.randomBytes(12);
+    const dataCipher = crypto.createCipheriv('aes-256-gcm', dek, dataIv);
+    const encryptedData = Buffer.concat([dataCipher.update(pem, 'utf8'), dataCipher.final()]);
+    const dataTag = dataCipher.getAuthTag();
+
+    // 3. Encrypt (wrap) DEK with the Key Encryption Key (KEK / master key) using AES-256-GCM
+    const dekIv = crypto.randomBytes(12);
+    const dekCipher = crypto.createCipheriv('aes-256-gcm', this.ENCRYPTION_KEY, dekIv);
+    const encryptedDek = Buffer.concat([dekCipher.update(dek), dekCipher.final()]);
+    const dekTag = dekCipher.getAuthTag();
 
     return {
-      data: encrypted.toString('base64'),
-      iv: iv.toString('base64'),
-      tag: cipher.getAuthTag().toString('base64'),
+      data: encryptedData.toString('base64'),
+      iv: dataIv.toString('base64'),
+      tag: dataTag.toString('base64'),
+      encryptedDek: encryptedDek.toString('base64'),
+      dekIv: dekIv.toString('base64'),
+      dekTag: dekTag.toString('base64'),
+      version: 'v2-envelope',
     };
   }
 
-  // --------------- Decrypt private key (internal only) ---------------
+  // --------------- Decrypt private key (Envelope unwrapping + AES-256-GCM) ---------------
 
-  private decryptPrivateKey(enc: EncryptedPrivateKey): crypto.KeyObject {
+  public decryptPrivateKey(enc: EncryptedPrivateKey): crypto.KeyObject {
+    let dek: Buffer;
+
+    if (enc.encryptedDek && enc.dekIv && enc.dekTag) {
+      // 1. Unwrap the DEK using the Key Encryption Key (KEK)
+      const dekDecipher = crypto.createDecipheriv(
+        'aes-256-gcm',
+        this.ENCRYPTION_KEY,
+        Buffer.from(enc.dekIv, 'base64'),
+      );
+      dekDecipher.setAuthTag(Buffer.from(enc.dekTag, 'base64'));
+      dek = Buffer.concat([
+        dekDecipher.update(Buffer.from(enc.encryptedDek, 'base64')),
+        dekDecipher.final(),
+      ]);
+    } else {
+      // Fallback for legacy single-layer encrypted keys
+      dek = this.ENCRYPTION_KEY;
+    }
+
+    // 2. Decrypt the RSA private key payload using the unwrapped DEK
     const decipher = crypto.createDecipheriv(
       'aes-256-gcm',
-      this.ENCRYPTION_KEY,
+      dek,
       Buffer.from(enc.iv, 'base64'),
     );
-
     decipher.setAuthTag(Buffer.from(enc.tag, 'base64'));
 
-    const decrypted = Buffer.concat([decipher.update(Buffer.from(enc.data, 'base64')), decipher.final()]);
+    const decrypted = Buffer.concat([
+      decipher.update(Buffer.from(enc.data, 'base64')),
+      decipher.final(),
+    ]);
 
     return crypto.createPrivateKey(decrypted.toString('utf8'));
   }
@@ -161,6 +201,11 @@ export class JoseService {
         },
       });
     });
+
+    return {
+      id: newKey.id,
+      kid: newKey.kid,
+    };
   }
 
   // --------------- JWKS for public endpoint ---------------

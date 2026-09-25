@@ -25,9 +25,6 @@ services:
     command: |
       sh -c '
         npm run prisma:generate &&
-        if [ "$RUN_SEEDS" = "true" ]; then 
-          npm run seed:dev; 
-        fi &&
         npx concurrently "npm run css:dev" "npm run dev"
       '
     networks:
