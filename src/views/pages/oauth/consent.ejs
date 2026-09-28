@@ -71,14 +71,7 @@
                 <span class="text-base font-black tracking-wider text-slate-800 dark:text-slate-100"><%= _initials %></span>
               <% } %>
             </div>
-            <% if (isVerifiedProduction) { %>
-            <!-- Verified Checkmark Badge Overlay (Production Only) -->
-            <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center ring-2 ring-white dark:ring-[#0f121d] shadow-xs" title="Verified App">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <% } else { %>
+            <% if (_environment !== 'production' || isLocalhost) { %>
             <!-- Dev Yellow Badge Overlay -->
             <div class="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[9px] font-extrabold ring-2 ring-white dark:ring-[#0f121d] shadow-xs" title="Developer Mode">
               DEV
@@ -93,11 +86,9 @@
             </svg>
           </div>
 
-          <!-- Pramaan IdP Avatar -->
-          <div class="w-14 h-14 rounded-2xl bg-linear-to-br from-brand-orange to-brand-orangeDark flex items-center justify-center border border-orange-400/30 shadow-md shadow-brand-orange/20">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
+          <!-- Pramaan IdP Avatar (from public favicon) -->
+          <div class="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700/60 shadow-md overflow-hidden">
+            <img src="/favicon_io/apple-touch-icon.png" alt="Pramaan" class="w-full h-full object-cover" />
           </div>
         </div>
 
@@ -105,52 +96,13 @@
         <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
           Sign in to <span class="text-transparent bg-clip-text bg-linear-to-r from-brand-orange to-orange-500"><%= _appName %></span>
         </h1>
-        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1.5 font-medium">
-          wants to access your <span class="font-bold text-slate-850 dark:text-slate-200">Pramaan Account</span>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 font-normal">
+          <%= _domain %><% if (isVerifiedProduction) { %> (verified)<% } %>
         </p>
-
-        <!-- Status Indicator Pill -->
-        <div class="mt-3 flex items-center justify-center">
-          <% if (isVerifiedProduction) { %>
-          <!-- Verified App (Production verified) -->
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/80 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-semibold shadow-2xs">
-            <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            <span>Verified App</span>
-            <span class="text-emerald-400 dark:text-emerald-600 font-normal">·</span>
-            <span class="font-mono text-[11px] font-bold text-emerald-800 dark:text-emerald-200"><%= _domain %></span>
-          </div>
-          <% } else if (isLocalhost) { %>
-          <!-- Localhost Dev Indicator (NO green tick) -->
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold shadow-2xs">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            <span>Local App</span>
-            <span class="text-amber-400 dark:text-amber-600 font-normal">·</span>
-            <span class="font-mono text-[11px] font-bold text-amber-900 dark:text-amber-200">localhost</span>
-          </div>
-          <% } else if (isDevApp) { %>
-          <!-- Developer App Indicator (NO green tick) -->
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold shadow-2xs">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            <span>Developer App</span>
-            <span class="text-amber-400 dark:text-amber-600 font-normal">·</span>
-            <span class="font-mono text-[11px] font-bold text-amber-900 dark:text-amber-200"><%= _domain %></span>
-          </div>
-          <% } else { %>
-          <!-- Unverified App Indicator (NO green tick) -->
-          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200/80 dark:border-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-semibold shadow-2xs">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            <span>App Not Verified</span>
-            <span class="text-amber-400 dark:text-amber-600 font-normal">·</span>
-            <span class="font-mono text-[11px] font-bold text-amber-900 dark:text-amber-200"><%= _domain %></span>
-          </div>
-          <% } %>
-        </div>
       </div>
 
-      <!-- Developer / Unverified Warning Banner (Clear & Short Warning For User) -->
-      <% if (!isVerifiedProduction) { %>
+      <!-- Developer Warning Banner (Clear & Short Warning For User; shown ONLY when not in production / localhost) -->
+      <% if (_environment !== 'production' || isLocalhost) { %>
       <div class="mx-6 sm:mx-8 mb-4 p-3.5 rounded-2xl bg-amber-50/90 dark:bg-amber-500/10 border border-amber-300/80 dark:border-amber-500/30 text-left">
         <div class="flex items-center gap-3">
           <div class="w-7 h-7 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
@@ -175,36 +127,6 @@
               <% } %>
             </p>
           </div>
-        </div>
-      </div>
-      <% } %>
-
-      <!-- User Identity Card (Account Being Authorized) -->
-      <% if (_user) { %>
-      <div class="px-6 sm:px-8 py-1">
-        <div class="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-800/80">
-          <% if (_user.avatar) { %>
-          <img src="<%= _user.avatar %>" alt="<%= _user.name %>" class="w-10 h-10 rounded-full object-cover ring-2 ring-brand-orange/30 shrink-0" />
-          <% } else { %>
-          <div class="w-10 h-10 rounded-full bg-brand-orange/15 text-brand-orange font-bold text-sm flex items-center justify-center shrink-0 border border-brand-orange/30">
-            <%= _user.name.slice(0, 1).toUpperCase() %>
-          </div>
-          <% } %>
-          <div class="flex-1 min-w-0">
-            <p class="text-xs font-bold text-slate-900 dark:text-white truncate"><%= _user.name %></p>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate"><%= _user.email %></p>
-          </div>
-          <% if (isLocalhost || isDevApp || !isVerifiedProduction) { %>
-          <!-- Yellow Pill DEV -->
-          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300/50 dark:border-amber-500/30">
-            DEV
-          </span>
-          <% } else { %>
-          <!-- Emerald Pill Active -->
-          <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300/50 dark:border-emerald-500/30">
-            Active
-          </span>
-          <% } %>
         </div>
       </div>
       <% } %>
