@@ -6,6 +6,23 @@ It implements the **Authorization Code flow with PKCE** (RFC 7636) and **OpenID 
 
 ---
 
+## 🎬 Live Demo: Pramaan in Action
+
+Watch how Pramaan delivers frictionless user sign-in, scope authorization, and instant token exchange in a client application:
+
+<div align="center">
+  <video src="https://res.cloudinary.com/ddsbhdeju/video/upload/pramaan-demo.mp4" poster="https://res.cloudinary.com/ddsbhdeju/image/upload/pramaan-demo-thumbnail.jpg" autoplay loop muted playsinline controls width="100%" style="max-width: 780px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+    <a href="https://res.cloudinary.com/ddsbhdeju/video/upload/pramaan-demo.mp4">
+      <img src="https://res.cloudinary.com/ddsbhdeju/image/upload/pramaan-demo-thumbnail.jpg" alt="Pramaan in Action Demo" width="100%" style="max-width: 780px; border-radius: 12px;" />
+    </a>
+  </video>
+  <p><sub><em>Demonstration: Frictionless OAuth 2.0 / OIDC sign-in and consent flow powered by Pramaan.</em></sub></p>
+</div>
+
+> 📺 **Direct Video Link:** If your markdown viewer does not render embedded video, [watch the demo video directly on Cloudinary](https://res.cloudinary.com/ddsbhdeju/video/upload/pramaan-demo.mp4).
+
+---
+
 ## Get Started
 
 Use the hosted Pramaan instance, self-host on your own infrastructure, or let your AI agent configure everything in one shot.

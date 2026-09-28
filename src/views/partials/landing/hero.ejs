@@ -2,15 +2,6 @@
   <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-20 sm:py-32 relative z-10">
     <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
 
-      <!-- Hero Badge -->
-      <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-brand-orange/30 dark:border-brand-orange/40 text-xs sm:text-sm font-semibold text-slate-850 dark:text-slate-100 mb-8 shadow-md shadow-brand-orange/10 dark:shadow-brand-orange/5 hover-scale">
-        <span class="relative flex h-2.5 w-2.5">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-orange opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-orange"></span>
-        </span>
-        <span class="tracking-wide font-bold text-slate-900 dark:text-slate-100">OAuth 2.0 & OpenID Connect IdP</span>
-      </div>
-
       <!-- Heading with Luminous Aurora Glow -->
       <div class="relative inline-block mb-6">
         <!-- Dual Aura Glow -->
@@ -39,25 +30,33 @@
         </a>
       </div>
 
-      <!-- Feature Badges -->
-      <div class="mt-16 flex flex-col items-center gap-3 font-semibold sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4 text-xs sm:text-sm">
+      <!-- Feature Badges (Compact & Single-Line) -->
+      <div class="mt-12 flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-2.5 text-xs font-medium whitespace-nowrap">
         
-        <div class="flex items-center gap-2.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-750 dark:text-slate-200 px-4 py-2.5 rounded-2xl shadow-xs hover:border-brand-orange/40 transition-all duration-300">
-          <svg class="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full shadow-xs hover:border-brand-orange/40 transition-all duration-300 shrink-0">
+          <span class="relative flex h-2 w-2 shrink-0">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-orange opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-orange"></span>
+          </span>
+          <span>OAuth 2.0 & OpenID Connect</span>
+        </div>
+
+        <div class="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full shadow-xs hover:border-brand-orange/40 transition-all duration-300 shrink-0">
+          <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
           <span>PKCE & Token Security</span>
         </div>
 
-        <div class="flex items-center gap-2.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-750 dark:text-slate-200 px-4 py-2.5 rounded-2xl shadow-xs hover:border-brand-orange/40 transition-all duration-300">
-          <svg class="w-4 h-4 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full shadow-xs hover:border-brand-orange/40 transition-all duration-300 shrink-0">
+          <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           <span>OIDC Discovery & JWKS</span>
         </div>
 
-        <div class="flex items-center gap-2.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-750 dark:text-slate-200 px-4 py-2.5 rounded-2xl shadow-xs hover:border-brand-orange/40 transition-all duration-300">
-          <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full shadow-xs hover:border-brand-orange/40 transition-all duration-300 shrink-0">
+          <svg class="w-3.5 h-3.5 text-brand-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
           <span>Client & Scope Controls</span>
@@ -65,6 +64,64 @@
 
       </div>
 
+      <!-- Demo Showcase (Inside Hero at last) -->
+      <div id="demo" class="mt-16 sm:mt-24 mb-10 sm:mb-16 w-full max-w-3xl mx-auto">
+        <!-- Ambient Glow Behind Video Frame -->
+        <div class="relative">
+          <div class="absolute -inset-1 rounded-3xl bg-linear-to-r from-brand-orange/25 via-sky-500/15 to-brand-orange/20 blur-xl opacity-60 dark:opacity-40 -z-10"></div>
+          
+          <div class="relative rounded-2xl sm:rounded-3xl bg-black border border-slate-200/80 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-black/70 overflow-hidden">
+            <div class="relative w-full aspect-video overflow-hidden bg-black flex items-center justify-center">
+              <video 
+                id="pramaanDemoVideo"
+                class="w-full h-full object-cover"
+                style="transform: scale(1.04) translateY(-1%); transform-origin: center center;"
+                muted
+                autoplay
+                loop
+                playsinline
+                preload="auto"
+                poster="https://res.cloudinary.com/ddsbhdeju/image/upload/pramaan-demo-thumbnail.jpg">
+                <source src="https://res.cloudinary.com/ddsbhdeju/video/upload/pramaan-demo.mp4" type="video/mp4">
+                Your browser does not support HTML5 video streaming.
+              </video>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtitle UNDER the video with i icon in front -->
+        <div class="mt-5 sm:mt-6 flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-normal text-center">
+          <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Watch a third-party client (OpenSpace) sign in users, verify consent, and exchange tokens via Pramaan.</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>
+
+<!-- IntersectionObserver to Autoplay when in view and Pause when out of view -->
+<script>
+  (function() {
+    const video = document.getElementById('pramaanDemoVideo');
+    if (!video) return;
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+          }
+        });
+      }, {
+        threshold: 0.25
+      });
+
+      observer.observe(video);
+    }
+  })();
+</script>

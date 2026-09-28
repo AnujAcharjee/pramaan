@@ -1,9 +1,19 @@
 @config "../../tailwind.config.js";
 @import 'tailwindcss';
-@source "../../src/views";
-@source "../../src";
+@source "../views";
+@source "../";
 @source "../../public";
 @custom-variant dark (&:where(.dark, .dark *));
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
 
 /* Your custom component classes */
 @layer components {

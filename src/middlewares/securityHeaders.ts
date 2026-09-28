@@ -18,6 +18,7 @@ export const setupSecurityHeaders = (app: Express) => {
           styleSrc: ["'self'", "'unsafe-inline'"], // required for SSR auth pages
           imgSrc: ["'self'", 'data:', 'https:', 'blob:'], // allow avatars, logos, QR codes, and local blob previews
           fontSrc: ["'self'", 'https:', 'data:'], // allow embedded web fonts
+          mediaSrc: ["'self'", 'https://res.cloudinary.com', 'blob:', 'data:'], // allow Cloudinary video streaming
 
           connectSrc: ["'self'", 'https:'], // restrict XHR / fetch / OAuth calls
 
