@@ -37,13 +37,13 @@ Use the hosted Pramaan instance, self-host on your own infrastructure, or let yo
 
 Pramaan exposes the following OIDC-compliant endpoints. All paths are discoverable via the OpenID Configuration document.
 
-| Endpoint | Path |
-| :--- | :--- |
+| Endpoint             | Path                                |
+| :------------------- | :---------------------------------- |
 | OpenID Configuration | `/.well-known/openid-configuration` |
-| JWKS | `/.well-known/jwks.json` |
-| Authorization | `/api/oauth/authorize` |
-| Token | `/api/oauth/token` |
-| UserInfo | `/userinfo` |
+| JWKS                 | `/.well-known/jwks.json`            |
+| Authorization        | `/api/oauth/authorize`              |
+| Token                | `/api/oauth/token`                  |
+| UserInfo             | `/userinfo`                         |
 
 ---
 
@@ -56,18 +56,18 @@ npm install @anuj304/pramaan
 ```
 
 ```typescript
-import { PramaanClient } from "@anuj304/pramaan";
+import { PramaanClient } from '@anuj304/pramaan';
 
 const pramaan = new PramaanClient({
-  issuer: "https://pramaan.anujacharjee.com",
+  issuer: 'https://pramaan.anujacharjee.com',
   clientId: process.env.PRAMAAN_CLIENT_ID!,
   clientSecret: process.env.PRAMAAN_CLIENT_SECRET,
-  redirectUri: "http://localhost:3000/pramaan/callback",
+  redirectUri: 'http://localhost:3000/pramaan/callback',
 });
 
 // 1. Initiate login
 const { url, transaction } = await pramaan.createAuthorizationRequest({
-  scope: ["openid", "profile", "email"],
+  scope: ['openid', 'profile', 'email'],
 });
 
 // 2. Complete callback & verify ID token via JWKS
@@ -89,15 +89,15 @@ const user = await pramaan.getUserInfo(tokens.accessToken);
 
 Comprehensive guides for every stage of integration and hosting:
 
-| Guide | Description |
-| :--- | :--- |
-| 🐳 [**Self-Hosting & Deployment**](./docs/deployment.md) | How to deploy your own instance of Pramaan with Docker Compose, Caddy, Postgres, and Redis. |
-| 📄 [**01 — Registering an OAuth Client**](./docs/01-create-client.md) | How to register your application, configure redirect URIs, and retrieve credentials. |
-| 🚀 [**02 — Manual Protocol Guide**](./docs/02-signup-flow.md) | Step-by-step RFC-compliant flow for Python, Go, Rust, Java, or raw HTTP integrations. |
-| ⚡ [**03 — Official SDK Guide**](./docs/03-sdk-guide.md) | Detailed documentation for `@anuj304/pramaan` with full options, typed errors, and utilities. |
-| 📚 [**04 — API & Claims Reference**](./docs/04-api-reference.md) | Endpoints, query parameters, token response formats, claim mappings, and error codes. |
-| 🛡️ [**05 — Security & Best Practices**](./docs/05-security.md) | Threat model, PKCE rationale, timing-safe state comparison, and production checklist. |
-| 💻 [**Runnable Express Example**](./sdk/examples/express/) | Full, production-ready Express reference application with sessions and UI. |
+| Guide                                                                 | Description                                                                                   |
+| :-------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
+| 🐳 [**Self-Hosting & Deployment**](./docs/deployment.md)              | How to deploy your own instance of Pramaan with Docker Compose, Caddy, Postgres, and Redis.   |
+| 📄 [**01 — Registering an OAuth Client**](./docs/01-create-client.md) | How to register your application, configure redirect URIs, and retrieve credentials.          |
+| 🚀 [**02 — Manual Protocol Guide**](./docs/02-signup-flow.md)         | Step-by-step RFC-compliant flow for Python, Go, Rust, Java, or raw HTTP integrations.         |
+| ⚡ [**03 — Official SDK Guide**](./docs/03-sdk-guide.md)              | Detailed documentation for `@anuj304/pramaan` with full options, typed errors, and utilities. |
+| 📚 [**04 — API & Claims Reference**](./docs/04-api-reference.md)      | Endpoints, query parameters, token response formats, claim mappings, and error codes.         |
+| 🛡️ [**05 — Security & Best Practices**](./docs/05-security.md)        | Threat model, PKCE rationale, timing-safe state comparison, and production checklist.         |
+| 💻 [**Runnable Express Example**](./sdk/examples/express/)            | Full, production-ready Express reference application with sessions and UI.                    |
 
 ```
 docs/
@@ -115,13 +115,13 @@ docs/
 
 Pramaan issues two token types. Understanding the distinction from your application session is critical.
 
-| | Access Token | ID Token |
-| :--- | :--- | :--- |
-| **Purpose** | Authorize API calls (e.g. `/userinfo`) | Prove user identity |
-| **Audience** | Resource server (`userinfo`) | Your client (`client_id`) |
-| **Signed with** | RS256 (asymmetric) | RS256 (asymmetric) |
-| **Lifetime** | Short-lived (configurable) | Short-lived (configurable) |
-| **Contains** | `sub`, `scope` | `sub`, `nonce`, `aud`, `iss` |
+|                 | Access Token                           | ID Token                     |
+| :-------------- | :------------------------------------- | :--------------------------- |
+| **Purpose**     | Authorize API calls (e.g. `/userinfo`) | Prove user identity          |
+| **Audience**    | Resource server (`userinfo`)           | Your client (`client_id`)    |
+| **Signed with** | RS256 (asymmetric)                     | RS256 (asymmetric)           |
+| **Lifetime**    | Short-lived (configurable)             | Short-lived (configurable)   |
+| **Contains**    | `sub`, `scope`                         | `sub`, `nonce`, `aud`, `iss` |
 
 > ⚠️ Never use OAuth tokens as your application session. After verifying the ID token, create your own session (cookie, JWT, etc.) with appropriate expiration and security flags.
 
@@ -129,23 +129,23 @@ Pramaan issues two token types. Understanding the distinction from your applicat
 
 ## Supported Scopes
 
-| Scope | Claims Returned |
-| :--- | :--- |
-| `openid` | `sub` |
-| `profile` | `name`, `picture` |
-| `email` | `email`, `email_verified` |
-| `avatar` | `avatar`, `picture` |
+| Scope     | Claims Returned           |
+| :-------- | :------------------------ |
+| `openid`  | `sub`                     |
+| `profile` | `name`, `picture`         |
+| `email`   | `email`, `email_verified` |
+| `avatar`  | `avatar`, `picture`       |
 
 ---
 
 ## Common Issues
 
-| Problem | Fix |
-| :--- | :--- |
-| **Invalid Redirect URI** | Must exactly match the URI registered in the client dashboard |
-| **State Mismatch** | Possible CSRF or expired session — validate the `state` parameter against your stored value |
-| **Invalid ID Token** | Verify `issuer`, `audience`, `nonce`, RS256 signature (via JWKS), and `exp` |
-| **Access Token Expired** | Re-authenticate the user; Pramaan does not currently issue refresh tokens |
+| Problem                  | Fix                                                                                         |
+| :----------------------- | :------------------------------------------------------------------------------------------ |
+| **Invalid Redirect URI** | Must exactly match the URI registered in the client dashboard                               |
+| **State Mismatch**       | Possible CSRF or expired session — validate the `state` parameter against your stored value |
+| **Invalid ID Token**     | Verify `issuer`, `audience`, `nonce`, RS256 signature (via JWKS), and `exp`                 |
+| **Access Token Expired** | Re-authenticate the user; Pramaan does not currently issue refresh tokens                   |
 
 ---
 

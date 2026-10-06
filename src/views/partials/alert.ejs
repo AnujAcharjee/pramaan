@@ -1,7 +1,7 @@
 <!-- Dynamic React-Like Toast Notifications Container (Fixed at top of screen) -->
 <div data-alert-container class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-md px-4 pointer-events-none flex flex-col items-center gap-3">
   <% if (typeof error === "string" && error && error !== 'Session_expired') { %>
-  <div class="pointer-events-auto w-full rounded-2xl border border-rose-200/80 dark:border-rose-500/30 bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-rose-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="error" data-alert-dismiss="5000">
+  <div class="pointer-events-auto w-full rounded-2xl border border-rose-200/80 dark:border-rose-500/30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-rose-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="error" data-alert-dismiss="5000">
     <div class="w-8 h-8 rounded-xl bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -11,7 +11,7 @@
       <p class="text-[11px] font-extrabold uppercase tracking-wider text-rose-600 dark:text-rose-400">Error</p>
       <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-normal" data-alert-message><%= error %></p>
     </div>
-    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
+    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
@@ -20,7 +20,7 @@
   <% } %>
 
   <% if (typeof success === "string" && success && success !== 'Session_expired') { %>
-  <div class="pointer-events-auto w-full rounded-2xl border border-emerald-200/80 dark:border-emerald-500/30 bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-emerald-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="success" data-alert-dismiss="5000">
+  <div class="pointer-events-auto w-full rounded-2xl border border-emerald-200/80 dark:border-emerald-500/30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-emerald-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="success" data-alert-dismiss="5000">
     <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -30,7 +30,7 @@
       <p class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Success</p>
       <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-normal" data-alert-message><%= success %></p>
     </div>
-    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
+    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
@@ -39,7 +39,7 @@
   <% } %>
 
   <% if (typeof warning === "string" && warning) { %>
-  <div class="pointer-events-auto w-full rounded-2xl border border-amber-200/80 dark:border-amber-500/30 bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-amber-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="warning" data-alert-dismiss="6000">
+  <div class="pointer-events-auto w-full rounded-2xl border border-amber-200/80 dark:border-amber-500/30 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl p-3.5 shadow-2xl shadow-amber-500/10 dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300" role="alert" data-alert data-alert-type="warning" data-alert-dismiss="6000">
     <div class="w-8 h-8 rounded-xl bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 shadow-xs mt-0.5">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -49,7 +49,7 @@
       <p class="text-[11px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400">Notice</p>
       <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-normal" data-alert-message><%= warning %></p>
     </div>
-    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
+    <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>

@@ -3,11 +3,7 @@ import assert from 'node:assert';
 import http from 'node:http';
 import * as jose from 'jose';
 import { PramaanClient } from '../src/client.js';
-import {
-  ConfigurationError,
-  StateMismatchError,
-  UnsupportedFeatureError,
-} from '../src/errors.js';
+import { ConfigurationError, StateMismatchError, UnsupportedFeatureError } from '../src/errors.js';
 
 describe('PramaanClient Integration & Orchestration', () => {
   let server: http.Server;

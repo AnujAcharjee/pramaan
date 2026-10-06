@@ -5,8 +5,7 @@ import * as jose from 'jose';
 import { joseService, type EncryptedPrivateKey } from '../src/services/jose.service.js';
 import { ENV } from '../src/config/env.js';
 
-const generateKey = () =>
-  jose.generateKeyPair('RS256', { modulusLength: 2048, extractable: true });
+const generateKey = () => jose.generateKeyPair('RS256', { modulusLength: 2048, extractable: true });
 
 describe('RSA Private Key Envelope Encryption (KEK + DEK)', () => {
   it('should encrypt RSA private key into a full two-tier envelope', async () => {

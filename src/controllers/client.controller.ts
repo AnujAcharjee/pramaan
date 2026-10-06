@@ -46,15 +46,14 @@ export class ClientController extends BaseController {
     return {
       title: 'Add Client',
       robots: 'noindex, nofollow',
+      user: (req as Request & { user?: unknown }).user || null,
       formData: {
         name: typeof req.body?.name === 'string' ? req.body.name : '',
         has_domain: typeof req.body?.has_domain === 'string' ? req.body.has_domain : 'yes',
         domain:
-          typeof req.body?.domain === 'string'
-            ? req.body.domain
-            : typeof req.body?.slug === 'string'
-              ? req.body.slug
-              : '',
+          typeof req.body?.domain === 'string' ? req.body.domain
+          : typeof req.body?.slug === 'string' ? req.body.slug
+          : '',
         client_type: typeof req.body?.client_type === 'string' ? req.body.client_type : 'CONFIDENTIAL',
       },
       success: typeof req.query.success === 'string' ? req.query.success : null,
@@ -62,9 +61,27 @@ export class ClientController extends BaseController {
     };
   }
 
+  renderDeveloperDashboard = this.handleViewRequest(async (req, res) => {
+    const userId = req.user.id;
+    const user = await this.accountService.get(userId);
+    const clients = await this.clientService.getAllClientsForUser(userId);
+
+    res.render('pages/app/developer', {
+      title: 'Developer Console',
+      robots: 'noindex, nofollow',
+      serverUrl: 'https://pramaan.anujacharjee.com',
+      user,
+      clients,
+      error: typeof req.query.error === 'string' ? req.query.error : undefined,
+      success: typeof req.query.success === 'string' ? req.query.success : undefined,
+    });
+  });
+
   renderAddClient = this.handleViewRequest(async (req, res) => {
-    res.render('pages/app/forms/create-client', {
+    const user = req.user?.id ? await this.accountService.get(req.user.id) : null;
+    res.render('pages/app/create-client', {
       ...this.buildAddClientViewData(req),
+      user,
     });
   });
 
@@ -104,7 +121,7 @@ export class ClientController extends BaseController {
 
       return res.redirect(303, `/client/${data.id}`);
     },
-    'pages/app/forms/create-client',
+    'pages/app/create-client',
     (req) => this.buildAddClientViewData(req),
     ClientZSchema.addClientSchema,
   );
@@ -117,15 +134,17 @@ export class ClientController extends BaseController {
       throw new AppError('clientId missing', 500, ErrorCode.INTERNAL_SERVER_ERROR, false);
     }
     const client = await this.clientService.getClient(clientId);
+    const user = req.user?.id ? await this.accountService.get(req.user.id) : null;
 
     // flash secret injection
     const clientSecret = req.cookies?.__flash_client_secret;
     res.clearCookie('__flash_client_secret');
 
     return {
-      title: 'OAuth Dashboard',
+      title: `${client.name} - Client Dashboard`,
       robots: 'noindex, nofollow',
       serverUrl: SERVER_URL,
+      user,
       client: {
         ...client,
         client_secret: clientSecret,
@@ -145,7 +164,7 @@ export class ClientController extends BaseController {
   renderClientDashboard = this.handleViewRequest(async (req, res) => {
     const viewData = await this.buildClientDashboardViewData(req, res);
 
-    res.render('pages/app/dashboards/client', {
+    res.render('pages/app/client', {
       ...viewData,
     });
   });
@@ -316,7 +335,7 @@ export class ClientController extends BaseController {
         303,
         `/client/${client_id}?success=${encodeURIComponent('Client logo updated successfully')}`,
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Cloudinary upload error details for client avatar:', error);
       return res.redirect(
         303,
@@ -363,11 +382,7 @@ export class ClientController extends BaseController {
     }
 
     try {
-      const { clientSecret } = await this.clientService.updateClientType(
-        client_id,
-        req.user.id,
-        client_type,
-      );
+      const { clientSecret } = await this.clientService.updateClientType(client_id, req.user.id, client_type);
 
       if (clientSecret) {
         res.cookie('__flash_client_secret', clientSecret, {
@@ -570,7 +585,7 @@ export class ClientController extends BaseController {
   renderClientConfirmation = this.handleViewRequest(async (req, res) => {
     try {
       const viewData = await this.buildClientConfirmationViewData(req);
-      res.render('pages/app/confirm-action/client', viewData);
+      res.render('pages/app/confirm-client', viewData);
     } catch (error) {
       const clientId = this.getString(req.params.client_id);
       if (error instanceof AppError && clientId) {

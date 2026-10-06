@@ -14,7 +14,10 @@ describe('Discovery Module', () => {
   before((_, done) => {
     server = http.createServer((req, res) => {
       requestCount++;
-      if (req.url === '/.well-known/openid-configuration' || req.url === '/mismatch/.well-known/openid-configuration') {
+      if (
+        req.url === '/.well-known/openid-configuration' ||
+        req.url === '/mismatch/.well-known/openid-configuration'
+      ) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(mockDoc));
       } else if (req.url === '/error/.well-known/openid-configuration') {

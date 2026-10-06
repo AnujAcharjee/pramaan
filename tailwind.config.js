@@ -22,6 +22,12 @@ export default {
           rose: '#F39F9F',
           roseDeep: '#B95E82',
         },
+        dark: {
+          bg: '#000000',
+          surface: '#0a0a0a',
+          sub: '#121212',
+          border: '#262626',
+        },
       },
     },
   },

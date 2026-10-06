@@ -16,7 +16,15 @@ export class TokenClient {
    * Exchange an authorization code for tokens at the token endpoint.
    */
   async exchangeCode(options: TokenExchangeOptions): Promise<TokenSet> {
-    const { tokenEndpoint, clientId, clientSecret, code, codeVerifier, redirectUri, timeoutMs = 10000 } = options;
+    const {
+      tokenEndpoint,
+      clientId,
+      clientSecret,
+      code,
+      codeVerifier,
+      redirectUri,
+      timeoutMs = 10000,
+    } = options;
 
     const bodyParams = new URLSearchParams({
       grant_type: 'authorization_code',

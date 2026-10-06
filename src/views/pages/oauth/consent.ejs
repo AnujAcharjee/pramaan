@@ -56,7 +56,7 @@
   <div class="w-full max-w-lg">
     
     <!-- Main Card -->
-    <div class="glass-card overflow-hidden shadow-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white/95 dark:bg-[#0f121d]/95 backdrop-blur-2xl">
+    <div class="glass-card overflow-hidden shadow-2xl border border-slate-200/80 dark:border-neutral-800/80 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl">
 
       <!-- Header: Connected Apps -->
       <div class="p-8 pb-5 text-center">
@@ -73,7 +73,7 @@
             </div>
             <% if (_environment !== 'production' || isLocalhost) { %>
             <!-- Dev Yellow Badge Overlay -->
-            <div class="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[9px] font-extrabold ring-2 ring-white dark:ring-[#0f121d] shadow-xs" title="Developer Mode">
+            <div class="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-full bg-amber-500 text-white text-[9px] font-extrabold ring-2 ring-white dark:ring-[#0a0a0a] shadow-xs" title="Developer Mode">
               DEV
             </div>
             <% } %>
@@ -140,7 +140,7 @@
         <!-- Permissions List -->
         <div class="space-y-2.5">
           <% if (_scopes.length === 0) { %>
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-800/80 text-center">
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-[#121212]/90 border border-slate-200/80 dark:border-neutral-800/80 text-center">
             <p class="text-xs text-slate-600 dark:text-slate-400 font-medium">Basic authentication only</p>
           </div>
           <% } else { %>
@@ -150,8 +150,8 @@
                 desc: 'Access requested permissions on your account',
                 icon: '<svg class="w-5 h-5 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>'
               }; %>
-              <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#141724] border border-slate-200/80 dark:border-slate-800/80 hover:border-slate-350 dark:hover:border-slate-700 transition-colors">
-                <div class="w-9 h-9 rounded-xl bg-white dark:bg-slate-800/80 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-slate-700/50 shadow-2xs">
+              <div class="flex items-start gap-3.5 p-3.5 rounded-2xl bg-slate-50/80 dark:bg-[#121212]/90 border border-slate-200/80 dark:border-neutral-800/80 hover:border-slate-300 dark:hover:border-neutral-700 transition-colors">
+                <div class="w-9 h-9 rounded-xl bg-white dark:bg-neutral-800/80 flex items-center justify-center shrink-0 border border-slate-200/60 dark:border-neutral-700/50 shadow-2xs">
                   <%- detail.icon %>
                 </div>
                 <div class="flex-1 min-w-0 mt-0.5">
@@ -171,7 +171,7 @@
 
       <!-- Redirect Context Bar -->
       <% if (_redirectHost) { %>
-      <div class="px-6 sm:px-8 py-3 bg-slate-50/80 dark:bg-[#0c0f1a] border-t border-slate-200/70 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+      <div class="px-6 sm:px-8 py-3 bg-slate-50/80 dark:bg-[#0a0a0a] border-t border-slate-200/70 dark:border-neutral-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
         <div class="flex items-center gap-1.5 truncate">
           <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -188,7 +188,7 @@
       <% } %>
 
       <!-- Form Actions (Cancel / Allow) -->
-      <form id="consent-form" method="POST" action="/oauth/consent" class="p-6 sm:p-8 bg-slate-50/90 dark:bg-[#121524] border-t border-slate-200/70 dark:border-slate-800/80">
+      <form id="consent-form" method="POST" action="/oauth/consent" class="p-6 sm:p-8 bg-slate-50/90 dark:bg-[#121212] border-t border-slate-200/70 dark:border-neutral-800/80">
         <input type="hidden" name="request_id" value="<%= requestId %>" />
         <input type="hidden" name="decision" id="decision-input" value="approve" />
 

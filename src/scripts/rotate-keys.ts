@@ -46,7 +46,9 @@ async function main() {
 
     // 3. Verify public JWKS endpoint state
     const jwks = await joseService.getJwks();
-    console.log(`\n📋 Current Public JWKS Pool: ${jwks.keys.length} key(s) available for signature verification`);
+    console.log(
+      `\n📋 Current Public JWKS Pool: ${jwks.keys.length} key(s) available for signature verification`,
+    );
     for (const k of jwks.keys as Array<{ kid?: string }>) {
       const isNew = k.kid === rotated.kid;
       console.log(`   - [${isNew ? 'ACTIVE' : 'RETIRED'}] kid: ${k.kid}`);

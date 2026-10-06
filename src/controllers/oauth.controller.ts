@@ -1,4 +1,3 @@
-import { SCOPES } from '../utils/constant.js';
 import type { Request, Response, NextFunction } from 'express';
 import type { OAuthService, AuthorizationCacheType } from '../services/oauth.service.js';
 import type { AccountService } from '../services/account.service.js';

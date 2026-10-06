@@ -25,7 +25,9 @@ export class AuthorizationService {
   createAuthorizationRequest(options: AuthorizationOptions = {}): AuthorizationRequest {
     const redirectUri = options.redirectUri ?? this.options.defaultRedirectUri;
     if (!redirectUri) {
-      throw new ConfigurationError('redirectUri is required either in PramaanClient config or in authorization options');
+      throw new ConfigurationError(
+        'redirectUri is required either in PramaanClient config or in authorization options',
+      );
     }
 
     // Process scope

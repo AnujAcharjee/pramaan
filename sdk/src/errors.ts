@@ -2,7 +2,10 @@
  * Base error class for all Pramaan SDK errors.
  */
 export class PramaanError extends Error {
-  constructor(message: string, public override readonly cause?: unknown) {
+  constructor(
+    message: string,
+    public override readonly cause?: unknown,
+  ) {
     super(message, { cause });
     this.name = this.constructor.name;
     Object.setPrototypeOf(this, new.target.prototype);
@@ -18,7 +21,11 @@ export class ConfigurationError extends PramaanError {}
  * Thrown when OpenID Connect Discovery fails or returns an invalid document.
  */
 export class DiscoveryError extends PramaanError {
-  constructor(message: string, public readonly status?: number, cause?: unknown) {
+  constructor(
+    message: string,
+    public readonly status?: number,
+    cause?: unknown,
+  ) {
     super(message, cause);
   }
 }
@@ -41,7 +48,9 @@ export class StateMismatchError extends PramaanError {
  * Thrown when nonce validation fails on ID token verification.
  */
 export class NonceMismatchError extends PramaanError {
-  constructor(message = 'Nonce validation failed: ID token nonce claim does not match the original transaction') {
+  constructor(
+    message = 'Nonce validation failed: ID token nonce claim does not match the original transaction',
+  ) {
     super(message);
   }
 }
@@ -69,7 +78,11 @@ export class OAuthError extends PramaanError {
  * Thrown when token exchange fails or returns a malformed response.
  */
 export class TokenError extends PramaanError {
-  constructor(message: string, public readonly statusCode?: number, cause?: unknown) {
+  constructor(
+    message: string,
+    public readonly statusCode?: number,
+    cause?: unknown,
+  ) {
     super(message, cause);
   }
 }

@@ -18,7 +18,10 @@ describe('Authorization Module', () => {
     assert.ok(req.transaction);
 
     const parsed = new URL(req.url);
-    assert.strictEqual(parsed.origin + parsed.pathname, 'https://pramaan.anujacharjee.com/api/oauth/authorize');
+    assert.strictEqual(
+      parsed.origin + parsed.pathname,
+      'https://pramaan.anujacharjee.com/api/oauth/authorize',
+    );
     assert.strictEqual(parsed.searchParams.get('response_type'), 'code');
     assert.strictEqual(parsed.searchParams.get('client_id'), 'test-client-123');
     assert.strictEqual(parsed.searchParams.get('redirect_uri'), 'http://localhost:3000/callback');

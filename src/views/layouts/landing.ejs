@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
   <%- partial("../partials/head", locals) %>
@@ -56,9 +56,9 @@
       }
     ]
   </script>
+  <script src="/js/navbar.js?v=3" defer></script>
+  <script src="/js/implementation.js?v=2" defer></script>
 </head>
-
-<script src="/js/navbar.js?v=3" defer></script>
 
 <body class="min-h-screen bg-theme text-slate-900 dark:text-slate-200 antialiased overflow-x-hidden transition-colors duration-300">
 
@@ -66,26 +66,20 @@
   <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
 
     <!-- Floating Gradient Orbs -->
-    <div class="absolute -top-20 -right-20 w-[30rem] h-[30rem] bg-linear-to-br from-orange-400/30 to-amber-500/20 dark:from-brand-orange/20 dark:to-amber-500/10 rounded-full blur-3xl animate-float"></div>
+    <div class="absolute -top-20 -right-20 w-[30rem] h-[30rem] bg-linear-to-br from-orange-400/30 to-amber-500/20 dark:from-brand-orange/10 dark:to-transparent rounded-full blur-3xl animate-float"></div>
 
-    <div class="absolute -bottom-28 -left-28 w-[30rem] h-[30rem] bg-linear-to-tr from-sky-400/25 to-indigo-500/20 dark:from-indigo-600/20 dark:to-sky-500/15 rounded-full blur-3xl animate-float-delayed"></div>
+    <div class="absolute -bottom-28 -left-28 w-[30rem] h-[30rem] bg-linear-to-tr from-sky-400/25 to-indigo-500/20 dark:from-transparent dark:to-transparent rounded-full blur-3xl animate-float-delayed"></div>
 
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-xl h-128 bg-linear-to-br from-orange-300/15 to-transparent dark:from-brand-orange/12 dark:to-indigo-500/8 rounded-full blur-3xl animate-pulse-slow"></div>
-
-    <!-- Subtle Grid Pattern -->
-    <svg class="absolute inset-0 w-full h-full opacity-[0.035] dark:opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="1" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-    </svg>
-
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-xl h-128 bg-linear-to-br from-orange-300/15 to-transparent dark:from-brand-orange/6 dark:to-transparent rounded-full blur-3xl animate-pulse-slow"></div>
   </div>
 
   <!-- Animation Styles -->
   <style>
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 4.5rem;
+    }
+
     body {
       font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
@@ -145,7 +139,7 @@
     <%- body %>
   </main>
 
-  <script src="/js/theme.js?v=3"></script>
+  <script src="/js/theme.js?v=3" defer></script>
 </body>
 
 </html>

@@ -100,11 +100,9 @@ export class AuthController extends BaseController {
   private buildEmailVerificationViewData(req: Request) {
     const { flow, requestId, isOAuthFlow } = this.getFlow(req);
     const email =
-      typeof req.query.email === 'string'
-        ? req.query.email
-        : typeof req.body?.email === 'string'
-          ? req.body.email
-          : '';
+      typeof req.query.email === 'string' ? req.query.email
+      : typeof req.body?.email === 'string' ? req.body.email
+      : '';
 
     return {
       title: 'Email Verification - Pramaan',

@@ -61,11 +61,7 @@ export class JWKSClient {
     try {
       json = rawText ? JSON.parse(rawText) : {};
     } catch (err) {
-      throw new DiscoveryError(
-        `Invalid JSON received from JWKS endpoint: ${rawText}`,
-        response.status,
-        err,
-      );
+      throw new DiscoveryError(`Invalid JSON received from JWKS endpoint: ${rawText}`, response.status, err);
     }
 
     const jwks = json as { keys?: jose.JWK[] };

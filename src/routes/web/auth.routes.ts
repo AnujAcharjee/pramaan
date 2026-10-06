@@ -14,13 +14,19 @@ import {
 const router = Router();
 const authController = new AuthController(authService, oauthService);
 
-router.route('/signup').get(authController.renderSignupForm).post(signupLimiter, authController.signup);
+router
+  .route('/signup')
+  .get(Authentication.redirectIfAuthenticated(), authController.renderSignupForm)
+  .post(signupLimiter, authController.signup);
 
 router.get('/verify', authController.renderEmailVerificationPage);
 router.get('/email/verify', authController.verifyEmail);
 router.get('/verify/resend', emailVerificationLimiter, authController.resendVerificationEmail);
 
-router.route('/signin').get(authController.renderSigninForm).post(signinLimiter, authController.signin);
+router
+  .route('/signin')
+  .get(Authentication.redirectIfAuthenticated(), authController.renderSigninForm)
+  .post(signinLimiter, authController.signin);
 router.get('/signin/verify', authController.verifySignin);
 
 router

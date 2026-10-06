@@ -35,15 +35,21 @@ async function main() {
 
     for (const keyRecord of allKeys) {
       const enc = keyRecord.privateKeyEnc as unknown as EncryptedPrivateKey;
-      const isEnvelope = Boolean(enc.encryptedDek && enc.dekIv && enc.dekTag && enc.version === 'v2-envelope');
+      const isEnvelope = Boolean(
+        enc.encryptedDek && enc.dekIv && enc.dekTag && enc.version === 'v2-envelope',
+      );
 
       if (isEnvelope) {
-        console.log(`  [OK] Key ID ${keyRecord.id} (kid: ${keyRecord.kid}) is already v2-envelope encrypted.`);
+        console.log(
+          `  [OK] Key ID ${keyRecord.id} (kid: ${keyRecord.kid}) is already v2-envelope encrypted.`,
+        );
         alreadyMigrated++;
         continue;
       }
 
-      console.log(`  [UPGRADE] Migrating legacy key ID ${keyRecord.id} (kid: ${keyRecord.kid}, status: ${keyRecord.status})...`);
+      console.log(
+        `  [UPGRADE] Migrating legacy key ID ${keyRecord.id} (kid: ${keyRecord.kid}, status: ${keyRecord.status})...`,
+      );
 
       try {
         // 1. Decrypt raw private key using backward-compatible fallback path
@@ -92,7 +98,9 @@ async function main() {
     console.log('------------------------------------------------------------\n');
 
     if (errors === 0) {
-      console.log('🎉 100% of signing keys in the database are now protected by Two-Tier Envelope Encryption!\n');
+      console.log(
+        '🎉 100% of signing keys in the database are now protected by Two-Tier Envelope Encryption!\n',
+      );
     } else {
       console.log('⚠️  Migration completed with errors. Please check the logs above.\n');
       process.exitCode = 1;

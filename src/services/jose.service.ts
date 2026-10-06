@@ -59,9 +59,9 @@ export class JoseService {
 
   public async encryptPrivateKey(privateKey: CryptoKey | crypto.KeyObject): Promise<EncryptedPrivateKey> {
     const pem =
-      privateKey instanceof crypto.KeyObject
-        ? (privateKey.export({ type: 'pkcs8', format: 'pem' }) as string)
-        : await jose.exportPKCS8(privateKey);
+      privateKey instanceof crypto.KeyObject ?
+        (privateKey.export({ type: 'pkcs8', format: 'pem' }) as string)
+      : await jose.exportPKCS8(privateKey);
 
     // 1. Generate unique single-use Data Encryption Key (DEK) - 256-bit AES
     const dek = crypto.randomBytes(32);
@@ -102,27 +102,17 @@ export class JoseService {
         Buffer.from(enc.dekIv, 'base64'),
       );
       dekDecipher.setAuthTag(Buffer.from(enc.dekTag, 'base64'));
-      dek = Buffer.concat([
-        dekDecipher.update(Buffer.from(enc.encryptedDek, 'base64')),
-        dekDecipher.final(),
-      ]);
+      dek = Buffer.concat([dekDecipher.update(Buffer.from(enc.encryptedDek, 'base64')), dekDecipher.final()]);
     } else {
       // Fallback for legacy single-layer encrypted keys
       dek = this.ENCRYPTION_KEY;
     }
 
     // 2. Decrypt the RSA private key payload using the unwrapped DEK
-    const decipher = crypto.createDecipheriv(
-      'aes-256-gcm',
-      dek,
-      Buffer.from(enc.iv, 'base64'),
-    );
+    const decipher = crypto.createDecipheriv('aes-256-gcm', dek, Buffer.from(enc.iv, 'base64'));
     decipher.setAuthTag(Buffer.from(enc.tag, 'base64'));
 
-    const decrypted = Buffer.concat([
-      decipher.update(Buffer.from(enc.data, 'base64')),
-      decipher.final(),
-    ]);
+    const decrypted = Buffer.concat([decipher.update(Buffer.from(enc.data, 'base64')), decipher.final()]);
 
     return crypto.createPrivateKey(decrypted.toString('utf8'));
   }

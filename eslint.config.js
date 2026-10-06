@@ -6,9 +6,15 @@ import eslintConfigPrettier from 'eslint-config-prettier/flat';
 
 export default defineConfig([
   {
-    ignores: ["node_modules/**", "dist/**", "build/**", "generated/**"],
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'generated/**',
+      'sdk/dist/**',
+      'sdk/examples/express/dist/**',
+    ],
   },
-
 
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],
@@ -21,6 +27,27 @@ export default defineConfig([
       globals: globals.node,
     },
   },
+  {
+    files: ['public/js/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
+    },
+  },
   tseslint.configs.recommended,
   eslintConfigPrettier,
+  {
+    rules: {
+      'no-empty': ['error', { allowEmptyCatch: true }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
 ]);

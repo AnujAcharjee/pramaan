@@ -1,35 +1,41 @@
-<section id="how-it-works" class="relative border-t border-slate-200/40 dark:border-slate-700/20 bg-slate-50/30 dark:bg-transparent">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
-    <div class="text-center max-w-3xl mx-auto mb-16">
+<section id="how-it-works" class="relative border-t border-slate-200/60 dark:border-neutral-800/80 bg-slate-50/40 dark:bg-transparent">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <div class="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
       <p class="text-xs font-semibold text-brand-orange tracking-wider uppercase">HOW IT WORKS</p>
-      <h2 class="text-3xl sm:text-5xl font-bold text-slate-900 dark:text-slate-100 mt-3 font-brand-hero">Authentication in three clear steps</h2>
-      <p class="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 font-medium">
-        Pramaan issues and secures tokens, while your app focuses on product logic.
+      <h2 class="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mt-2.5 sm:mt-3 font-brand-hero leading-tight">
+        Authentication in three clear steps
+      </h2>
+      <p class="mt-3 sm:mt-4 text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed px-2">
+        Built on battle-tested
+        <span class="font-semibold text-slate-800 dark:text-slate-200">OAuth 2.0</span>
+        and
+        <span class="font-semibold text-slate-800 dark:text-slate-200">OIDC (OpenID Connect)</span>
+        standards — Pramaan handles authentication and identity, so your app can focus on building your product.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div class="p-8 rounded-3xl bg-white/80 dark:bg-[#0c111d]/90 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 shadow-md shadow-slate-100/50 dark:shadow-black/30 hover:shadow-xl dark:hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 group">
-        <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-brand-orange/15 text-brand-orange flex items-center justify-center font-bold text-lg mb-6 group-hover:bg-brand-orange group-hover:text-white transition-all duration-300">01</div>
-        <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Authorize</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="w-10 h-10 rounded-xl bg-orange-50 dark:bg-brand-orange/15 text-brand-orange border border-orange-200/50 dark:border-brand-orange/20 flex items-center justify-center font-bold text-lg mb-5 sm:mb-6 group-hover:bg-brand-orange group-hover:text-white group-hover:border-transparent transition-all duration-300">01</div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2.5 sm:mb-3">OAuth 2.0 Authorize</h3>
         <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-          Redirect users to Pramaan for authentication and consent. We handle credentials, MFA, and session security centrally.
+          Redirect users via PKCE-enabled OAuth 2.0 authorization. Pramaan securely validates user credentials, executes multi-factor authentication, and requests user consent.
         </p>
       </div>
 
-      <div class="p-8 rounded-3xl bg-white/80 dark:bg-[#0c111d]/90 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 shadow-md shadow-slate-100/50 dark:shadow-black/30 hover:shadow-xl dark:hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 group">
-        <div class="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold text-lg mb-6 group-hover:bg-sky-500 group-hover:text-white transition-all duration-300">02</div>
-        <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Exchange</h3>
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="w-10 h-10 rounded-xl bg-sky-50 dark:bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-200/50 dark:border-sky-500/20 flex items-center justify-center font-bold text-lg mb-5 sm:mb-6 group-hover:bg-sky-500 group-hover:text-white group-hover:border-transparent transition-all duration-300">02</div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2.5 sm:mb-3">Token Exchange</h3>
         <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-          Your backend securely exchanges the authorization code for access and ID tokens via the RFC-compliant token endpoint.
+          Your backend securely exchanges the authorization code for an OAuth 2.0 access token and an OIDC ID token via the RFC-compliant token endpoint.
         </p>
       </div>
 
-      <div class="p-8 rounded-3xl bg-white/80 dark:bg-[#0c111d]/90 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 shadow-md shadow-slate-100/50 dark:shadow-black/30 hover:shadow-xl dark:hover:border-slate-700 hover:-translate-y-1 transition-all duration-300 group">
-        <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-lg mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">03</div>
-        <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-3">Secure</h3>
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-500/20 flex items-center justify-center font-bold text-lg mb-5 sm:mb-6 group-hover:bg-emerald-500 group-hover:text-white group-hover:border-transparent transition-all duration-300">03</div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2.5 sm:mb-3">OIDC Verification</h3>
         <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
-          Access protected UserInfo endpoints with short-lived tokens and verify token signatures using JWKS for secure API access.
+          Verify token signatures offline using standard OIDC JWKS public keys, and query protected OIDC UserInfo endpoints using short-lived tokens.
         </p>
       </div>
     </div>

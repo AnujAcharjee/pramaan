@@ -8,13 +8,13 @@ Integrate authentication and single sign-on into your Node.js applications with 
 
 ## Features
 
-* 🔍 **Automatic OIDC Discovery**: Dynamically resolves endpoints from `/.well-known/openid-configuration` — no hardcoded URLs.
-* 🛡️ **Built-in PKCE (RFC 7636)**: Secure S256 code challenge and verifier generation to protect against code interception.
-* 🔒 **CSRF & Nonce Protection**: Constant-time `state` validation and strict OIDC `nonce` validation.
-* 🔑 **Cryptographic ID Token Verification**: Validates RS256 signatures, audience, issuer, expiration, and key ID (`kid`) rotation using standard JWKS.
-* 👤 **UserInfo Integration**: Type-safe profile retrieval from the `/userinfo` endpoint.
-* ⚡ **Framework Independent**: Pure TypeScript library compatible with Express, Fastify, NestJS, or raw Node.js HTTP servers.
-* 📦 **Zero Fluff**: Clean API without unnecessary abstractions or database vendor lock-in.
+- 🔍 **Automatic OIDC Discovery**: Dynamically resolves endpoints from `/.well-known/openid-configuration` — no hardcoded URLs.
+- 🛡️ **Built-in PKCE (RFC 7636)**: Secure S256 code challenge and verifier generation to protect against code interception.
+- 🔒 **CSRF & Nonce Protection**: Constant-time `state` validation and strict OIDC `nonce` validation.
+- 🔑 **Cryptographic ID Token Verification**: Validates RS256 signatures, audience, issuer, expiration, and key ID (`kid`) rotation using standard JWKS.
+- 👤 **UserInfo Integration**: Type-safe profile retrieval from the `/userinfo` endpoint.
+- ⚡ **Framework Independent**: Pure TypeScript library compatible with Express, Fastify, NestJS, or raw Node.js HTTP servers.
+- 📦 **Zero Fluff**: Clean API without unnecessary abstractions or database vendor lock-in.
 
 ---
 
@@ -41,7 +41,7 @@ Integrate Pramaan OAuth 2.0 / OpenID Connect authentication into this Node.js/Ty
    Ask the user whether they prefer:
    - **(A) Session-Based Auth** (stateful in-app sessions via `express-session`)
    - **(B) JWT-Based Auth** (stateless app JWT in signed httpOnly cookie or Authorization header)
-   Proceed based on their answer.
+     Proceed based on their answer.
 
 2. **Install Dependencies & Configure .env**:
    - Install `@anuj304/pramaan`.
@@ -58,15 +58,15 @@ Integrate Pramaan OAuth 2.0 / OpenID Connect authentication into this Node.js/Ty
 
 4. **Implement Auth Routes**:
    - `/login`: Call `const { url, transaction } = await pramaan.createAuthorizationRequest({ scope: ["openid", "profile", "email"] })`.
-     - *Session*: Store `transaction` in `req.session.oauth`.
-     - *JWT*: Store `transaction` in temporary signed httpOnly cookie (`pramaan_tx`, maxAge 10m).
+     - _Session_: Store `transaction` in `req.session.oauth`.
+     - _JWT_: Store `transaction` in temporary signed httpOnly cookie (`pramaan_tx`, maxAge 10m).
      - Redirect to `url`.
    - `/pramaan/callback`:
      - Retrieve `transaction` from session or `pramaan_tx` cookie.
      - Call `const tokens = await pramaan.handleCallback({ code, state, transaction })`.
      - Clear temporary transaction state.
-     - *Session*: Store user profile / tokens in `req.session.user`.
-     - *JWT*: Sign application JWT with user claims (`jwt.sign(claims, JWT_SECRET, { expiresIn: '7d' })`) and set in secure `httpOnly` cookie (`auth_token`).
+     - _Session_: Store user profile / tokens in `req.session.user`.
+     - _JWT_: Sign application JWT with user claims (`jwt.sign(claims, JWT_SECRET, { expiresIn: '7d' })`) and set in secure `httpOnly` cookie (`auth_token`).
      - Redirect to protected dashboard.
    - `/user` or `/profile`: Return profile claims (from session, decoded JWT, or `await pramaan.getUserInfo(tokens.accessToken)`).
    - `/logout`: Destroy session or clear `auth_token` cookie and redirect.
@@ -187,34 +187,34 @@ Host Application                       Pramaan IdP
 
 ### `new PramaanClient(config)`
 
-* `issuer` *(string, required)*: Base URL of your Pramaan instance.
-* `clientId` *(string, required)*: Registered OAuth Client ID.
-* `clientSecret` *(string, optional)*: Client Secret for confidential clients.
-* `redirectUri` *(string, optional)*: Default redirect URI for callbacks.
-* `clockTolerance` *(number, optional)*: JWT clock skew tolerance in seconds (default: 5).
-* `timeoutMs` *(number, optional)*: HTTP timeout in ms (default: 10000).
+- `issuer` _(string, required)_: Base URL of your Pramaan instance.
+- `clientId` _(string, required)_: Registered OAuth Client ID.
+- `clientSecret` _(string, optional)_: Client Secret for confidential clients.
+- `redirectUri` _(string, optional)_: Default redirect URI for callbacks.
+- `clockTolerance` _(number, optional)_: JWT clock skew tolerance in seconds (default: 5).
+- `timeoutMs` _(number, optional)_: HTTP timeout in ms (default: 10000).
 
 ### Methods
 
-* `discover(forceRefresh?: boolean): Promise<DiscoveryDocument>`
-* `createAuthorizationRequest(options?: AuthorizationOptions): Promise<AuthorizationRequest>`
-* `getAuthorizationUrl(options?: AuthorizationOptions): Promise<string>`
-* `handleCallback(options: CallbackOptions): Promise<TokenSet>`
-* `exchangeCode(code: string, codeVerifier: string, redirectUri?: string): Promise<TokenSet>`
-* `verifyIdToken(idToken: string, expectedNonce?: string): Promise<IDTokenClaims>`
-* `getUserInfo(accessToken: string): Promise<UserInfo>`
-* `getLogoutUrl(options?: LogoutOptions): string` *(Throws `UnsupportedFeatureError` until implemented in Pramaan)*
+- `discover(forceRefresh?: boolean): Promise<DiscoveryDocument>`
+- `createAuthorizationRequest(options?: AuthorizationOptions): Promise<AuthorizationRequest>`
+- `getAuthorizationUrl(options?: AuthorizationOptions): Promise<string>`
+- `handleCallback(options: CallbackOptions): Promise<TokenSet>`
+- `exchangeCode(code: string, codeVerifier: string, redirectUri?: string): Promise<TokenSet>`
+- `verifyIdToken(idToken: string, expectedNonce?: string): Promise<IDTokenClaims>`
+- `getUserInfo(accessToken: string): Promise<UserInfo>`
+- `getLogoutUrl(options?: LogoutOptions): string` _(Throws `UnsupportedFeatureError` until implemented in Pramaan)_
 
 ### Error Classes
 
-* `PramaanError`: Base class for all SDK errors.
-* `ConfigurationError`: Invalid initialization options or parameters.
-* `DiscoveryError`: Discovery endpoint network failure or invalid metadata.
-* `OAuthError`: Standard OAuth 2.0 error returned by server (`error`, `error_description`, `error_uri`).
-* `TokenValidationError`: ID token signature verification or claims mismatch.
-* `StateMismatchError`: State parameter does not match the transaction.
-* `NonceMismatchError`: ID token nonce does not match the transaction.
-* `UnsupportedFeatureError`: Calling an endpoint not yet supported by Pramaan.
+- `PramaanError`: Base class for all SDK errors.
+- `ConfigurationError`: Invalid initialization options or parameters.
+- `DiscoveryError`: Discovery endpoint network failure or invalid metadata.
+- `OAuthError`: Standard OAuth 2.0 error returned by server (`error`, `error_description`, `error_uri`).
+- `TokenValidationError`: ID token signature verification or claims mismatch.
+- `StateMismatchError`: State parameter does not match the transaction.
+- `NonceMismatchError`: ID token nonce does not match the transaction.
+- `UnsupportedFeatureError`: Calling an endpoint not yet supported by Pramaan.
 
 ---
 
@@ -226,9 +226,9 @@ See the [`examples/express`](examples/express/) directory for a full working Exp
 
 ## Current Protocol Limitations
 
-* **RP-Initiated Logout**: Pramaan does not currently support `end_session_endpoint`. Local session cleanup should be performed by the application.
-* **Refresh Tokens**: Pramaan currently issues access tokens and ID tokens only. Refresh token rotation is not yet implemented on the server.
-* **Token Revocation / Introspection**: RFC 7009 / RFC 7662 endpoints are not yet supported.
+- **RP-Initiated Logout**: Pramaan does not currently support `end_session_endpoint`. Local session cleanup should be performed by the application.
+- **Refresh Tokens**: Pramaan currently issues access tokens and ID tokens only. Refresh token rotation is not yet implemented on the server.
+- **Token Revocation / Introspection**: RFC 7009 / RFC 7662 endpoints are not yet supported.
 
 ---
 

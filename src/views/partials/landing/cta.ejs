@@ -1,16 +1,19 @@
-<section class="relative border-t border-slate-200/40 dark:border-slate-700/20 bg-slate-50/50 dark:bg-transparent">
+<%
+  const _user = typeof user !== 'undefined' && user ? user : (typeof locals !== 'undefined' && locals.user ? locals.user : null);
+%>
+<section class="relative border-t border-slate-200/60 dark:border-neutral-800/80 bg-slate-50/50 dark:bg-transparent">
   <div class="absolute inset-0 bg-linear-to-br from-white via-orange-50/10 to-sky-50/20 dark:from-transparent dark:via-brand-orange/3 dark:to-transparent pointer-events-none"></div>
-  <div class="relative max-w-4xl mx-auto px-6 py-20 sm:py-24 text-center z-10">
-    <h2 class="text-3xl sm:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-6 font-brand-hero leading-tight">
+  <div class="relative max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center z-10">
+    <h2 class="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4 font-brand-hero leading-tight">
       Ready to launch your identity layer?
     </h2>
-    <p class="text-base sm:text-lg text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto font-medium">
+    <p class="text-sm sm:text-base text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto font-medium leading-relaxed">
       Create an account, register your first client, and start authenticating in minutes.
     </p>
 
     <div class="flex justify-center">
-      <a href="/signup" class="btn-orange text-lg shadow-xl shadow-brand-orange/15 hover:-translate-y-0.5 active:translate-y-0">
-        Sign up now
+      <a href="<%= _user ? '/account' : '/signup' %>" class="btn-orange text-base sm:text-lg shadow-xl shadow-brand-orange/15 hover:-translate-y-0.5 active:translate-y-0 px-8 py-3.5">
+        <%= _user ? 'Go to Dashboard' : 'Sign up now' %>
       </a>
     </div>
     

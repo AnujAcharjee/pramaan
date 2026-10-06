@@ -97,7 +97,7 @@
         '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
     }
 
-    wrapper.className = `pointer-events-auto w-full rounded-2xl border ${borderClass} bg-white/95 dark:bg-[#0c111d]/95 backdrop-blur-xl p-3.5 shadow-2xl dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300`;
+    wrapper.className = `pointer-events-auto w-full rounded-2xl border ${borderClass} bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl p-3.5 shadow-2xl dark:shadow-black/70 animate-toastIn flex items-start gap-3.5 transition-all duration-300`;
     wrapper.setAttribute('role', 'alert');
     wrapper.setAttribute('data-alert', '');
     wrapper.setAttribute('data-alert-type', type);
@@ -112,7 +112,7 @@
         <p class="text-[11px] font-extrabold uppercase tracking-wider ${titleClass}">${titleText}</p>
         <p class="text-xs font-semibold text-slate-800 dark:text-slate-200 mt-0.5 leading-normal" data-alert-message></p>
       </div>
-      <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
+      <button type="button" class="shrink-0 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer" data-alert-close aria-label="Dismiss alert">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>

@@ -19,7 +19,6 @@ The examples use Node.js with Express and the [`jose`](https://github.com/panva/
 7. Your backend fetches user profile claims from the UserInfo endpoint
 8. Your app creates a local user record and establishes its own session
 
-
 ## Step 0 — Discover Endpoints
 
 Pramaan publishes an OpenID Connect discovery document. Fetch it once at startup and cache it:
@@ -57,10 +56,10 @@ The discovery document returns the exact endpoint URLs to use in subsequent step
 Generate a PKCE code verifier/challenge pair, a `state` value for CSRF protection, and a `nonce` that will be embedded in the ID token:
 
 ```typescript
-import crypto from "crypto";
+import crypto from 'crypto';
 
 function base64url(bytes: Buffer): string {
-  return bytes.toString("base64url");
+  return bytes.toString('base64url');
 }
 
 export function generateOAuthParameters() {
@@ -70,9 +69,7 @@ export function generateOAuthParameters() {
     state: base64url(crypto.randomBytes(32)),
     nonce: base64url(crypto.randomBytes(32)),
     codeVerifier,
-    codeChallenge: base64url(
-      crypto.createHash("sha256").update(codeVerifier).digest()
-    ),
+    codeChallenge: base64url(crypto.createHash('sha256').update(codeVerifier).digest()),
   };
 }
 ```
@@ -86,7 +83,7 @@ Store `state`, `nonce`, and `codeVerifier` in the server-side session — they a
 Build the authorization URL using the discovered `authorization_endpoint` and redirect the user:
 
 ```typescript
-app.get("/login", async (req, res) => {
+app.get('/login', async (req, res) => {
   const config = await getOidcConfig();
   const params = generateOAuthParameters();
 
@@ -98,14 +95,14 @@ app.get("/login", async (req, res) => {
   };
 
   const url = new URL(config.authorization_endpoint);
-  url.searchParams.set("response_type", "code");
-  url.searchParams.set("client_id", process.env.CLIENT_ID!);
-  url.searchParams.set("redirect_uri", process.env.CALLBACK_URL!);
-  url.searchParams.set("scope", "openid profile email");
-  url.searchParams.set("state", params.state);
-  url.searchParams.set("nonce", params.nonce);
-  url.searchParams.set("code_challenge", params.codeChallenge);
-  url.searchParams.set("code_challenge_method", "S256");
+  url.searchParams.set('response_type', 'code');
+  url.searchParams.set('client_id', process.env.CLIENT_ID!);
+  url.searchParams.set('redirect_uri', process.env.CALLBACK_URL!);
+  url.searchParams.set('scope', 'openid profile email');
+  url.searchParams.set('state', params.state);
+  url.searchParams.set('nonce', params.nonce);
+  url.searchParams.set('code_challenge', params.codeChallenge);
+  url.searchParams.set('code_challenge_method', 'S256');
 
   res.redirect(url.toString());
 });
@@ -120,20 +117,20 @@ Pramaan will authenticate the user, show a consent screen (if needed), and redir
 Validate the `state` parameter and extract the authorization code:
 
 ```typescript
-app.get("/oauth/callback", async (req, res) => {
+app.get('/oauth/callback', async (req, res) => {
   const { code, state, error, error_description } = req.query;
 
   if (error) {
-    console.error("OAuth error:", error_description || error);
-    return res.redirect("/login?error=access_denied");
+    console.error('OAuth error:', error_description || error);
+    return res.redirect('/login?error=access_denied');
   }
 
   if (!state || state !== req.session.oauth?.state) {
-    return res.status(403).send("Invalid state parameter");
+    return res.status(403).send('Invalid state parameter');
   }
 
-  if (typeof code !== "string") {
-    return res.status(400).send("Missing authorization code");
+  if (typeof code !== 'string') {
+    return res.status(400).send('Missing authorization code');
   }
 
   // Proceed to token exchange (Step 4)
@@ -151,10 +148,10 @@ async function exchangeCode(code: string, codeVerifier: string) {
   const config = await getOidcConfig();
 
   const res = await fetch(config.token_endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
-      grant_type: "authorization_code",
+      grant_type: 'authorization_code',
       code,
       client_id: process.env.CLIENT_ID!,
       client_secret: process.env.CLIENT_SECRET!,
@@ -187,7 +184,7 @@ The response contains:
 Validate the RS256 signature using Pramaan's JWKS, and check the `issuer`, `audience`, and `nonce` claims:
 
 ```typescript
-import { createRemoteJWKSet, jwtVerify } from "jose";
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
 
@@ -201,11 +198,11 @@ async function verifyIdToken(idToken: string, expectedNonce: string) {
   const { payload } = await jwtVerify(idToken, jwks, {
     issuer: config.issuer,
     audience: process.env.CLIENT_ID!,
-    algorithms: ["RS256"],
+    algorithms: ['RS256'],
   });
 
   if (payload.nonce !== expectedNonce) {
-    throw new Error("Nonce mismatch — possible token replay");
+    throw new Error('Nonce mismatch — possible token replay');
   }
 
   return payload; // { sub, nonce, iss, aud, iat, exp }
@@ -235,11 +232,11 @@ async function fetchUserInfo(accessToken: string) {
 
 The claims returned depend on the scopes granted:
 
-| Scope | Claims |
-| :--- | :--- |
-| `openid` | `sub` |
-| `profile` | `name`, `picture` |
-| `email` | `email`, `email_verified` |
+| Scope     | Claims                    |
+| :-------- | :------------------------ |
+| `openid`  | `sub`                     |
+| `profile` | `name`, `picture`         |
+| `email`   | `email`, `email_verified` |
 
 ---
 
@@ -274,7 +271,7 @@ if (!user) {
 req.session.user = { id: user.id, email: user.email, name: user.name };
 delete req.session.oauth; // Clean up one-time OAuth state
 
-res.redirect("/dashboard");
+res.redirect('/dashboard');
 ```
 
 > ⚠️ **Do not use OAuth tokens as your application session.** They are short-lived and scoped to Pramaan's API. Always create your own session with `httpOnly`, `secure`, and `sameSite: 'lax'` cookie flags.
@@ -299,4 +296,3 @@ res.redirect("/dashboard");
 - [Official SDK Integration Guide →](./03-sdk-guide.md) — Integrate in 4 lines of code with `@anuj304/pramaan`
 - [API & Claims Reference →](./04-api-reference.md) — Comprehensive endpoints and claims specifications
 - [Security Best Practices →](./05-security.md) — Production hardening, PKCE rationale, and CSRF mitigation
-

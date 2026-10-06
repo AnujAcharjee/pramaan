@@ -15,7 +15,7 @@ export const setupSecurityHeaders = (app: Express) => {
           defaultSrc: ["'self'"], // block all external resources by default
 
           scriptSrc: ["'self'"], // prevent remote script injection
-          styleSrc: ["'self'", "'unsafe-inline'"], // required for SSR auth pages
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'], // required for SSR auth pages & Google Fonts
           imgSrc: ["'self'", 'data:', 'https:', 'blob:'], // allow avatars, logos, QR codes, and local blob previews
           fontSrc: ["'self'", 'https:', 'data:'], // allow embedded web fonts
           mediaSrc: ["'self'", 'https://res.cloudinary.com', 'blob:', 'data:'], // allow Cloudinary video streaming
