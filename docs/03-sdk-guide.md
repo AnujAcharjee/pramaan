@@ -3,6 +3,7 @@
 The easiest and most secure way to integrate a Node.js or TypeScript application with Pramaan is using the official **`@anuj304/pramaan`** SDK.
 
 The SDK automatically handles:
+
 - ✅ **OIDC Discovery** from `/.well-known/openid-configuration`
 - ✅ **PKCE S256** code challenge and verifier generation (RFC 7636)
 - ✅ **CSRF & State defense** with constant-time verification
@@ -19,7 +20,7 @@ The SDK automatically handles:
 npm install @anuj304/pramaan
 ```
 
-*(Requires Node.js >= 18.0.0)*
+_(Requires Node.js >= 18.0.0)_
 
 ---
 
@@ -34,7 +35,7 @@ Integrate Pramaan OAuth 2.0 / OpenID Connect authentication into this Node.js/Ty
    Ask the user whether they prefer:
    - **(A) Session-Based Auth** (stateful in-app sessions via `express-session`)
    - **(B) JWT-Based Auth** (stateless app JWT in signed httpOnly cookie or Authorization header)
-   Proceed based on their answer.
+     Proceed based on their answer.
 
 2. **Install Dependencies & Configure .env**:
    - Install `@anuj304/pramaan`.
@@ -51,15 +52,15 @@ Integrate Pramaan OAuth 2.0 / OpenID Connect authentication into this Node.js/Ty
 
 4. **Implement Auth Routes**:
    - `/login`: Call `const { url, transaction } = await pramaan.createAuthorizationRequest({ scope: ["openid", "profile", "email"] })`.
-     - *Session*: Store `transaction` in `req.session.oauth`.
-     - *JWT*: Store `transaction` in temporary signed httpOnly cookie (`pramaan_tx`, maxAge 10m).
+     - _Session_: Store `transaction` in `req.session.oauth`.
+     - _JWT_: Store `transaction` in temporary signed httpOnly cookie (`pramaan_tx`, maxAge 10m).
      - Redirect to `url`.
    - `/pramaan/callback`:
      - Retrieve `transaction` from session or `pramaan_tx` cookie.
      - Call `const tokens = await pramaan.handleCallback({ code, state, transaction })`.
      - Clear temporary transaction state.
-     - *Session*: Store user profile / tokens in `req.session.user`.
-     - *JWT*: Sign application JWT with user claims (`jwt.sign(claims, JWT_SECRET, { expiresIn: '7d' })`) and set in secure `httpOnly` cookie (`auth_token`).
+     - _Session_: Store user profile / tokens in `req.session.user`.
+     - _JWT_: Sign application JWT with user claims (`jwt.sign(claims, JWT_SECRET, { expiresIn: '7d' })`) and set in secure `httpOnly` cookie (`auth_token`).
      - Redirect to protected dashboard.
    - `/user` or `/profile`: Return profile claims (from session, decoded JWT, or `await pramaan.getUserInfo(tokens.accessToken)`).
    - `/logout`: Destroy session or clear `auth_token` cookie and redirect.
@@ -75,13 +76,13 @@ Integrate Pramaan OAuth 2.0 / OpenID Connect authentication into this Node.js/Ty
 Initialize `PramaanClient` once with your client credentials:
 
 ```typescript
-import { PramaanClient } from "@anuj304/pramaan";
+import { PramaanClient } from '@anuj304/pramaan';
 
 export const pramaan = new PramaanClient({
-  issuer: process.env.PRAMAAN_ISSUER || "https://pramaan.anujacharjee.com",
+  issuer: process.env.PRAMAAN_ISSUER || 'https://pramaan.anujacharjee.com',
   clientId: process.env.PRAMAAN_CLIENT_ID!,
   clientSecret: process.env.PRAMAAN_CLIENT_SECRET, // required for confidential server-side clients
-  redirectUri: process.env.PRAMAAN_REDIRECT_URI || "http://localhost:3000/pramaan/callback",
+  redirectUri: process.env.PRAMAAN_REDIRECT_URI || 'http://localhost:3000/pramaan/callback',
 });
 ```
 
@@ -96,10 +97,10 @@ When the user clicks "Sign in with Pramaan", call `createAuthorizationRequest()`
 Store this transaction in the user's encrypted server-side session:
 
 ```typescript
-app.get("/login", async (req, res, next) => {
+app.get('/login', async (req, res, next) => {
   try {
     const auth = await pramaan.createAuthorizationRequest({
-      scope: ["openid", "profile", "email"],
+      scope: ['openid', 'profile', 'email'],
     });
 
     // Save transaction state in the session
@@ -118,12 +119,13 @@ app.get("/login", async (req, res, next) => {
 When Pramaan redirects the user back to your redirect URI, pass the query parameters and saved session transaction to `handleCallback()`.
 
 The SDK will:
+
 1. Verify the `state` matches the transaction using constant-time comparison.
 2. Exchange the authorization code for tokens at the discovered token endpoint.
 3. Validate the ID token's RS256 signature, issuer, audience, and nonce via JWKS.
 
 ```typescript
-app.get("/pramaan/callback", async (req, res, next) => {
+app.get('/pramaan/callback', async (req, res, next) => {
   try {
     const tokens = await pramaan.handleCallback({
       code: req.query.code as string,
@@ -139,7 +141,7 @@ app.get("/pramaan/callback", async (req, res, next) => {
     // Store tokens in session (or find/create local user in your database)
     req.session.tokens = tokens;
 
-    res.redirect("/profile");
+    res.redirect('/profile');
   } catch (err) {
     next(err);
   }
@@ -151,10 +153,10 @@ app.get("/pramaan/callback", async (req, res, next) => {
 Use the issued `accessToken` to retrieve the authenticated user's profile claims:
 
 ```typescript
-app.get("/profile", async (req, res, next) => {
+app.get('/profile', async (req, res, next) => {
   try {
     if (!req.session.tokens?.accessToken) {
-      return res.redirect("/login");
+      return res.redirect('/login');
     }
 
     const user = await pramaan.getUserInfo(req.session.tokens.accessToken);
@@ -177,9 +179,9 @@ app.get("/profile", async (req, res, next) => {
 To log out from your application, destroy your local application session:
 
 ```typescript
-app.get("/logout", (req, res) => {
+app.get('/logout', (req, res) => {
   req.session.destroy(() => {
-    res.redirect("/");
+    res.redirect('/');
   });
 });
 ```
@@ -200,18 +202,18 @@ function signInWithPramaan() {
   const top = window.screenY + (window.outerHeight - height) / 2;
 
   const popup = window.open(
-    "/login",
-    "pramaan_login",
-    `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+    '/login',
+    'pramaan_login',
+    `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`,
   );
 
   // Listen for callback completion from the popup
-  window.addEventListener("message", function onMessage(event) {
+  window.addEventListener('message', function onMessage(event) {
     if (event.origin !== window.location.origin) return;
 
-    if (event.data?.type === "PRAMAAN_AUTH_SUCCESS") {
-      window.removeEventListener("message", onMessage);
-      window.location.href = "/dashboard"; // Navigate initial tab to dashboard
+    if (event.data?.type === 'PRAMAAN_AUTH_SUCCESS') {
+      window.removeEventListener('message', onMessage);
+      window.location.href = '/dashboard'; // Navigate initial tab to dashboard
     }
   });
 }
@@ -225,12 +227,12 @@ In your callback route, after exchanging tokens and setting your session cookie,
 <script>
   if (window.opener) {
     // Notify the initial tab
-    window.opener.postMessage({ type: "PRAMAAN_AUTH_SUCCESS" }, window.location.origin);
+    window.opener.postMessage({ type: 'PRAMAAN_AUTH_SUCCESS' }, window.location.origin);
     // Close the popup window
     window.close();
   } else {
     // Fallback for full-page redirect
-    window.location.href = "/dashboard";
+    window.location.href = '/dashboard';
   }
 </script>
 ```
@@ -241,14 +243,14 @@ The popup will close automatically upon user consent, and the initial browser ta
 
 ## 4. Client Configuration Reference
 
-| Option | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `issuer` | `string` | Yes | Pramaan base URL (e.g. `https://pramaan.anujacharjee.com`) |
-| `clientId` | `string` | Yes | Client ID issued by Pramaan dashboard |
-| `clientSecret` | `string` | No | Client Secret (required for confidential server apps) |
-| `redirectUri` | `string` | No | Default callback URI registered in Pramaan |
-| `timeoutMs` | `number` | No | HTTP request timeout in milliseconds (default: `10000`) |
-| `fetchFn` | `typeof fetch` | No | Custom fetch function (defaults to global `fetch`) |
+| Option         | Type           | Required | Description                                                |
+| :------------- | :------------- | :------- | :--------------------------------------------------------- |
+| `issuer`       | `string`       | Yes      | Pramaan base URL (e.g. `https://pramaan.anujacharjee.com`) |
+| `clientId`     | `string`       | Yes      | Client ID issued by Pramaan dashboard                      |
+| `clientSecret` | `string`       | No       | Client Secret (required for confidential server apps)      |
+| `redirectUri`  | `string`       | No       | Default callback URI registered in Pramaan                 |
+| `timeoutMs`    | `number`       | No       | HTTP request timeout in milliseconds (default: `10000`)    |
+| `fetchFn`      | `typeof fetch` | No       | Custom fetch function (defaults to global `fetch`)         |
 
 ---
 
@@ -302,20 +304,20 @@ import {
   createRemoteJwks,
   verifyIdToken,
   discoverOidcConfig,
-} from "@anuj304/pramaan";
+} from '@anuj304/pramaan';
 
 // 1. Generate PKCE verifier + challenge
 const { codeVerifier, codeChallenge } = generatePkce();
 
 // 2. Discover endpoints
-const config = await discoverOidcConfig("https://pramaan.anujacharjee.com");
+const config = await discoverOidcConfig('https://pramaan.anujacharjee.com');
 
 // 3. Construct URL manually
 const url = buildAuthorizationUrl(config.authorization_endpoint, {
-  clientId: "your-client-id",
-  redirectUri: "https://yourapp.com/callback",
-  scope: ["openid", "profile"],
-  state: "xyz123",
+  clientId: 'your-client-id',
+  redirectUri: 'https://yourapp.com/callback',
+  scope: ['openid', 'profile'],
+  state: 'xyz123',
   codeChallenge,
 });
 ```
@@ -328,6 +330,7 @@ A complete, runnable Express application with session configuration, styled UI, 
 [`application/sdk/examples/express`](../sdk/examples/express/)
 
 To run it locally:
+
 ```bash
 cd application/sdk/examples/express
 cp .env.example .env
@@ -343,4 +346,3 @@ npm run dev
 - [API & Claims Reference →](./04-api-reference.md) — Comprehensive endpoints, tokens, and claims specs
 - [Manual Implementation Guide →](./02-signup-flow.md) — Protocol specifications for non-Node.js stacks
 - [Security Best Practices →](./05-security.md) — Hardening, PKCE rationale, and CSRF mitigation
-

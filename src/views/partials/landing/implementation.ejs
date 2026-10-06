@@ -1,0 +1,210 @@
+<section id="implementation" class="relative overflow-hidden border-t border-slate-200/60 dark:border-neutral-800/80 py-16 sm:py-24">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Section Heading -->
+    <div class="max-w-3xl mb-8 sm:mb-12 text-center mx-auto">
+      <p class="text-xs font-semibold text-brand-orange tracking-wider uppercase">
+        IMPLEMENTATION
+      </p>
+
+      <h2 class="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mt-2.5 font-brand-hero leading-tight">
+        Add authentication with just a few lines of code
+      </h2>
+
+      <p class="mt-3.5 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed font-medium max-w-2xl mx-auto">
+        Drop in the official Node.js SDK to handle PKCE generation, callback exchange, and token verification effortlessly.
+      </p>
+
+      <!-- Quick Install Bar -->
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 text-xs sm:text-sm font-mono text-slate-700 dark:text-slate-300">
+          <span class="text-brand-orange font-bold">$</span>
+          <span id="installCmdText">npm i @anuj304/pramaan</span>
+          <button
+            id="copyInstallBtn"
+            type="button"
+            class="ml-1 p-1 rounded-lg text-slate-400 hover:text-brand-orange dark:text-slate-500 dark:hover:text-brand-orange transition-colors cursor-pointer"
+            title="Copy command"
+            aria-label="Copy install command"
+          >
+            <svg id="copyInstallIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            <svg id="copiedInstallIcon" class="w-4 h-4 text-emerald-500 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stepper Navigation Pills -->
+    <div class="flex items-center justify-center gap-2 sm:gap-3 mb-6 flex-wrap" role="tablist" aria-label="Implementation Steps">
+      <button
+        type="button"
+        data-step-target="1"
+        class="step-nav-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-brand-orange text-white shadow-md shadow-brand-orange/20 cursor-pointer flex items-center gap-1.5"
+      >
+        <span>01</span>
+        <span class="hidden sm:inline">Auth Request</span>
+      </button>
+
+      <button
+        type="button"
+        data-step-target="2"
+        class="step-nav-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-slate-100 dark:bg-neutral-900 border border-slate-200/80 dark:border-neutral-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center gap-1.5"
+      >
+        <span>02</span>
+        <span class="hidden sm:inline">Token Exchange</span>
+      </button>
+
+      <button
+        type="button"
+        data-step-target="3"
+        class="step-nav-btn px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 bg-slate-100 dark:bg-neutral-900 border border-slate-200/80 dark:border-neutral-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer flex items-center gap-1.5"
+      >
+        <span>03</span>
+        <span class="hidden sm:inline">User Claims</span>
+      </button>
+    </div>
+
+    <!-- Code Frame Container -->
+    <div class="relative group max-w-4xl mx-auto">
+      <!-- Single Code Window -->
+      <div class="relative rounded-3xl bg-white dark:bg-black border border-slate-200/90 dark:border-neutral-800 shadow-xl overflow-hidden transition-all duration-300">
+
+        <!-- Window Top Bar: Classic macOS Style (3 Dots, No Copy) -->
+        <div class="flex items-center px-5 py-3.5 border-b border-slate-200/80 dark:border-neutral-800/80 bg-slate-50/80 dark:bg-black backdrop-blur-md select-none">
+          <!-- 3 macOS-style colorful dots -->
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-[#ff5f56]"></span>
+            <span class="w-3 h-3 rounded-full bg-[#ffbd2e]"></span>
+            <span class="w-3 h-3 rounded-full bg-[#27c93f]"></span>
+          </div>
+        </div>
+
+        <!-- Dynamic Code Viewport (Fixed Height) -->
+        <div class="p-5 sm:p-7 h-[420px] sm:h-[460px] overflow-hidden">
+
+          <!-- STEP 1 CODE -->
+          <div id="stepCode-1" class="sdk-step-block code-scrollbar overflow-x-auto overflow-y-auto h-full w-full transition-opacity duration-300">
+            <pre class="text-xs sm:text-[13px] font-mono leading-relaxed text-slate-800 dark:text-slate-200 m-0 w-max min-w-full">
+<code><span class="text-slate-500 dark:text-slate-400">// ===================================================================</span>
+<span class="text-slate-500 dark:text-slate-400">// Step 1 · Initialize SDK & Create Authorization Request (Auto-PKCE)</span>
+<span class="text-slate-500 dark:text-slate-400">// Automatically generates code_verifier, code_challenge (S256), and state</span>
+<span class="text-slate-500 dark:text-slate-400">// ===================================================================</span>
+
+<span class="text-sky-600 dark:text-sky-400">import</span> { <span class="text-emerald-600 dark:text-emerald-400">PramaanClient</span> } <span class="text-sky-600 dark:text-sky-400">from</span> <span class="text-amber-600 dark:text-amber-400">'@anuj304/pramaan'</span>;
+
+<span class="text-sky-600 dark:text-sky-400">const</span> pramaan = <span class="text-emerald-600 dark:text-emerald-400">new</span> <span class="text-emerald-600 dark:text-emerald-400">PramaanClient</span>({
+  <span class="text-purple-600 dark:text-purple-400">issuer</span>: <span class="text-amber-600 dark:text-amber-400">"https://pramaan.anujacharjee.com"</span>,
+  <span class="text-purple-600 dark:text-purple-400">clientId</span>: process.env.PRAMAAN_CLIENT_ID,
+  <span class="text-purple-600 dark:text-purple-400">clientSecret</span>: process.env.PRAMAAN_CLIENT_SECRET,
+  <span class="text-purple-600 dark:text-purple-400">redirectUri</span>: <span class="text-amber-600 dark:text-amber-400">"https://your-app.com/callback"</span>,
+});
+
+<span class="text-slate-500 dark:text-slate-400">// Create PKCE-secured authorization URL & session transaction</span>
+<span class="text-sky-600 dark:text-sky-400">const</span> { url, transaction } = <span class="text-emerald-600 dark:text-emerald-400">await</span> pramaan.<span class="text-emerald-600 dark:text-emerald-400">createAuthorizationRequest</span>({
+  <span class="text-purple-600 dark:text-purple-400">scope</span>: [<span class="text-amber-600 dark:text-amber-400">"openid"</span>, <span class="text-amber-600 dark:text-amber-400">"profile"</span>, <span class="text-amber-600 dark:text-amber-400">"email"</span>],
+});
+
+<span class="text-slate-500 dark:text-slate-400">// Save transaction in user session and redirect user to Pramaan</span>
+req.session.oauth = transaction;
+res.<span class="text-emerald-600 dark:text-emerald-400">redirect</span>(url);</code>
+            </pre>
+          </div>
+
+          <!-- STEP 2 CODE -->
+          <div id="stepCode-2" class="sdk-step-block code-scrollbar overflow-x-auto overflow-y-auto h-full w-full hidden transition-opacity duration-300">
+            <pre class="text-xs sm:text-[13px] font-mono leading-relaxed text-slate-800 dark:text-slate-200 m-0 w-max min-w-full">
+<code><span class="text-slate-500 dark:text-slate-400">// ===================================================================</span>
+<span class="text-slate-500 dark:text-slate-400">// Step 2 · Handle Callback & Exchange Code (Auto-JWKS Verification)</span>
+<span class="text-slate-500 dark:text-slate-400">// Validates state CSRF token, verifies PKCE challenge, and checks RS256</span>
+<span class="text-slate-500 dark:text-slate-400">// ===================================================================</span>
+
+<span class="text-sky-600 dark:text-sky-400">const</span> tokens = <span class="text-emerald-600 dark:text-emerald-400">await</span> pramaan.<span class="text-emerald-600 dark:text-emerald-400">handleCallback</span>({
+  <span class="text-purple-600 dark:text-purple-400">code</span>: req.query.code,
+  <span class="text-purple-600 dark:text-purple-400">state</span>: req.query.state,
+  <span class="text-purple-600 dark:text-purple-400">transaction</span>: req.session.oauth,
+});
+
+<span class="text-slate-500 dark:text-slate-400">// Clean up one-time transaction state</span>
+<span class="text-sky-600 dark:text-sky-400">delete</span> req.session.oauth;
+
+<span class="text-slate-500 dark:text-slate-400">// tokens: { accessToken, idToken, tokenType }</span>
+<span class="text-slate-500 dark:text-slate-400">// Automatically verified: constant-time CSRF, PKCE verifier, RS256 JWKS</span>
+req.session.tokens = tokens;
+res.<span class="text-emerald-600 dark:text-emerald-400">redirect</span>(<span class="text-amber-600 dark:text-amber-400">"/dashboard"</span>);</code>
+            </pre>
+          </div>
+
+          <!-- STEP 3 CODE -->
+          <div id="stepCode-3" class="sdk-step-block code-scrollbar overflow-x-auto overflow-y-auto h-full w-full hidden transition-opacity duration-300">
+            <pre class="text-xs sm:text-[13px] font-mono leading-relaxed text-slate-800 dark:text-slate-200 m-0 w-max min-w-full">
+<code><span class="text-slate-500 dark:text-slate-400">// ===================================================================</span>
+<span class="text-slate-500 dark:text-slate-400">// Step 3 · Fetch Verified User Claims (OIDC /userinfo)</span>
+<span class="text-slate-500 dark:text-slate-400">// Returns standardized, fully-typed user profile claims</span>
+<span class="text-slate-500 dark:text-slate-400">// ===================================================================</span>
+
+<span class="text-sky-600 dark:text-sky-400">const</span> user = <span class="text-emerald-600 dark:text-emerald-400">await</span> pramaan.<span class="text-emerald-600 dark:text-emerald-400">getUserInfo</span>(
+  req.session.tokens.accessToken
+);
+
+<span class="text-slate-500 dark:text-slate-400">// Access standard typed user claims directly</span>
+res.<span class="text-emerald-600 dark:text-emerald-400">json</span>({
+  <span class="text-purple-600 dark:text-purple-400">id</span>: user.sub,
+  <span class="text-purple-600 dark:text-purple-400">name</span>: user.name,
+  <span class="text-purple-600 dark:text-purple-400">email</span>: user.email,
+  <span class="text-purple-600 dark:text-purple-400">picture</span>: user.picture,
+});</code>
+            </pre>
+          </div>
+
+        </div>
+
+        <!-- Window Bottom Bar: Step Indicator & Next / Prev Controls -->
+        <div class="flex items-center justify-between px-5 py-3.5 border-t border-slate-200/80 dark:border-neutral-800/80 bg-slate-50/80 dark:bg-black backdrop-blur-md">
+          <!-- Step Counter Indicator -->
+          <div class="flex items-center gap-2">
+            <span id="stepCounterText" class="text-xs font-semibold text-slate-600 dark:text-slate-400">
+              Step <span id="currentStepNum" class="text-brand-orange font-bold">1</span> of <span id="totalStepNum">3</span>
+            </span>
+            <div class="hidden sm:flex items-center gap-1.5 ml-2">
+              <span class="step-indicator-dot w-2 h-2 rounded-full bg-brand-orange"></span>
+              <span class="step-indicator-dot w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+              <span class="step-indicator-dot w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+            </div>
+          </div>
+
+          <!-- Controls: Prev / Next Buttons -->
+          <div class="flex items-center gap-2">
+            <button
+              id="prevStepBtn"
+              type="button"
+              disabled
+              class="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-slate-200 dark:border-neutral-800 text-slate-400 dark:text-slate-500 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-neutral-900 hover:text-slate-800 dark:hover:text-slate-200 transition-all cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Previous</span>
+            </button>
+
+            <button
+              id="nextStepBtn"
+              type="button"
+              class="inline-flex items-center gap-1 px-4 py-1.5 rounded-xl text-xs font-semibold bg-linear-to-r from-brand-orange to-brand-orangeDark text-white shadow-md shadow-brand-orange/20 hover:shadow-lg hover:shadow-brand-orange/30 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+            >
+              <span id="nextStepLabel">Next Step</span>
+              <svg id="nextStepIcon" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>

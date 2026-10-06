@@ -1,31 +1,111 @@
-<section id="features" class="relative border-t border-slate-200/40 dark:border-slate-700/20">
-  <div class="max-w-6xl mx-auto px-6 sm:px-8 py-20 sm:py-24">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-      <div>
-        <p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase">Why Pramaan</p>
-        <h2 class="text-3xl sm:text-5xl font-bold text-slate-900 dark:text-slate-100 mt-3 font-brand-hero">Secure by default. Built for developers.</h2>
-        <p class="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 font-medium">
-          Ship secure identity flows with built-in security controls, standards-based protocols, and a developer-friendly experience.
+<section id="features" class="relative border-t border-slate-200/60 dark:border-neutral-800/80 bg-slate-50/40 dark:bg-transparent">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+
+    <!-- Section Header (Matches rest of landing vibe) -->
+    <div class="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+      <p class="text-xs font-semibold text-brand-orange tracking-wider uppercase">WHY PRAMAAN</p>
+      <h2 class="text-2xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 mt-2.5 sm:mt-3 font-brand-hero leading-tight">
+        Secure by default. Built for developers.
+      </h2>
+      <p class="mt-3 sm:mt-4 text-sm sm:text-base text-slate-600 dark:text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed px-2">
+        Everything you need to ship enterprise-grade authentication with open protocols, cryptographic guarantees, and zero vendor lock-in.
+      </p>
+    </div>
+
+    <!-- 6-Feature Grid (Clean, no icon bg, no dividers, no bottom meta) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+
+      <!-- Feature 1: PKCE & OAuth 2.0 -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="mb-4 text-brand-orange">
+          <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 sm:mb-2.5">
+          OAuth 2.0 + PKCE
+        </h3>
+        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+          Full RFC 7636 Authorization Code flow with SHA-256 code challenge validation to protect against authorization code interception attacks.
         </p>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="p-6 rounded-3xl bg-white/80 dark:bg-[#0c111d]/90 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 shadow-sm dark:shadow-black/30 hover:shadow-md dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-300">
-          <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-2">Strong sessions</h3>
-          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Short-lived access tokens, secure session management, and configurable token lifetimes.</p>
+
+      <!-- Feature 2: OIDC & Public JWKS -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="mb-4 text-sky-500 dark:text-sky-400">
+          <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+          </svg>
         </div>
-        <div class="p-6 rounded-3xl bg-white/80 dark:bg-[#0c111d]/90 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 shadow-sm dark:shadow-black/30 hover:shadow-md dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-300">
-          <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-2">Client registry</h3>
-          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Manage redirect URIs, scopes, and client credentials from one place.</p>
-        </div>
-        <div class="p-6 rounded-3xl bg-white/80 dark:bg-[#0c111d]/90 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 shadow-sm dark:shadow-black/30 hover:shadow-md dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-300">
-          <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-2">Open standards</h3>
-          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">OAuth 2.0 and OpenID Connect endpoints designed around industry standards.</p>
-        </div>
-        <div class="p-6 rounded-3xl bg-white/80 dark:bg-[#0c111d]/90 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 shadow-sm dark:shadow-black/30 hover:shadow-md dark:hover:border-slate-700 hover:-translate-y-0.5 transition-all duration-300">
-          <h3 class="font-bold text-slate-900 dark:text-slate-100 mb-2">Security controls</h3>
-          <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Sign-in verification, account lockouts, rate limiting, and secure token validation.</p>
-        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 sm:mb-2.5">
+          OIDC Discovery & JWKS
+        </h3>
+        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+          Standardized <code class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-800 dark:text-slate-200 text-xs font-mono">.well-known</code> configuration and RS256 JWKS endpoints for effortless client SDK integration and token signature verification.
+        </p>
       </div>
+
+      <!-- Feature 3: Two-Factor Authentication -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="mb-4 text-purple-500 dark:text-purple-400">
+          <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 sm:mb-2.5">
+          Two-Factor Auth (TOTP)
+        </h3>
+        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+          Built-in authenticator app integration with QR code onboarding, time-based one-time passwords, and encrypted offline backup recovery codes.
+        </p>
+      </div>
+
+      <!-- Feature 4: Client Registry & DNS Verification -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="mb-4 text-emerald-500 dark:text-emerald-400">
+          <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+          </svg>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 sm:mb-2.5">
+          Client Registry & DNS Check
+        </h3>
+        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+          Manage callback URIs, scopes, and rotated client secrets. Verify client domain ownership through automated DNS TXT record checks before production use.
+        </p>
+      </div>
+
+      <!-- Feature 5: Real-Time Session Governance -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="mb-4 text-amber-500 dark:text-amber-400">
+          <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 sm:mb-2.5">
+          Active Session Governance
+        </h3>
+        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+          Inspect device types, IP addresses, and geolocation across active sign-in sessions. Instantly revoke compromised sessions with single-click invalidation.
+        </p>
+      </div>
+
+      <!-- Feature 6: Defense in Depth & Rate Limiting -->
+      <div class="p-6 sm:p-8 rounded-3xl bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 group">
+        <div class="mb-4 text-rose-500 dark:text-rose-400">
+          <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100 mb-2 sm:mb-2.5">
+          Rate Limiting & Lockouts
+        </h3>
+        <p class="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">
+          Redis-backed sliding window rate limiters protect authorization and token endpoints against brute-force attacks, with automatic account lockout shields.
+        </p>
+      </div>
+
     </div>
+
   </div>
 </section>

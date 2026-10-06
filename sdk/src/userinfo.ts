@@ -65,11 +65,9 @@ export class UserInfoClient {
       const errObj = json as Record<string, unknown>;
       const code = typeof errObj.error === 'string' ? errObj.error : 'invalid_token';
       const description =
-        typeof errObj.error_description === 'string'
-          ? errObj.error_description
-          : typeof errObj.message === 'string'
-            ? errObj.message
-            : undefined;
+        typeof errObj.error_description === 'string' ? errObj.error_description
+        : typeof errObj.message === 'string' ? errObj.message
+        : undefined;
 
       throw new OAuthError(code, description, undefined, response.status);
     }

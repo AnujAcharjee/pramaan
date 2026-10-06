@@ -91,6 +91,118 @@ export class Authentication {
     };
   };
 
+  static optionalSsr = () => {
+    return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const asid = req.signedCookies[COOKIE_NAMES.ACTIVE_SESSION];
+        const isid = req.signedCookies[COOKIE_NAMES.IDENTITY_SESSION];
+
+        // Try Active Session
+        if (asid) {
+          const hashedAsid = AppCrypto.hash(asid, CRYPTO_ALGORITHMS.sha256, 'hex');
+
+          const cached = await redis.get(Authentication.activeSession_RK(hashedAsid));
+
+          if (cached) {
+            const { userId, roles, createdAt } = JSON.parse(cached);
+
+            if (userId && roles && createdAt) {
+              req.user = { id: userId, roles };
+              return next();
+            }
+          }
+        }
+
+        // Fallback -> Refresh using Identity Session
+        if (isid) {
+          try {
+            const data = await sessionService.refreshActiveSession(isid);
+
+            await setSessionCookies(res, null, data.activeSessId);
+
+            req.user = {
+              id: data.userId,
+              roles: data.roles,
+            };
+
+            return next();
+          } catch {
+            // Identity session invalid/expired, continue as guest
+          }
+        }
+
+        return next();
+      } catch {
+        return next();
+      }
+    };
+  };
+
+  static redirectIfAuthenticated = (redirectTo = '/account') => {
+    return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const asid = req.signedCookies[COOKIE_NAMES.ACTIVE_SESSION];
+        const isid = req.signedCookies[COOKIE_NAMES.IDENTITY_SESSION];
+
+        // Try Active Session
+        if (asid) {
+          const hashedAsid = AppCrypto.hash(asid, CRYPTO_ALGORITHMS.sha256, 'hex');
+          const cached = await redis.get(Authentication.activeSession_RK(hashedAsid));
+
+          if (cached) {
+            const { userId, roles, createdAt } = JSON.parse(cached);
+
+            if (userId && roles && createdAt) {
+              const query = (req.query ?? {}) as Record<string, unknown>;
+              const flow = query.flow as string | undefined;
+              const requestId = Authentication.resolveOAuthRequestId(req);
+
+              if (flow === 'oauth' && requestId) {
+                try {
+                  const redirectURL = await oauthService.authorize(requestId, userId);
+                  return res.redirect(303, redirectURL);
+                } catch {
+                  return res.redirect(303, redirectTo);
+                }
+              }
+
+              return res.redirect(303, redirectTo);
+            }
+          }
+        }
+
+        // Fallback -> Refresh using Identity Session
+        if (isid) {
+          try {
+            const data = await sessionService.refreshActiveSession(isid);
+            await setSessionCookies(res, null, data.activeSessId);
+
+            const query = (req.query ?? {}) as Record<string, unknown>;
+            const flow = query.flow as string | undefined;
+            const requestId = Authentication.resolveOAuthRequestId(req);
+
+            if (flow === 'oauth' && requestId) {
+              try {
+                const redirectURL = await oauthService.authorize(requestId, data.userId);
+                return res.redirect(303, redirectURL);
+              } catch {
+                return res.redirect(303, redirectTo);
+              }
+            }
+
+            return res.redirect(303, redirectTo);
+          } catch {
+            // Identity session invalid/expired, continue as guest
+          }
+        }
+
+        return next();
+      } catch {
+        return next();
+      }
+    };
+  };
+
   static async client(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const auth = req.headers.authorization;

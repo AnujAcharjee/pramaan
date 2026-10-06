@@ -34,7 +34,7 @@ interface ResendErrorResponse {
 const BOUNCE_KEY_PREFIX = 'email:bounce:';
 const SOFT_BOUNCE_KEY_PREFIX = 'email:softbounce:';
 const HARD_BOUNCE_TTL = 30 * 24 * 60 * 60; // 30 days
-const SOFT_BOUNCE_TTL = 24 * 60 * 60;       // 24-hour window for counting
+const SOFT_BOUNCE_TTL = 24 * 60 * 60; // 24-hour window for counting
 const MAX_SOFT_BOUNCES = 3;
 
 class EmailService {
@@ -81,11 +81,7 @@ class EmailService {
     const exists = await redis.get(redisKey);
 
     if (exists) {
-      throw new AppError(
-        'Please wait before requesting another email.',
-        429,
-        ErrorCode.RATE_LIMITED,
-      );
+      throw new AppError('Please wait before requesting another email.', 429, ErrorCode.RATE_LIMITED);
     }
 
     await redis.set(redisKey, '1', 'EX', limitSeconds);
@@ -276,7 +272,13 @@ class EmailService {
   // HELPERS
   // -----------------------
 
-  private buildUrl(path: string, token: string, flow: AuthenticationFlow, requestId?: string, email?: string) {
+  private buildUrl(
+    path: string,
+    token: string,
+    flow: AuthenticationFlow,
+    requestId?: string,
+    email?: string,
+  ) {
     const url = new URL(`${SERVER_URL}${path}`);
     url.searchParams.append('token', token);
     if (email) {

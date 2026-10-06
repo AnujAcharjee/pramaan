@@ -45,29 +45,28 @@ export class AccountController extends BaseController {
   renderAccountDashboard = this.handleViewRequest(async (req, res) => {
     const viewData = await this.buildAccountDashboardViewData(req);
 
-    res.render('pages/app/dashboards/account', viewData);
+    res.render('pages/app/account', viewData);
   });
 
   updateProfile = this.handleViewRequest(async (req, res) => {
     let avatarUrl = req.body.updates?.avatar;
-    const user = await this.accountService.get(req.user.id);
 
     if (req.file) {
       try {
         // Upload image to Cloudinary using streamifier
         avatarUrl = await new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { folder: 'pramaan_avatars' },
-            (error, result) => {
-              if (result) resolve(result.secure_url);
-              else reject(error);
-            }
-          );
+          const stream = cloudinary.uploader.upload_stream({ folder: 'pramaan_avatars' }, (error, result) => {
+            if (result) resolve(result.secure_url);
+            else reject(error);
+          });
           streamifier.createReadStream(req.file!.buffer).pipe(stream);
         });
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Cloudinary upload error details:', error);
-        return res.redirect(303, `/account?error=${encodeURIComponent('Avatar upload failed. Please check Cloudinary configuration.')}`);
+        return res.redirect(
+          303,
+          `/account?error=${encodeURIComponent('Avatar upload failed. Please check Cloudinary configuration.')}`,
+        );
       }
     }
 
@@ -83,10 +82,7 @@ export class AccountController extends BaseController {
   removeAvatar = this.handleViewRequest(async (req, res) => {
     await this.accountService.update(req.user.id, { avatar: null });
 
-    return res.redirect(
-      303,
-      `/account?success=${encodeURIComponent('Avatar removed successfully')}`,
-    );
+    return res.redirect(303, `/account?success=${encodeURIComponent('Avatar removed successfully')}`);
   });
 
   changePassword = this.handleViewRequest(async (req, res) => {
@@ -159,7 +155,7 @@ export class AccountController extends BaseController {
   });
 
   renderAccountConfirmation = this.handleViewRequest(async (req, res) => {
-    res.render('pages/app/confirm-action/account', {
+    res.render('pages/app/confirm-account', {
       title: 'Confirm Account Action',
       userId: req.user.id,
       action: req.params.action,

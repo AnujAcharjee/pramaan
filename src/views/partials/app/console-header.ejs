@@ -1,0 +1,111 @@
+<%
+  const _user = typeof user !== 'undefined' && user ? user : (typeof locals !== 'undefined' && locals.user ? locals.user : null);
+  const _activeNav = typeof activeNav !== 'undefined' ? activeNav : '';
+  const _client = typeof client !== 'undefined' && client ? client : null;
+  const _docUrl = typeof docUrl !== 'undefined' && docUrl ? docUrl : 'https://github.com/AnujAcharjee/pramaan';
+%>
+
+<header class="h-14 shrink-0 z-50 w-full bg-white/80 dark:bg-black backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800 transition-colors duration-300 shadow-xs">
+  <div class="h-full px-3 sm:px-5 flex items-center justify-between gap-3">
+
+    <!-- Left: Sidebar Toggle + Logo + Breadcrumb -->
+    <div class="flex items-center gap-2.5 min-w-0">
+      <button
+        id="consoleNavToggle"
+        type="button"
+        class="w-9 h-9 rounded-xl border border-slate-200/80 dark:border-neutral-800 bg-slate-100/90 dark:bg-neutral-900 text-slate-700 dark:text-slate-200 hover:text-brand-orange dark:hover:text-brand-orange hover:border-brand-orange/40 dark:hover:border-neutral-700 hover:bg-orange-50/50 dark:hover:bg-neutral-800 flex items-center justify-center shrink-0 transition-all cursor-pointer shadow-2xs"
+        aria-label="Toggle navigation"
+        title="Toggle sidebar navigation"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Pramaan Brand -->
+      <a href="/" class="flex items-center hover:opacity-90 transition-opacity shrink-0 group" aria-label="Pramaan Home">
+        <span class="font-extrabold text-base tracking-tight text-slate-900 dark:text-slate-100 group-hover:text-brand-orange transition-colors">PRAMAAN</span>
+      </a>
+
+      <!-- Divider -->
+      <div class="h-4 w-px bg-slate-200 dark:bg-neutral-800 hidden sm:block mx-1"></div>
+
+      <!-- Service / Context Breadcrumb -->
+      <div class="hidden sm:flex items-center gap-1.5 text-xs truncate">
+        <% if (_activeNav === 'developer') { %>
+          <span class="font-bold text-slate-800 dark:text-slate-100">Developer Console</span>
+        <% } else if (_activeNav === 'create-client') { %>
+          <a href="/developer" class="text-slate-500 dark:text-slate-400 hover:text-brand-orange dark:hover:text-brand-orange transition-colors">Developer</a>
+          <span class="text-slate-400 dark:text-slate-600">/</span>
+          <span class="font-bold text-slate-800 dark:text-slate-100">Create Client</span>
+        <% } else if (_activeNav === 'client' && _client) { %>
+          <a href="/developer" class="text-slate-500 dark:text-slate-400 hover:text-brand-orange dark:hover:text-brand-orange transition-colors">Developer</a>
+          <span class="text-slate-400 dark:text-slate-600">/</span>
+          <span class="font-bold text-slate-800 dark:text-slate-100 truncate max-w-[140px] sm:max-w-[200px]"><%= _client.name %></span>
+        <% } else { %>
+          <span class="font-bold text-slate-800 dark:text-slate-100">User Account Portal</span>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Right: Quick Navigation, Theme Toggle, User Avatar -->
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      
+      <!-- Quick Nav Links on Desktop -->
+      <nav class="hidden md:flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+        <a href="/" class="px-2.5 py-1.5 rounded-xl hover:text-brand-orange hover:bg-slate-100 dark:hover:bg-neutral-900 dark:hover:text-white transition-all">
+          Landing
+        </a>
+        <a href="<%= _docUrl %>" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-xl hover:text-brand-orange hover:bg-slate-100 dark:hover:bg-neutral-900 dark:hover:text-white transition-all">
+          Docs
+        </a>
+        <% if (_activeNav === 'account') { %>
+          <a href="/developer" class="px-2.5 py-1.5 rounded-xl hover:text-brand-orange hover:bg-slate-100 dark:hover:bg-neutral-900 dark:hover:text-white transition-all">
+            Developer Hub
+          </a>
+        <% } else { %>
+          <a href="/account" class="px-2.5 py-1.5 rounded-xl hover:text-brand-orange hover:bg-slate-100 dark:hover:bg-neutral-900 dark:hover:text-white transition-all">
+            My Account
+          </a>
+        <% } %>
+      </nav>
+
+      <div class="h-4 w-px bg-slate-200 dark:bg-neutral-800 hidden md:block"></div>
+
+      <!-- Theme Toggle Button -->
+      <button
+        id="themeToggle"
+        type="button"
+        class="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-neutral-900 hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
+        aria-label="Toggle dark mode"
+      >
+        <!-- Sun Icon (visible in dark mode) -->
+        <svg class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+        </svg>
+        <!-- Moon Icon (visible in light mode) -->
+        <svg class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      </button>
+
+      <!-- User Avatar / Profile Link -->
+      <% if (_user) { %>
+        <a href="/account" class="flex items-center gap-2 pl-1 group cursor-pointer" title="User account settings">
+          <% if (_user.avatar) { %>
+            <img src="<%= _user.avatar %>" alt="<%= _user.name || 'User' %>" class="w-8 h-8 rounded-xl object-cover ring-2 ring-slate-200 dark:ring-neutral-800 group-hover:ring-brand-orange/60 transition-all shadow-xs" />
+          <% } else { %>
+            <div class="w-8 h-8 rounded-xl bg-linear-to-br from-brand-orange/20 to-amber-500/10 text-brand-orange font-black text-xs flex items-center justify-center ring-2 ring-slate-200 dark:ring-neutral-800 group-hover:ring-brand-orange/60 transition-all shadow-xs">
+              <%= (_user.name || 'U').slice(0, 1).toUpperCase() %>
+            </div>
+          <% } %>
+          <span class="hidden lg:inline text-xs font-semibold text-slate-700 dark:text-slate-200 group-hover:text-brand-orange transition-colors truncate max-w-[110px]">
+            <%= _user.name || 'Account' %>
+          </span>
+        </a>
+      <% } %>
+
+    </div>
+
+  </div>
+</header>

@@ -8,12 +8,12 @@ This guide walks you through deploying and self-hosting your own instance of **P
 
 A production Pramaan deployment consists of:
 
-* **Pramaan App Container:** Node.js backend executing the OpenID Connect & OAuth 2.0 services.
-* **Reverse Proxy (Caddy / Nginx):** Handles SSL termination (automatic Let's Encrypt certificates), compression, and security headers.
-* **PostgreSQL Database:** Stores users, registered OAuth clients, grants, and cryptographic key metadata (compatible with PostgreSQL 14+, Neon, Supabase, or AWS RDS).
-* **Redis Cache:** High-speed in-memory store for session states, authorization codes, rate limiting, and discovery document caching.
-* **Transactional Email (Resend):** Sends email verification codes and password reset links.
-* **Cloudinary (Optional):** Handles user avatar image storage.
+- **Pramaan App Container:** Node.js backend executing the OpenID Connect & OAuth 2.0 services.
+- **Reverse Proxy (Caddy / Nginx):** Handles SSL termination (automatic Let's Encrypt certificates), compression, and security headers.
+- **PostgreSQL Database:** Stores users, registered OAuth clients, grants, and cryptographic key metadata (compatible with PostgreSQL 14+, Neon, Supabase, or AWS RDS).
+- **Redis Cache:** High-speed in-memory store for session states, authorization codes, rate limiting, and discovery document caching.
+- **Transactional Email (Resend):** Sends email verification codes and password reset links.
+- **Cloudinary (Optional):** Handles user avatar image storage.
 
 ---
 
@@ -52,7 +52,7 @@ Set up and run Pramaan (OAuth 2.0 / OpenID Connect Identity Provider) in this wo
    - Build Tailwind CSS: `npm run css:build`
    - Start development server with concurrent CSS watcher and nodemon:
      `npx concurrently "npm run css:dev" "npm run dev"`
-     *(Or start via Docker Compose: `npm run docker:dev:up` / `docker compose up -d`)*
+     _(Or start via Docker Compose: `npm run docker:dev:up` / `docker compose up -d`)_
 
 4. **Verify Health & Endpoints**:
    - Verify health check returns 200 OK: `http://localhost:8080/health`
@@ -115,6 +115,7 @@ INIT_ADMIN_PASSWORD=YourStrongInitialPassword123!
 ```
 
 > 💡 **Tip:** Generate random 64-character hex strings in your terminal with:
+>
 > ```bash
 > node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 > ```
@@ -177,9 +178,10 @@ Visit `https://auth.yourdomain.com` in your browser and sign in with your `INIT_
 If deploying directly onto a Linux server without Docker:
 
 ### Prerequisites
-* **Node.js:** `>= 20.0.0`
-* **npm:** `>= 10.0.0`
-* **Process Manager:** `pm2` (`npm install -g pm2`)
+
+- **Node.js:** `>= 20.0.0`
+- **npm:** `>= 10.0.0`
+- **Process Manager:** `pm2` (`npm install -g pm2`)
 
 ### Build & Start Steps
 
@@ -206,24 +208,24 @@ pm2 startup
 
 ## 5. Configuration Reference
 
-| Variable | Required | Description |
-| :--- | :--- | :--- |
-| `NODE_ENV` | Yes | `production` or `development`. |
-| `PORT` | Yes | Port the HTTP application listens on (default: `8080`). |
-| `APP_DOMAIN` | Yes | Public domain name without protocol (e.g. `auth.yourdomain.com`). |
-| `OAUTH_ISSUER` | Yes | Exact base URL of your identity provider (e.g. `https://auth.yourdomain.com`). Must match what clients use. |
-| `NEON_PG_DATABASE_URL`| Yes | PostgreSQL database connection string. |
-| `REDIS_HOST` | Yes | Redis host endpoint. |
-| `REDIS_PORT` | Yes | Redis port (default: `6379`). |
-| `REDIS_PASSWORD` | No | Redis authorization password. |
-| `REDIS_TLS_ENABLED` | No | `true` if your Redis provider uses TLS (e.g. Upstash, AWS). |
-| `COOKIE_SECRET` | Yes | Secret key used to sign HTTP session cookies. |
-| `KEY_ENC_SECRET` | Yes | Cryptographic key used to encrypt RS256 private keys in the database. |
-| `CLIENT_SECRET_KEY` | Yes | Secret key used to encrypt client secrets. |
-| `RESEND_API_KEY` | Yes | API key from Resend for verification emails. |
-| `EMAIL_FROM` | Yes | Sender email address (e.g. `auth@yourdomain.com`). |
-| `INIT_ADMIN_EMAIL` | Yes | Initial super-admin email seeded on first startup. |
-| `INIT_ADMIN_PASSWORD`| Yes| Password for the initial admin account. |
+| Variable               | Required | Description                                                                                                 |
+| :--------------------- | :------- | :---------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`             | Yes      | `production` or `development`.                                                                              |
+| `PORT`                 | Yes      | Port the HTTP application listens on (default: `8080`).                                                     |
+| `APP_DOMAIN`           | Yes      | Public domain name without protocol (e.g. `auth.yourdomain.com`).                                           |
+| `OAUTH_ISSUER`         | Yes      | Exact base URL of your identity provider (e.g. `https://auth.yourdomain.com`). Must match what clients use. |
+| `NEON_PG_DATABASE_URL` | Yes      | PostgreSQL database connection string.                                                                      |
+| `REDIS_HOST`           | Yes      | Redis host endpoint.                                                                                        |
+| `REDIS_PORT`           | Yes      | Redis port (default: `6379`).                                                                               |
+| `REDIS_PASSWORD`       | No       | Redis authorization password.                                                                               |
+| `REDIS_TLS_ENABLED`    | No       | `true` if your Redis provider uses TLS (e.g. Upstash, AWS).                                                 |
+| `COOKIE_SECRET`        | Yes      | Secret key used to sign HTTP session cookies.                                                               |
+| `KEY_ENC_SECRET`       | Yes      | Cryptographic key used to encrypt RS256 private keys in the database.                                       |
+| `CLIENT_SECRET_KEY`    | Yes      | Secret key used to encrypt client secrets.                                                                  |
+| `RESEND_API_KEY`       | Yes      | API key from Resend for verification emails.                                                                |
+| `EMAIL_FROM`           | Yes      | Sender email address (e.g. `auth@yourdomain.com`).                                                          |
+| `INIT_ADMIN_EMAIL`     | Yes      | Initial super-admin email seeded on first startup.                                                          |
+| `INIT_ADMIN_PASSWORD`  | Yes      | Password for the initial admin account.                                                                     |
 
 ---
 
@@ -236,6 +238,7 @@ curl https://auth.yourdomain.com/health
 ```
 
 **Response (`200 OK`):**
+
 ```json
 {
   "status": "healthy",

@@ -221,7 +221,8 @@ export class ClientService {
       };
     }
 
-    const isMultiPartCctld = /\.(?:co|com|org|net|edu|gov|ac|biz|ne|or|gen|firm|ind|nic|res)\.[a-z]{2}$/i.test(normalized);
+    const isMultiPartCctld =
+      /\.(?:co|com|org|net|edu|gov|ac|biz|ne|or|gen|firm|ind|nic|res)\.[a-z]{2}$/i.test(normalized);
     const apexPartsCount = isMultiPartCctld ? 3 : 2;
 
     if (parts.length <= apexPartsCount) {
@@ -320,7 +321,8 @@ export class ClientService {
         );
       }
     } else {
-      const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.localhost');
+      const isLocalhost =
+        hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.localhost');
       const isClientLocalhost =
         !normalizedDomain ||
         normalizedDomain === 'localhost' ||
@@ -328,7 +330,13 @@ export class ClientService {
         normalizedDomain.endsWith('.localhost');
       const isRegisteredDomain = Boolean(normalizedDomain && hostname === normalizedDomain);
 
-      if (isRegisteredDomain && !isLocalhost && !isClientLocalhost && !isVercelClientDomain && domainStatus !== 'VERIFIED') {
+      if (
+        isRegisteredDomain &&
+        !isLocalhost &&
+        !isClientLocalhost &&
+        !isVercelClientDomain &&
+        domainStatus !== 'VERIFIED'
+      ) {
         throw new AppError(
           `Domain "${normalizedDomain}" is not verified yet. Please verify your domain via DNS TXT record in the dashboard before using it in redirect URIs, or use localhost or *.vercel.app in development.`,
           400,
@@ -838,11 +846,7 @@ export class ClientService {
 
   // -------- UPDATE CLIENT AVATAR --------
 
-  async updateClientAvatar(
-    clientId: string,
-    userId: string,
-    avatarUrl: string | null,
-  ): Promise<ClientView> {
+  async updateClientAvatar(clientId: string, userId: string, avatarUrl: string | null): Promise<ClientView> {
     const existing = await prisma.oAuthClient.findUnique({
       where: { id: clientId },
     });

@@ -17,10 +17,7 @@ describe('PKCE Module', () => {
     assert.ok(pkce.codeVerifier.length <= 128, 'Verifier should be <= 128 characters');
 
     // Verify S256 math: SHA256(verifier) base64url
-    const expectedChallenge = crypto
-      .createHash('sha256')
-      .update(pkce.codeVerifier)
-      .digest('base64url');
+    const expectedChallenge = crypto.createHash('sha256').update(pkce.codeVerifier).digest('base64url');
 
     assert.strictEqual(pkce.codeChallenge, expectedChallenge);
   });
@@ -36,10 +33,7 @@ describe('PKCE Module', () => {
     const verifier = 'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk';
     const challenge = computeChallenge(verifier, 'S256');
 
-    const expected = crypto
-      .createHash('sha256')
-      .update(verifier)
-      .digest('base64url');
+    const expected = crypto.createHash('sha256').update(verifier).digest('base64url');
 
     assert.strictEqual(challenge, expected);
   });

@@ -1,11 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import {
-  createTransaction,
-  validateState,
-  validateNonce,
-  generateRandomString,
-} from '../src/transaction.js';
+import { createTransaction, validateState, validateNonce, generateRandomString } from '../src/transaction.js';
 import { StateMismatchError, NonceMismatchError } from '../src/errors.js';
 
 describe('Transaction Module', () => {

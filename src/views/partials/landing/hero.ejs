@@ -1,127 +1,87 @@
+<%
+  const _user = typeof user !== 'undefined' && user ? user : (typeof locals !== 'undefined' && locals.user ? locals.user : null);
+%>
 <section id="hero" class="relative overflow-hidden">
-  <div class="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-20 sm:py-32 relative z-10">
+  <div class="max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 py-12 sm:py-20 lg:py-24 relative z-10">
+
     <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
 
-      <!-- Heading with Luminous Aurora Glow -->
-      <div class="relative inline-block mb-6">
-        <!-- Dual Aura Glow -->
-        <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-36 bg-linear-to-r from-brand-orange/30 via-amber-400/20 to-indigo-500/20 dark:from-brand-orange/25 dark:via-amber-400/15 dark:to-indigo-500/15 blur-3xl rounded-full pointer-events-none"></div>
+      <!-- Identity Provider Tag -->
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-orange/10 text-brand-orange border border-brand-orange/20 tracking-wider uppercase mb-4 sm:mb-6">
+        <svg class="w-3.5 h-3.5 text-brand-orange shrink-0" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        <span>Identity Provider</span>
+      </div>
 
-        <h1 class="relative font-brand-hero text-5xl sm:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.12]">
-          Modern Identity <br class="hidden sm:inline" />
-          <span class="text-transparent bg-clip-text bg-linear-to-r from-brand-orange via-amber-500 to-orange-500 dark:from-brand-orange dark:via-amber-300 dark:to-orange-400 drop-shadow-[0_0_35px_rgba(255,150,68,0.22)]">
-            Infrastructure
+      <!-- Hero Heading -->
+      <div class="relative inline-block mb-5 sm:mb-7">
+        <!-- Ambient Glow -->
+        <div
+          class="absolute -top-10 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-36
+                 bg-linear-to-r from-brand-orange/30 via-amber-400/20 to-indigo-500/20
+                 dark:from-brand-orange/25 dark:via-amber-400/15 dark:to-indigo-500/15
+                 blur-3xl rounded-full pointer-events-none"
+        ></div>
+
+        <h1
+          class="relative font-brand-hero text-3xl min-[380px]:text-4xl
+                 sm:text-5xl lg:text-7xl font-extrabold tracking-tight
+                 text-slate-900 dark:text-white leading-tight sm:leading-[1.12]"
+        >
+          Ship authentication in
+          <br class="sm:hidden" />
+
+          <span
+            class="text-transparent bg-clip-text
+                   bg-linear-to-r from-brand-orange via-amber-500 to-orange-500
+                   dark:from-brand-orange dark:via-amber-300 dark:to-orange-400
+                   drop-shadow-[0_0_35px_rgba(255,150,68,0.22)]"
+          >
+            just a few clicks.
           </span>
         </h1>
       </div>
 
-      <!-- Subheading -->
-      <p class="text-base sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl text-center font-normal sm:font-medium">
-        One identity layer for secure authentication across web, mobile, and backend apps.
-      </p>
+      <!-- Supporting Copy -->
+      <div class="mt-5 sm:mt-7 flex flex-col items-center">
+        <p
+          class="text-base sm:text-xl text-slate-600 dark:text-slate-300
+                 leading-relaxed max-w-2xl text-center px-4"
+        >
+          Set up your application in Pramaan, grab your credentials,
+          and use the official SDK to add secure authentication to your app.
+        </p>
 
-      <!-- CTA Row -->
-      <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <a href="/account" class="btn-orange text-base sm:text-lg shadow-xl shadow-brand-orange/20 hover:shadow-2xl hover:shadow-brand-orange/30 hover:-translate-y-0.5 active:translate-y-0 px-8 py-3.5">
-          Get Started
-        </a>
-        <a href="#how-it-works" class="inline-flex items-center justify-center px-6 py-3.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/70 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 text-base font-semibold hover:bg-white hover:border-slate-400 dark:hover:bg-slate-700 dark:hover:text-white dark:hover:border-slate-600 transition-all duration-200 shadow-xs">
-          Explore Architecture
-        </a>
-      </div>
+        <!-- CTA -->
+        <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3.5">
+          <a
+            href="<%= _user ? '/account' : '/signup' %>"
+            class="btn-orange rounded-2xl border border-brand-orange/40 dark:border-brand-orange/50
+                   text-base sm:text-lg shadow-xl shadow-brand-orange/20
+                   hover:shadow-2xl hover:shadow-brand-orange/30
+                   hover:-translate-y-0.5 active:translate-y-0
+                   px-8 py-3.5"
+          >
+            Get Started
+          </a>
 
-      <!-- Feature Badges (Compact & Single-Line) -->
-      <div class="mt-12 flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 sm:gap-2.5 text-xs font-medium whitespace-nowrap">
-        
-        <div class="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full shadow-xs hover:border-brand-orange/40 transition-all duration-300 shrink-0">
-          <span class="relative flex h-2 w-2 shrink-0">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-orange opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-orange"></span>
-          </span>
-          <span>OAuth 2.0 & OpenID Connect</span>
-        </div>
-
-        <div class="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full shadow-xs hover:border-brand-orange/40 transition-all duration-300 shrink-0">
-          <svg class="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-          </svg>
-          <span>PKCE & Token Security</span>
-        </div>
-
-        <div class="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full shadow-xs hover:border-brand-orange/40 transition-all duration-300 shrink-0">
-          <svg class="w-3.5 h-3.5 text-sky-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-          </svg>
-          <span>OIDC Discovery & JWKS</span>
-        </div>
-
-        <div class="flex items-center gap-1.5 bg-white/70 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200/80 dark:border-slate-700/80 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-full shadow-xs hover:border-brand-orange/40 transition-all duration-300 shrink-0">
-          <svg class="w-3.5 h-3.5 text-brand-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          <span>Client & Scope Controls</span>
-        </div>
-
-      </div>
-
-      <!-- Demo Showcase (Inside Hero at last) -->
-      <div id="demo" class="mt-16 sm:mt-24 mb-10 sm:mb-16 w-full max-w-3xl mx-auto">
-        <!-- Ambient Glow Behind Video Frame -->
-        <div class="relative">
-          <div class="absolute -inset-1 rounded-3xl bg-linear-to-r from-brand-orange/25 via-sky-500/15 to-brand-orange/20 blur-xl opacity-60 dark:opacity-40 -z-10"></div>
-          
-          <div class="relative rounded-2xl sm:rounded-3xl bg-black border border-slate-200/80 dark:border-slate-800 shadow-2xl shadow-slate-200/50 dark:shadow-black/70 overflow-hidden">
-            <div class="relative w-full aspect-video overflow-hidden bg-black flex items-center justify-center">
-              <video 
-                id="pramaanDemoVideo"
-                class="w-full h-full object-cover"
-                style="transform: scale(1.04) translateY(-1%); transform-origin: center center;"
-                muted
-                autoplay
-                loop
-                playsinline
-                preload="auto"
-                poster="https://res.cloudinary.com/ddsbhdeju/image/upload/pramaan-demo-thumbnail.jpg">
-                <source src="https://res.cloudinary.com/ddsbhdeju/video/upload/pramaan-demo.mp4" type="video/mp4">
-                Your browser does not support HTML5 video streaming.
-              </video>
-            </div>
-          </div>
-        </div>
-
-        <!-- Subtitle UNDER the video with i icon in front -->
-        <div class="mt-5 sm:mt-6 flex items-center justify-center gap-2 text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-normal text-center">
-          <svg class="w-4 h-4 text-brand-orange shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>Watch a third-party client (OpenSpace) sign in users, verify consent, and exchange tokens via Pramaan.</span>
+          <a
+            href="#demo"
+            class="text-base sm:text-lg font-semibold
+                   rounded-2xl border border-slate-300 dark:border-slate-700
+                   backdrop-blur-md
+                   text-slate-800 dark:text-slate-100
+                   hover:text-slate-900 dark:hover:text-white
+                   hover:bg-slate-100 dark:hover:bg-slate-700
+                   hover:border-slate-400 dark:hover:border-slate-600
+                   transition-all duration-200 px-6 py-3.5 shadow-sm"
+          >
+            See how it works
+          </a>
         </div>
       </div>
 
     </div>
   </div>
 </section>
-
-<!-- IntersectionObserver to Autoplay when in view and Pause when out of view -->
-<script>
-  (function() {
-    const video = document.getElementById('pramaanDemoVideo');
-    if (!video) return;
-
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            video.play().catch(() => {});
-          } else {
-            video.pause();
-          }
-        });
-      }, {
-        threshold: 0.25
-      });
-
-      observer.observe(video);
-    }
-  })();
-</script>

@@ -12,7 +12,15 @@ const router = Router();
 const clientController = new ClientController(clientService, accountService);
 
 router
-  .route('/create-client')
+  .route('/developer')
+  .get(
+    Authentication.ssr('default'),
+    Authorize.role([ROLES.USER, ROLES.DEVELOPER]),
+    clientController.renderDeveloperDashboard,
+  );
+
+router
+  .route('/client/create')
   .get(
     Authentication.ssr('default'),
     Authorize.role([ROLES.USER, ROLES.DEVELOPER]),
@@ -24,6 +32,8 @@ router
     validateRequest(ClientZSchema.addClientSchema),
     clientController.addClient,
   );
+
+router.get('/create-client', (_req, res) => res.redirect(301, '/client/create'));
 
 router
   .route('/client/:client_id')

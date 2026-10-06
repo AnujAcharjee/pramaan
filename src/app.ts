@@ -20,6 +20,7 @@ const app = express();
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
 app.set('views', path.join(process.cwd(), 'src', 'views'));
+app.set('view cache', ENV.NODE_ENV === 'production');
 
 // Trust the first proxy in front of the app (e.g. Nginx, Caddy, load balancer, Docker)
 // This is required so Express correctly reads the real client IP from
@@ -37,7 +38,7 @@ const setupMiddleware = (app: express.Application) => {
   app.use(cookieParser(ENV.COOKIE_SECRET));
   app.use(
     express.static(path.join(process.cwd(), 'public'), {
-      maxAge: '7d',
+      maxAge: ENV.NODE_ENV === 'production' ? '7d' : 0,
       etag: true,
       lastModified: true,
     }),

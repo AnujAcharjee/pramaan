@@ -1,0 +1,91 @@
+<% layout("layouts/dashboard") %>
+
+<%
+  activeNav = 'create-client';
+  const fd = typeof formData !== 'undefined' && formData ? formData : {};
+%>
+
+<div class="max-w-4xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8 space-y-6 animate-slideIn relative z-10 pb-28">
+
+  <!-- Header -->
+  <div class="border-b border-slate-200/80 dark:border-neutral-800/80 pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2">
+        <a href="/developer" class="text-xs font-semibold text-slate-500 hover:text-brand-orange transition-colors flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          <span>Developer Console</span>
+        </a>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight mt-1">Register New Application</h1>
+      <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">Configure an OAuth 2.0 / OpenID Connect client credentials profile.</p>
+    </div>
+  </div>
+
+  <%- include("../../partials/alert", { success, error }) %>
+
+  <!-- Main Registration Card -->
+  <div class="dashboard-section !p-6 sm:!p-10 max-w-2xl mx-auto">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="dashboard-icon bg-brand-orange shrink-0">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Application Identity</h2>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Enter a descriptive name for your client integration.</p>
+      </div>
+    </div>
+
+    <form method="POST" action="/client/create" class="space-y-6">
+      
+      <%- include("../../partials/form/input", {
+        id: "name",
+        name: "name",
+        type: "text",
+        label: "Application Name",
+        placeholder: "e.g. Acme Dashboard, Mobile App, Portal",
+        value: fd.name ?? "",
+        required: true,
+        autocomplete: "name",
+        helperText: "This name will be displayed to users on the OAuth consent screen."
+      }) %>
+
+      <!-- Default Settings Info Card -->
+      <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#121212]/90 border border-slate-200/80 dark:border-neutral-800/80 space-y-3.5 shadow-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Default Baseline Profile</span>
+          <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md bg-sky-100 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300/30">Auto-Provisioned</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3.5 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200/80 dark:border-neutral-800/80">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Initial Domain</span>
+            <span class="font-mono font-bold text-slate-800 dark:text-slate-200 mt-0.5 block">localhost</span>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200/80 dark:border-neutral-800/80">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 block">Client Type</span>
+            <span class="font-bold text-slate-800 dark:text-slate-200 mt-0.5 block">Confidential</span>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed pt-0.5">
+          💡 After registration, you can customize your domain (including Vercel dev domains), generate client secrets, switch to Public client type, and manage callback redirect URIs.
+        </p>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col-reverse sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+        <a href="/developer" class="btn-outline-gray !py-2.5 !px-5 text-xs font-semibold text-center w-full sm:w-auto">
+          Cancel
+        </a>
+
+        <button type="submit" class="btn-orange !py-2.5 !px-6 text-xs font-bold shadow-md shadow-brand-orange/20 w-full sm:w-auto text-center justify-center">
+          Register Application
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

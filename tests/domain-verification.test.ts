@@ -164,7 +164,6 @@ describe('DNS Verification Host Calculation for Subdomains and Apex Domains', ()
   });
 });
 
-
 describe('Redirect URI Validation Policy', () => {
   const registeredDomain = 'clientapp.com';
   const vercelDomain = 'my-cool-app.vercel.app';
@@ -674,10 +673,7 @@ describe('DNS TXT Domain Ownership Verification', () => {
       redirectURIs: ['http://localhost:3000/callback'],
     });
 
-    const result = await clientService.setClientEnvironment(
-      clientId,
-      OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION,
-    );
+    const result = await clientService.setClientEnvironment(clientId, OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION);
     assert.strictEqual(result.clearedRedirectsCount, 1);
   });
 

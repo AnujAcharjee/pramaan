@@ -1,0 +1,226 @@
+<% layout("layouts/dashboard") %>
+
+<%
+  activeNav = 'developer';
+  const totalClients = clients ? clients.length : 0;
+  const prodClients = clients ? clients.filter(c => c.environment === 'production').length : 0;
+  const devClients = clients ? clients.filter(c => c.environment !== 'production').length : 0;
+%>
+
+<%- include("../../partials/alert", { success, error }) %>
+
+<div class="max-w-7xl mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8 animate-slideIn relative z-10 pb-28">
+
+  <!-- Header Banner -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/80 dark:border-neutral-800/80 pb-6">
+    <div>
+      <div class="flex items-center gap-2.5">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Developer Console</h1>
+      </div>
+      <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1.5">
+        Manage your registered client applications, authentication keys, callback URIs, and domain.
+      </p>
+    </div>
+
+    <div>
+      <a href="/client/create" class="btn-orange !py-2.5 !px-5 !text-xs font-bold inline-flex items-center gap-2 shadow-lg shadow-brand-orange/20 shrink-0 self-start sm:self-auto">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        <span>Register New Client</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Summary Metric Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <!-- Card 1: Total Apps -->
+    <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#0a0a0a]/90 border border-slate-200/80 dark:border-neutral-800/80 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-orange-500/10 dark:bg-brand-orange/15 text-brand-orange flex items-center justify-center shrink-0">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Registered Apps</p>
+        <p class="text-2xl font-black text-slate-900 dark:text-slate-100 mt-0.5"><%= totalClients %></p>
+      </div>
+    </div>
+
+    <!-- Card 2: Production Apps -->
+    <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#0a0a0a]/90 border border-slate-200/80 dark:border-neutral-800/80 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Production Mode</p>
+        <p class="text-2xl font-black text-slate-900 dark:text-slate-100 mt-0.5"><%= prodClients %></p>
+      </div>
+    </div>
+
+    <!-- Card 3: Dev Mode Apps -->
+    <div class="p-5 rounded-2xl bg-white/90 dark:bg-[#0a0a0a]/90 border border-slate-200/80 dark:border-neutral-800/80 shadow-xs flex items-center gap-4">
+      <div class="w-12 h-12 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+      </div>
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Development Mode</p>
+        <p class="text-2xl font-black text-slate-900 dark:text-slate-100 mt-0.5"><%= devClients %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Applications Section -->
+  <section class="dashboard-section !p-5 sm:!p-8">
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div class="flex items-center gap-3">
+        <div class="dashboard-icon bg-indigo-500 shadow-indigo-200 dark:shadow-indigo-500/10 shrink-0">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Client Applications</h2>
+          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Your registered OAuth 2.0 / OpenID Connect client profiles.</p>
+        </div>
+      </div>
+    </div>
+
+    <% if (totalClients === 0) { %>
+      <div class="text-center py-14 px-6 rounded-2xl border border-dashed border-slate-200 dark:border-neutral-800/80 bg-slate-50/40 dark:bg-[#121212]/40">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto mb-4 shadow-xs">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 dark:text-slate-100">No applications registered yet</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-6 max-w-md mx-auto leading-relaxed">
+          Create an OAuth 2.0 client application to enable secure login, issue JWT tokens, and connect your frontend or backend services.
+        </p>
+        <a href="/client/create" class="btn-orange !py-3 !px-6 !text-xs font-bold inline-flex items-center gap-2 shadow-lg shadow-brand-orange/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Register First Application</span>
+        </a>
+      </div>
+    <% } else { %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <% for (const client of clients) { %>
+          <%
+            const isClientDev = client.environment === 'development' || client.domain === 'localhost';
+          %>
+          <div class="p-5 rounded-2xl bg-slate-50 dark:bg-[#121212]/90 border border-slate-200/70 dark:border-neutral-800/80 hover:border-brand-orange/30 dark:hover:border-brand-orange/40 hover:bg-white dark:hover:bg-[#181818] hover:shadow-lg dark:hover:shadow-black/25 transition-all duration-300 flex flex-col justify-between space-y-4">
+            
+            <div class="space-y-3">
+              <!-- Top Row: Logo + Name + Status Badge -->
+              <div class="flex items-center justify-between gap-3 flex-wrap">
+                <div class="flex items-center gap-3 min-w-0">
+                  <% if (client.avatar) { %>
+                    <img src="<%= client.avatar %>" alt="<%= client.name %>" class="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200 dark:ring-neutral-700 shrink-0" />
+                  <% } else { %>
+                    <div class="w-10 h-10 rounded-xl bg-linear-to-br from-slate-100 to-slate-200 dark:from-neutral-800 dark:to-neutral-700 text-slate-800 dark:text-slate-200 font-black text-xs flex items-center justify-center border border-slate-300/60 dark:border-neutral-700/50 shrink-0">
+                      <%= client.name.trim().slice(0, 2).toUpperCase() %>
+                    </div>
+                  <% } %>
+                  <div class="min-w-0">
+                    <h3 class="font-extrabold text-slate-900 dark:text-slate-100 text-base truncate"><%= client.name %></h3>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                      <span class="text-xs font-mono font-medium text-slate-500 dark:text-slate-400 truncate"><%= client.domain %></span>
+                      <% if (client.domainStatus === 'VERIFIED') { %>
+                        <span class="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" title="Domain Verified">
+                          <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                        </span>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <%- include("../../partials/ui/badge", {
+                    variant: !client.isActive ? "default" : (isClientDev ? "warning" : "success"),
+                    text: !client.isActive ? "Disabled" : (isClientDev ? "DEV" : "Active"),
+                    size: "sm"
+                  }) %>
+                </div>
+              </div>
+
+              <!-- Client ID display -->
+              <div class="p-3 rounded-xl bg-white dark:bg-[#0a0a0a] border border-slate-200/80 dark:border-neutral-800/80 flex items-center justify-between gap-2">
+                <div class="min-w-0 flex-1">
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Client ID</p>
+                  <code class="text-xs font-mono text-slate-700 dark:text-slate-200 truncate block select-all"><%= client.id %></code>
+                </div>
+                <button type="button" class="copy-btn shrink-0 p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-brand-orange hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer" data-copy-target="cid-<%= client.id %>" title="Copy Client ID">
+                  <input id="cid-<%= client.id %>" type="hidden" value="<%= client.id %>" />
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <div class="pt-2 border-t border-slate-100 dark:border-neutral-800/80 flex items-center justify-between">
+              <span class="text-xs text-slate-500 dark:text-slate-400 capitalize"><%= client.clientType?.toLowerCase() || 'confidential' %></span>
+              <a href="/client/<%= client.id %>" class="btn-outline-sky !py-1.5 !px-4 !text-xs rounded-xl inline-flex items-center gap-1.5">
+                <span>Manage Client</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </a>
+            </div>
+
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- Developer Protocol Endpoints Reference Card -->
+  <section class="dashboard-section !p-5 sm:!p-8">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="dashboard-icon bg-emerald-500 shrink-0">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-slate-100">Standard OIDC Protocol Endpoints</h2>
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">Use these URLs to integrate with standard OpenID Connect client libraries.</p>
+      </div>
+    </div>
+
+    <% const actualDomain = 'https://pramaan.anujacharjee.com'; %>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="p-4 rounded-xl bg-slate-50 dark:bg-[#121212]/90 border border-slate-200/80 dark:border-neutral-800/80 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">OpenID Configuration</span>
+          <a href="<%= actualDomain %>/.well-known/openid-configuration" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-brand-orange hover:underline">View JSON &rarr;</a>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="openid-config-url" type="text" readonly value="<%= actualDomain %>/.well-known/openid-configuration" class="flex-1 min-w-0 text-xs font-mono bg-white dark:bg-[#0a0a0a] text-slate-700 dark:text-slate-300 px-3 py-2 rounded-lg border border-slate-200 dark:border-neutral-800/80 select-all focus:outline-none" />
+          <button type="button" class="copy-btn shrink-0 p-2 rounded-lg border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#0a0a0a] text-slate-500 hover:text-brand-orange dark:text-slate-400 dark:hover:text-brand-orange hover:border-brand-orange/40 dark:hover:border-neutral-700 transition-colors cursor-pointer flex items-center justify-center shadow-2xs" data-copy-target="openid-config-url" title="Copy OpenID Configuration URL">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-50 dark:bg-[#121212]/90 border border-slate-200/80 dark:border-neutral-800/80 space-y-1.5">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">JWKS Public Keys</span>
+          <a href="<%= actualDomain %>/.well-known/jwks.json" target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-brand-orange hover:underline">View JSON &rarr;</a>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="jwks-url" type="text" readonly value="<%= actualDomain %>/.well-known/jwks.json" class="flex-1 min-w-0 text-xs font-mono bg-white dark:bg-[#0a0a0a] text-slate-700 dark:text-slate-300 px-3 py-2 rounded-lg border border-slate-200 dark:border-neutral-800/80 select-all focus:outline-none" />
+          <button type="button" class="copy-btn shrink-0 p-2 rounded-lg border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#0a0a0a] text-slate-500 hover:text-brand-orange dark:text-slate-400 dark:hover:text-brand-orange hover:border-brand-orange/40 dark:hover:border-neutral-700 transition-colors cursor-pointer flex items-center justify-center shadow-2xs" data-copy-target="jwks-url" title="Copy JWKS URL">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="/js/copyBtn.js" defer></script>
+

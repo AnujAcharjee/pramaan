@@ -80,9 +80,7 @@ export class ClientZSchema {
       client_id: UtilFields.clientIdField,
     }),
     body: z.object({
-      client_type: z.enum(
-        Object.values(OAUTH_CLIENT_TYPES) as [OAuthClientType, ...OAuthClientType[]],
-      ),
+      client_type: z.enum(Object.values(OAUTH_CLIENT_TYPES) as [OAuthClientType, ...OAuthClientType[]]),
     }),
   });
 

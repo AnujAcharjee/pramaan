@@ -16,10 +16,17 @@
     } catch (_) {}
   }
 
+  function getScrollContainer() {
+    return document.getElementById('consoleMain') || document.querySelector('main') || null;
+  }
+
   // Helper to save current scroll coordinate
   function saveScroll() {
     try {
-      const y = Math.round(window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0);
+      const container = getScrollContainer();
+      const y = container && container.scrollTop > 0
+        ? Math.round(container.scrollTop)
+        : Math.round(window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0);
       sessionStorage.setItem(storageKey, String(y));
     } catch (_) {}
   }
@@ -40,6 +47,10 @@
   // 3. Multi-phase restoration function
   function restoreScroll() {
     if (targetY === null) return;
+    const container = getScrollContainer();
+    if (container) {
+      container.scrollTop = targetY;
+    }
     window.scrollTo({ top: targetY, behavior: 'instant' });
   }
 

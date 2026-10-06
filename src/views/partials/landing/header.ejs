@@ -1,17 +1,20 @@
-<header class="sticky top-0 z-50 bg-white/70 dark:bg-[#0b0d18]/80 backdrop-blur-xl border-b border-slate-200/40 dark:border-slate-800/40 transition-colors duration-300">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+<%
+  const _user = typeof user !== 'undefined' && user ? user : (typeof locals !== 'undefined' && locals.user ? locals.user : null);
+%>
+<header class="sticky top-0 z-50 bg-white/70 dark:bg-black/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80 transition-colors duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
     <div class="flex items-center justify-between">
 
       <!-- Logo -->
-      <a href="/" class="flex items-center hover:opacity-90 transition-opacity">
+      <a href="/" class="flex items-center hover:opacity-90 transition-opacity" aria-label="Pramaan Home">
         <%- include("../icons/horizontal-logo") %>
       </a>
 
       <!-- Desktop Nav -->
-      <nav class="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-350">
+      <nav class="hidden lg:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300">
         <a href="#demo" class="hover:text-brand-orange dark:hover:text-brand-orange transition-colors duration-300">Demo</a>
         <a href="#how-it-works" class="hover:text-brand-orange dark:hover:text-brand-orange transition-colors duration-300">How it works</a>
-        <a href="#oauth-flow" class="hover:text-brand-orange dark:hover:text-brand-orange transition-colors duration-300">OAuth 2.0 flow</a>
+        <a href="#implementation" class="hover:text-brand-orange dark:hover:text-brand-orange transition-colors duration-300">Implementation</a>
         <a href="#features" class="hover:text-brand-orange dark:hover:text-brand-orange transition-colors duration-300">Why Pramaan</a>
         <a href="<%= docUrl %>" class="hover:text-brand-orange dark:hover:text-brand-orange transition-colors duration-300">Documentation</a>
       </nav>
@@ -30,12 +33,25 @@
           </svg>
         </button>
 
-        <a href="/signin" class="text-sm font-semibold px-4 py-2.5 rounded-xl text-slate-600 dark:text-slate-350 hover:text-brand-orange dark:hover:text-brand-orange transition-all duration-300">
-          Sign in
-        </a>
-        <a href="/signup" class="btn-orange !px-5 !py-2.5 !text-sm">
-          Get Started
-        </a>
+        <% if (_user) { %>
+          <a href="/account" class="text-sm font-semibold px-3 py-1.5 rounded-xl text-slate-700 dark:text-slate-200 hover:text-brand-orange dark:hover:text-brand-orange hover:bg-slate-100 dark:hover:bg-neutral-900 flex items-center gap-2 transition-all duration-200" title="User Dashboard">
+            <% if (_user.avatar) { %>
+              <img src="<%= _user.avatar %>" alt="<%= _user.name || 'User' %>" class="w-6 h-6 rounded-lg object-cover ring-1 ring-slate-200 dark:ring-neutral-700" />
+            <% } else { %>
+              <div class="w-6 h-6 rounded-lg bg-orange-100 dark:bg-brand-orange/20 text-brand-orange font-bold text-xs flex items-center justify-center ring-1 ring-brand-orange/30">
+                <%= (_user.name || 'U').slice(0, 1).toUpperCase() %>
+              </div>
+            <% } %>
+            <span>Dashboard</span>
+          </a>
+        <% } else { %>
+          <a href="/signin" class="text-sm font-semibold px-4 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-brand-orange dark:hover:text-brand-orange transition-all duration-200">
+            Sign in
+          </a>
+          <a href="/signup" class="btn-orange !px-4 !py-2 !text-sm">
+            Get Started
+          </a>
+        <% } %>
       </div>
 
       <!-- Mobile Controls -->
@@ -51,7 +67,7 @@
         </button>
 
         <!-- Mobile Hamburger -->
-        <button id="menuBtn" class="inline-flex items-center justify-center p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer">
+        <button id="menuBtn" class="inline-flex items-center justify-center p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors cursor-pointer" aria-label="Toggle navigation menu">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
@@ -62,22 +78,35 @@
   </div>
 
   <!-- Mobile Menu -->
-  <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-100 dark:border-slate-800/40 bg-white/95 dark:bg-[#0b0d18]/95 backdrop-blur-xl">
-    <div class="p-4 mx-2 rounded-2xl flex flex-col gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 shadow-inner">
+  <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-200/80 dark:border-neutral-800/80 bg-white/95 dark:bg-black/95 backdrop-blur-xl">
+    <div class="p-4 mx-2 rounded-2xl flex flex-col gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-inner">
 
-      <a href="#demo" class="px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">Demo</a>
-      <a href="#how-it-works" class="px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">How it works</a>
-      <a href="#oauth-flow" class="px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">OAuth 2.0 flow</a>
-      <a href="#features" class="px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">Why Pramaan</a>
-      <a href="<%= docUrl %>" class="px-3 py-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">Documentation</a>
+      <a href="#demo" class="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">Demo</a>
+      <a href="#how-it-works" class="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">How it works</a>
+      <a href="#implementation" class="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">Implementation</a>
+      <a href="#features" class="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">Why Pramaan</a>
+      <a href="<%= docUrl %>" class="px-3 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-900 hover:text-brand-orange dark:hover:text-brand-orange transition-all">Documentation</a>
 
-      <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-3">
-        <a href="/signin" class="block text-center px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-          Sign in
-        </a>
-        <a href="/signup" class="block text-center px-4 py-2.5 rounded-xl bg-linear-to-r from-brand-orange to-brand-orangeDark text-white font-bold shadow-md hover:shadow-lg transition-all duration-300">
-          Get Started
-        </a>
+      <div class="pt-3 border-t border-slate-200/80 dark:border-neutral-800 flex flex-col gap-3">
+        <% if (_user) { %>
+          <a href="/account" class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-neutral-900 border border-slate-200/80 dark:border-neutral-800 text-slate-800 dark:text-slate-200 hover:text-brand-orange dark:hover:text-brand-orange font-semibold transition-all">
+            <% if (_user.avatar) { %>
+              <img src="<%= _user.avatar %>" alt="<%= _user.name || 'User' %>" class="w-6 h-6 rounded-lg object-cover ring-1 ring-slate-200 dark:ring-neutral-700" />
+            <% } else { %>
+              <div class="w-6 h-6 rounded-lg bg-orange-100 dark:bg-brand-orange/20 text-brand-orange font-bold text-xs flex items-center justify-center ring-1 ring-brand-orange/30">
+                <%= (_user.name || 'U').slice(0, 1).toUpperCase() %>
+              </div>
+            <% } %>
+            <span>Dashboard</span>
+          </a>
+        <% } else { %>
+          <a href="/signin" class="block text-center px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-all">
+            Sign in
+          </a>
+          <a href="/signup" class="block text-center px-4 py-2.5 rounded-xl bg-linear-to-r from-brand-orange to-brand-orangeDark text-white font-bold shadow-md hover:shadow-lg transition-all duration-300">
+            Get Started
+          </a>
+        <% } %>
       </div>
 
     </div>

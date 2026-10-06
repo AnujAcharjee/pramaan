@@ -14,13 +14,13 @@ Click **Create OAuth Client**.
 
 ## 2. Fill in Client Details
 
-| Field | Description |
-| :--- | :--- |
-| **Client Name** | Display name shown to users on the consent screen |
-| **Client Domain** | Your application's primary domain (e.g. `yourapp.com`) |
-| **Client Type** | `Confidential` for server-side apps (can store a secret securely), `Public` for SPAs/mobile apps |
-| **Environment** | `Production` enforces `https://` redirect URIs. `Development` allows `http://localhost` |
-| **Redirect URI** | The exact callback URL that receives the authorization code (e.g. `https://yourapp.com/oauth/callback`) |
+| Field             | Description                                                                                             |
+| :---------------- | :------------------------------------------------------------------------------------------------------ |
+| **Client Name**   | Display name shown to users on the consent screen                                                       |
+| **Client Domain** | Your application's primary domain (e.g. `yourapp.com`)                                                  |
+| **Client Type**   | `Confidential` for server-side apps (can store a secret securely), `Public` for SPAs/mobile apps        |
+| **Environment**   | `Production` enforces `https://` redirect URIs. `Development` allows `http://localhost`                 |
+| **Redirect URI**  | The exact callback URL that receives the authorization code (e.g. `https://yourapp.com/oauth/callback`) |
 
 > ⚠️ Redirect URIs are matched exactly. A trailing slash or different port will cause a mismatch error.
 
@@ -55,4 +55,3 @@ From the **Client Dashboard** you can:
 - [Official SDK Guide →](./03-sdk-guide.md) — Fast and secure integration using `@anuj304/pramaan`
 - [Manual Implementation Guide →](./02-signup-flow.md) — Raw HTTP and protocol flow for any backend language
 - [API & Claims Reference →](./04-api-reference.md) — Comprehensive endpoints, parameters, and claims specifications
-
