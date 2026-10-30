@@ -41,7 +41,7 @@ Set up and run Pramaan (OAuth 2.0 / OpenID Connect Identity Provider) in this wo
      - `REDIS_URL`: Set to active Redis connection (e.g. `redis://localhost:6379`).
      - `RESEND_API_KEY`: Set your Resend API key for transactional emails.
      - `EMAIL_FROM`: Set a valid sender email (e.g. `auth@example.com`).
-     - `LOGTAIL_SOURCE_TOKEN`: Provide token or dummy string for dev logging.
+     - `GRAFANA_CLOUD_LOKI_URL`, `GRAFANA_CLOUD_LOKI_USER`, `GRAFANA_CLOUD_LOKI_TOKEN`: Grafana Cloud Loki credentials for log forwarding via Grafana Alloy.
 
 2. **Dependencies & Database Sync**:
    - Install dependencies: `npm install`

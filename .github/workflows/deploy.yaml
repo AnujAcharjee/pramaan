@@ -63,7 +63,7 @@ jobs:
           host: ${{ secrets.EC2_SSH_HOST }}
           username: ${{ secrets.EC2_SSH_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.yml,Caddyfile"
+          source: "docker-compose.yml,Caddyfile,config.alloy"
           target: "/srv/pramaan"
 
       # Deploy in EC2
@@ -121,7 +121,11 @@ jobs:
             RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
             KEY_ENC_SECRET=${{ secrets.KEY_ENC_SECRET }}
             CLIENT_SECRET_KEY=${{ secrets.CLIENT_SECRET_KEY }}
-            LOGTAIL_SOURCE_TOKEN=${{ secrets.LOGTAIL_SOURCE_TOKEN }}
+
+            # Grafana Cloud Loki Log Ingestion (via Grafana Alloy)
+            GRAFANA_CLOUD_LOKI_URL=${{ secrets.GRAFANA_CLOUD_LOKI_URL }}
+            GRAFANA_CLOUD_LOKI_USER=${{ secrets.GRAFANA_CLOUD_LOKI_USER }}
+            GRAFANA_CLOUD_LOKI_TOKEN=${{ secrets.GRAFANA_CLOUD_LOKI_TOKEN }}
 
             INIT_ADMIN_EMAIL=${{ secrets.INIT_ADMIN_EMAIL }}
             INIT_ADMIN_PASSWORD=${{ secrets.INIT_ADMIN_PASSWORD }}
