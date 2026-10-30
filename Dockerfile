@@ -42,7 +42,7 @@ ENV TZ=UTC
 USER appuser
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:' + process.env.PORT + '/health', r => { if(r.statusCode !== 200) process.exit(1); }).on('error', () => process.exit(1));"
+  CMD node -e "require('http').get('http://localhost:' + process.env.PORT + '/health', r => { if(r.statusCode === 200) process.exit(0); else process.exit(1); }).on('error', () => process.exit(1));"
 
 EXPOSE 8080
 

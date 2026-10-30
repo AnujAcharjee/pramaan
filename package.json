@@ -60,8 +60,6 @@
     "typescript-eslint": "^8.56.0"
   },
   "dependencies": {
-    "@logtail/node": "^0.5.8",
-    "@logtail/winston": "^0.5.8",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.4.1",
     "bcrypt": "^6.0.0",
@@ -80,6 +78,7 @@
     "module-alias": "^2.2.3",
     "multer": "^2.2.0",
     "pg": "^8.16.3",
+    "rate-limit-redis": "^6.0.2",
     "resend": "^6.25.0",
     "streamifier": "^0.1.1",
     "uuid": "^13.0.0",

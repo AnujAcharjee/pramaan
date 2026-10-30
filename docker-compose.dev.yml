@@ -35,7 +35,7 @@ services:
     image: redis:8.4.0
     command: >
       redis-server
-      --requirepass ${REDIS_PASSWORD}
+      --requirepass ${REDIS_PASSWORD:-devpassword}
       --appendonly yes
       --appendfsync everysec
       --maxmemory 512mb
@@ -43,15 +43,32 @@ services:
     volumes:
       - redis-data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-devpassword}", "ping"]
       interval: 5s
       timeout: 3s
       retries: 5
     networks:
       - pramaan-dev-network
 
+  alloy:
+    image: grafana/alloy:v1.0.0
+    restart: unless-stopped
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - GRAFANA_CLOUD_LOKI_URL=${GRAFANA_CLOUD_LOKI_URL}
+      - GRAFANA_CLOUD_LOKI_USER=${GRAFANA_CLOUD_LOKI_USER}
+      - GRAFANA_CLOUD_LOKI_TOKEN=${GRAFANA_CLOUD_LOKI_TOKEN}
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+    networks:
+      - pramaan-dev-network
+
 volumes:
-  # redis-data:
+  redis-data:
   api_node_modules:
   api_dist:
 

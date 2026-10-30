@@ -44,7 +44,7 @@ services:
     init: true
 
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/health', r => { if(r.statusCode !== 200) process.exit(1); }).on('error', () => process.exit(1));"]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/health', r => { if(r.statusCode === 200) process.exit(0); else process.exit(1); }).on('error', () => process.exit(1));"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -55,6 +55,26 @@ services:
       options:
         max-size: "5m"
         max-file: "2"
+
+  alloy:
+    image: grafana/alloy:v1.0.0
+    restart: unless-stopped
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - GRAFANA_CLOUD_LOKI_URL=${GRAFANA_CLOUD_LOKI_URL}
+      - GRAFANA_CLOUD_LOKI_USER=${GRAFANA_CLOUD_LOKI_USER}
+      - GRAFANA_CLOUD_LOKI_TOKEN=${GRAFANA_CLOUD_LOKI_TOKEN}
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+    depends_on:
+      - pramaan
+      - caddy
+    networks:
+      - pramaan-network
 
 volumes:
   caddy_data:
