@@ -1,0 +1,71 @@
+// 1. Discover running Docker containers via the local Docker socket
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// 2. Relabel: Filter Pramaan and Caddy containers, extract clean labels
+discovery.relabel "app_logs" {
+  targets = discovery.docker.containers.targets
+
+  // Keep containers with pramaan or caddy in their name
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = ".*(pramaan|caddy).*"
+    action        = "keep"
+  }
+
+  // Assign service label (pramaan or caddy)
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = ".*(pramaan|caddy).*"
+    target_label  = "service"
+  }
+
+  // Assign container label
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    target_label  = "container"
+  }
+}
+
+// 3. Collect logs from discovered containers
+loki.source.docker "docker_logs" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.relabel.app_logs.output
+  forward_to = [loki.process.parse_json.receiver]
+}
+
+// 4. Parse JSON logs emitted by Winston / Caddy
+loki.process "parse_json" {
+  forward_to = [loki.write.grafana_cloud.receiver]
+
+  stage.json {
+    expressions = {
+      level     = "level",
+      requestId = "requestId",
+      context   = "context",
+      status    = "status",
+      method    = "method",
+      url       = "url",
+    }
+  }
+
+  stage.labels {
+    values = {
+      level   = "level",
+      context = "context",
+    }
+  }
+}
+
+// 5. Forward to Grafana Cloud Loki
+loki.write "grafana_cloud" {
+  endpoint {
+    url = env("GRAFANA_CLOUD_LOKI_URL")
+
+    basic_auth {
+      username = env("GRAFANA_CLOUD_LOKI_USER")
+      password = env("GRAFANA_CLOUD_LOKI_TOKEN")
+    }
+  }
+}

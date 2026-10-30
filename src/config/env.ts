@@ -48,10 +48,6 @@ const envSchema = z.object({
 
   PORT: port('PORT'),
 
-  LOGTAIL_SOURCE_TOKEN: z
-    .string({ error: 'LOGTAIL_SOURCE_TOKEN is required' })
-    .min(1, 'LOGTAIL_SOURCE_TOKEN cannot be empty'),
-
   APP_NAME: isDev ? z.string().optional().default('Pramaan') : z.string(),
   APP_DOMAIN: z.string({ error: 'APP_DOMAIN is required' }).min(1, 'APP_DOMAIN cannot be empty'),
   APP_DOC_URL: url('APP_DOC_URL'),
