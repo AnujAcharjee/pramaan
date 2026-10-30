@@ -42,6 +42,16 @@ export const setupSecurityHeaders = (app: Express) => {
 
       crossOriginEmbedderPolicy: false, // required for OAuth redirects & Swagger
 
+      /* -------- Framing & Clickjacking -------- */
+      xFrameOptions: { action: 'deny' }, // align with Caddy's DENY policy & CSP frame-ancestors 'none'
+
+      /* -------- Strict Transport Security -------- */
+      strictTransportSecurity: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true,
+      },
+
       /* -------- Other protections -------- */
 
       dnsPrefetchControl: { allow: false }, // prevent DNS leakage
