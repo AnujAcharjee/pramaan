@@ -2,59 +2,61 @@
   const _user = typeof user !== 'undefined' && user ? user : (typeof locals !== 'undefined' && locals.user ? locals.user : null);
 %>
 <section id="hero" class="relative overflow-hidden">
-  <div class="max-w-6xl mx-auto px-4 sm:px-8 lg:px-12 py-12 sm:py-20 lg:py-24 relative z-10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative z-10">
 
-    <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
 
-      <!-- Identity Provider Tag -->
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-orange/10 text-brand-orange border border-brand-orange/20 tracking-wider uppercase mb-4 sm:mb-6">
-        <svg class="w-3.5 h-3.5 text-brand-orange shrink-0" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-        </svg>
-        <span>Identity Provider</span>
-      </div>
+      <!-- Left Column: Copy & Get Started CTA -->
+      <div class="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left">
 
-      <!-- Hero Heading -->
-      <div class="relative inline-block mb-5 sm:mb-7">
-        <!-- Ambient Glow -->
-        <div
-          class="absolute -top-10 left-1/2 -translate-x-1/2 w-72 sm:w-96 h-36
-                 bg-linear-to-r from-brand-orange/30 via-amber-400/20 to-indigo-500/20
-                 dark:from-brand-orange/25 dark:via-amber-400/15 dark:to-indigo-500/15
-                 blur-3xl rounded-full pointer-events-none"
-        ></div>
+        <!-- Identity Provider Tag -->
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-orange/10 text-brand-orange border border-brand-orange/20 tracking-wider uppercase mb-4 sm:mb-6">
+          <svg class="w-3.5 h-3.5 text-brand-orange shrink-0" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span>Identity Provider</span>
+        </div>
 
-        <h1
-          class="relative font-brand-hero text-3xl min-[380px]:text-4xl
-                 sm:text-5xl lg:text-7xl font-extrabold tracking-tight
-                 text-slate-900 dark:text-white leading-tight sm:leading-[1.12]"
-        >
-          Ship authentication in
-          <br class="sm:hidden" />
+        <!-- Hero Heading -->
+        <div class="relative inline-block mb-4 sm:mb-6">
+          <!-- Ambient Glow -->
+          <div
+            class="absolute -top-8 left-1/2 -translate-x-1/2 lg:left-0 lg:translate-x-0 w-72 sm:w-96 h-36
+                   bg-linear-to-r from-brand-orange/30 via-amber-400/20 to-indigo-500/20
+                   dark:from-brand-orange/25 dark:via-amber-400/15 dark:to-indigo-500/15
+                   blur-3xl rounded-full pointer-events-none"
+          ></div>
 
-          <span
-            class="text-transparent bg-clip-text
-                   bg-linear-to-r from-brand-orange via-amber-500 to-orange-500
-                   dark:from-brand-orange dark:via-amber-300 dark:to-orange-400
-                   drop-shadow-[0_0_35px_rgba(255,150,68,0.22)]"
+          <h1
+            class="relative font-brand-hero text-3xl min-[380px]:text-4xl
+                   sm:text-5xl lg:text-6xl font-extrabold tracking-tight
+                   text-slate-900 dark:text-white leading-tight sm:leading-[1.12]"
           >
-            just a few clicks.
-          </span>
-        </h1>
-      </div>
+            Ship authentication in
+            <br class="hidden sm:inline" />
 
-      <!-- Supporting Copy -->
-      <div class="mt-5 sm:mt-7 flex flex-col items-center">
+            <span
+              class="text-transparent bg-clip-text
+                     bg-linear-to-r from-brand-orange via-amber-500 to-orange-500
+                     dark:from-brand-orange dark:via-amber-300 dark:to-orange-400
+                     drop-shadow-[0_0_35px_rgba(255,150,68,0.22)]"
+            >
+              just a few clicks.
+            </span>
+          </h1>
+        </div>
+
+        <!-- Supporting Copy -->
         <p
-          class="text-base sm:text-xl text-slate-600 dark:text-slate-300
-                 leading-relaxed max-w-2xl text-center px-4"
+          class="text-base sm:text-lg text-slate-600 dark:text-slate-300
+                 leading-relaxed max-w-xl text-center lg:text-left"
         >
           Set up your application in Pramaan, grab your credentials,
           and use the official SDK to add secure authentication to your app.
         </p>
 
-        <!-- CTA -->
-        <div class="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3.5">
+        <!-- CTA: Get Started Button -->
+        <div class="mt-6 sm:mt-8 flex items-center">
           <a
             href="<%= _user ? '/account' : '/signup' %>"
             class="btn-orange rounded-2xl border border-brand-orange/40 dark:border-brand-orange/50
@@ -65,23 +67,108 @@
           >
             Get Started
           </a>
+        </div>
 
-          <a
-            href="#demo"
-            class="text-base sm:text-lg font-semibold
-                   rounded-2xl border border-slate-300 dark:border-slate-700
-                   backdrop-blur-md
-                   text-slate-800 dark:text-slate-100
-                   hover:text-slate-900 dark:hover:text-white
-                   hover:bg-slate-100 dark:hover:bg-slate-700
-                   hover:border-slate-400 dark:hover:border-slate-600
-                   transition-all duration-200 px-6 py-3.5 shadow-sm"
-          >
-            See how it works
-          </a>
+      </div>
+
+      <!-- Right Column: Video Frame Showcase (No header, with caption & i tag) -->
+      <div id="demo" class="lg:col-span-6 w-full">
+        <div class="relative group w-full">
+          <!-- Ambient Glow behind video -->
+          <div
+            class="absolute -top-6 -right-6 w-72 h-44
+                   bg-linear-to-r from-brand-orange/20 via-amber-400/10 to-indigo-500/10
+                   dark:from-brand-orange/15 dark:via-amber-400/10 dark:to-indigo-500/10
+                   blur-2xl rounded-full pointer-events-none"
+          ></div>
+
+          <!-- Video Frame Outer -->
+          <div class="relative rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0a0a0a] p-1 sm:p-2 border border-slate-200/90 dark:border-neutral-800 shadow-xl shadow-slate-200/60 dark:shadow-2xl dark:shadow-black/70 overflow-hidden transition-colors duration-300">
+            <div class="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-slate-950 dark:bg-black border border-slate-200/60 dark:border-neutral-800/80 flex items-center justify-center">
+
+              <!-- Video Player (Autoplay, muted, loop, viewport intersection observer) -->
+              <video
+                id="pramaanDemoVideo"
+                class="w-full h-full object-cover"
+                style="transform: scale(1.04) translateY(-1%); transform-origin: center;"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="auto"
+                width="800"
+                height="450"
+                poster="https://res.cloudinary.com/ddsbhdeju/image/upload/f_auto,q_auto,w_900/pramaan-demo-thumbnail.jpg"
+              >
+                <source
+                  src="https://res.cloudinary.com/ddsbhdeju/video/upload/pramaan-demo.mp4"
+                  type="video/mp4"
+                />
+                Your browser does not support HTML5 video.
+              </video>
+
+            </div>
+          </div>
+
+          <!-- Video Description / Caption (with info 'i' tag) -->
+          <div class="mt-3 sm:mt-4 flex items-center justify-center lg:justify-start gap-1.5 text-xs font-light text-slate-500 dark:text-slate-400 text-center lg:text-left px-2">
+            <span class="inline-flex items-center text-brand-orange shrink-0" aria-hidden="true">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </span>
+            <span>
+              See how OpenSpace uses Pramaan to authenticate users, handle consent, and securely exchange tokens.
+            </span>
+          </div>
+
         </div>
       </div>
 
     </div>
+
   </div>
 </section>
+
+<!-- Autoplay & Viewport Intersection Handler -->
+<script>
+  (function () {
+    const video = document.getElementById("pramaanDemoVideo");
+    if (!video) return;
+
+    // Explicitly guarantee muted property for mobile browser autoplay policies
+    video.muted = true;
+    video.playsInline = true;
+
+    const playSafe = () => {
+      const p = video.play();
+      if (p !== undefined) {
+        p.catch(() => {});
+      }
+    };
+
+    // Attempt autoplay immediately and when metadata / canplay fires
+    playSafe();
+    video.addEventListener("loadedmetadata", playSafe, { once: true });
+    video.addEventListener("canplay", playSafe, { once: true });
+
+    // Manage viewport play/pause to preserve battery and resources
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              playSafe();
+            } else {
+              video.pause();
+            }
+          });
+        },
+        {
+          threshold: 0.1,
+        }
+      );
+      observer.observe(video);
+    }
+  })();
+</script>
