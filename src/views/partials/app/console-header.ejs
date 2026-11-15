@@ -5,7 +5,7 @@
   const _docUrl = typeof docUrl !== 'undefined' && docUrl ? docUrl : 'https://github.com/AnujAcharjee/pramaan';
 %>
 
-<header class="h-14 shrink-0 z-50 w-full bg-white/80 dark:bg-black backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800 transition-colors duration-300 shadow-xs">
+<header class="h-14 shrink-0 z-50 w-full bg-white dark:bg-black border-b border-slate-200/90 dark:border-neutral-800 transition-colors duration-200 shadow-2xs">
   <div class="h-full px-3 sm:px-5 flex items-center justify-between gap-3">
 
     <!-- Left: Sidebar Toggle + Logo + Breadcrumb -->
@@ -13,7 +13,7 @@
       <button
         id="consoleNavToggle"
         type="button"
-        class="w-9 h-9 rounded-xl border border-slate-200/80 dark:border-neutral-800 bg-slate-100/90 dark:bg-neutral-900 text-slate-700 dark:text-slate-200 hover:text-brand-orange dark:hover:text-brand-orange hover:border-brand-orange/40 dark:hover:border-neutral-700 hover:bg-orange-50/50 dark:hover:bg-neutral-800 flex items-center justify-center shrink-0 transition-all cursor-pointer shadow-2xs"
+        class="w-9 h-9 rounded-craftsman-sm border border-slate-200/90 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 text-slate-700 dark:text-slate-200 hover:text-brand-orange dark:hover:text-brand-orange hover:border-brand-orange/40 dark:hover:border-neutral-700 hover:bg-orange-50/50 dark:hover:bg-neutral-800 flex items-center justify-center shrink-0 transition-all cursor-pointer shadow-2xs"
         aria-label="Toggle navigation"
         title="Toggle sidebar navigation"
       >
@@ -93,9 +93,9 @@
       <% if (_user) { %>
         <a href="/account" class="flex items-center gap-2 pl-1 group cursor-pointer" title="User account settings">
           <% if (_user.avatar) { %>
-            <img src="<%= _user.avatar %>" alt="<%= _user.name || 'User' %>" class="w-8 h-8 rounded-xl object-cover ring-2 ring-slate-200 dark:ring-neutral-800 group-hover:ring-brand-orange/60 transition-all shadow-xs" />
+            <img src="<%= _user.avatar %>" alt="<%= _user.name || 'User' %>" class="w-8 h-8 rounded-craftsman-sm object-cover ring-1 ring-slate-200 dark:ring-neutral-800 group-hover:ring-brand-orange/60 transition-all shadow-2xs" />
           <% } else { %>
-            <div class="w-8 h-8 rounded-xl bg-linear-to-br from-brand-orange/20 to-amber-500/10 text-brand-orange font-black text-xs flex items-center justify-center ring-2 ring-slate-200 dark:ring-neutral-800 group-hover:ring-brand-orange/60 transition-all shadow-xs">
+            <div class="w-8 h-8 rounded-craftsman-sm bg-linear-to-br from-brand-orange/20 to-amber-500/10 text-brand-orange font-black text-xs flex items-center justify-center ring-1 ring-slate-200 dark:ring-neutral-800 group-hover:ring-brand-orange/60 transition-all shadow-2xs">
               <%= (_user.name || 'U').slice(0, 1).toUpperCase() %>
             </div>
           <% } %>

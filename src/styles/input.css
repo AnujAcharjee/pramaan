@@ -18,47 +18,58 @@
 /* Your custom component classes */
 @layer components {
   .btn-orange {
-    @apply inline-flex items-center justify-center px-7 py-3.5 rounded-xl 
-            bg-linear-to-r from-brand-orange via-brand-orange/90 to-brand-orangeDark
+    @apply inline-flex items-center justify-center px-7 py-3.5 
+            bg-linear-to-r from-brand-orange via-brand-orange/95 to-brand-orangeDark
             text-white text-base font-semibold 
-            hover:shadow-xl hover:shadow-orange-500/20 dark:hover:shadow-brand-orange/10 active:scale-[0.98] transition-all duration-300 cursor-pointer;
+            border border-brand-orange/40 dark:border-brand-orange/50
+            hover:shadow-md hover:shadow-brand-orange/20 dark:hover:shadow-brand-orange/10 
+            active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    border-radius: 10px 8px 11px 9px;
   }
 
   .btn-sky {
-    @apply inline-flex items-center justify-center px-7 py-3.5 rounded-xl 
-            bg-linear-to-r from-sky-500 via-sky-500/90 to-sky-600 
+    @apply inline-flex items-center justify-center px-7 py-3.5 
+            bg-linear-to-r from-sky-500 via-sky-500/95 to-sky-600 
             text-white text-base font-semibold 
-            hover:shadow-xl hover:shadow-sky-500/20 dark:hover:shadow-sky-500/10 active:scale-[0.98] transition-all duration-300 cursor-pointer;
+            border border-sky-400/40
+            hover:shadow-md hover:shadow-sky-500/20 dark:hover:shadow-sky-500/10 
+            active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    border-radius: 10px 8px 11px 9px;
   }
 
   .btn-outline-sky {
-    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-xl 
-            border-2 border-sky-500/80 dark:border-sky-400/50 text-sky-600 dark:text-sky-400 font-semibold bg-white/50 dark:bg-sky-500/5 backdrop-blur-xs
-            hover:bg-sky-500 hover:text-white hover:border-sky-500 dark:hover:bg-sky-500 dark:hover:text-white dark:hover:border-sky-500 active:scale-[0.98] transition-all duration-300 cursor-pointer;
+    @apply inline-flex items-center justify-center px-4 py-2.5 
+            border border-sky-500/80 dark:border-sky-400/50 text-sky-600 dark:text-sky-400 font-semibold bg-white/70 dark:bg-sky-500/5
+            hover:bg-sky-500 hover:text-white hover:border-sky-500 dark:hover:bg-sky-500 dark:hover:text-white dark:hover:border-sky-500 active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    border-radius: 10px 8px 11px 9px;
   }
 
   .btn-outline-rose {
-    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-xl 
-            border-2 border-rose-500/80 dark:border-rose-400/50 text-rose-500 dark:text-rose-400 font-semibold bg-white/50 dark:bg-rose-500/5 backdrop-blur-xs
-            hover:bg-rose-500 hover:text-white hover:border-rose-500 dark:hover:bg-rose-500 dark:hover:text-white dark:hover:border-rose-500 active:scale-[0.98] transition-all duration-300 cursor-pointer;
+    @apply inline-flex items-center justify-center px-4 py-2.5 
+            border border-rose-500/80 dark:border-rose-400/50 text-rose-500 dark:text-rose-400 font-semibold bg-white/70 dark:bg-rose-500/5
+            hover:bg-rose-500 hover:text-white hover:border-rose-500 dark:hover:bg-rose-500 dark:hover:text-white dark:hover:border-rose-500 active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    border-radius: 10px 8px 11px 9px;
   }
 
   .btn-outline-green {
-    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-xl 
-            border-2 border-green-500/80 dark:border-emerald-400/50 text-green-600 dark:text-emerald-400 font-semibold bg-white/50 dark:bg-emerald-500/5 backdrop-blur-xs
-            hover:bg-green-500 hover:text-white hover:border-green-500 dark:hover:bg-emerald-500 dark:hover:text-white dark:hover:border-emerald-500 active:scale-[0.98] transition-all duration-300 cursor-pointer;
+    @apply inline-flex items-center justify-center px-4 py-2.5 
+            border border-emerald-500/80 dark:border-emerald-400/50 text-emerald-600 dark:text-emerald-400 font-semibold bg-white/70 dark:bg-emerald-500/5
+            hover:bg-emerald-500 hover:text-white hover:border-emerald-500 dark:hover:bg-emerald-500 dark:hover:text-white dark:hover:border-emerald-500 active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    border-radius: 10px 8px 11px 9px;
   }
 
   .btn-outline-gray {
-    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-xl 
-            border-2 border-slate-400 dark:border-slate-600 text-slate-600 dark:text-slate-400 font-semibold bg-white/50 dark:bg-slate-500/5 backdrop-blur-xs
-            hover:bg-slate-500 dark:hover:bg-slate-600 hover:text-white active:scale-[0.98] transition-all duration-300 cursor-pointer;
+    @apply inline-flex items-center justify-center px-4 py-2.5 
+            border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold bg-white/70 dark:bg-slate-800/20
+            hover:bg-slate-700 dark:hover:bg-slate-700 hover:text-white active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    border-radius: 10px 8px 11px 9px;
   }
 
   .btn-outline-orange {
-    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-xl 
-            border-2 border-brand-orange dark:border-brand-orange/60 text-brand-orange font-semibold bg-white/50 dark:bg-brand-orange/5 backdrop-blur-xs
-            hover:bg-brand-orange hover:text-white hover:border-brand-orange active:scale-[0.98] transition-all duration-300 cursor-pointer;
+    @apply inline-flex items-center justify-center px-4 py-2.5 
+            border border-brand-orange dark:border-brand-orange/70 text-brand-orange font-semibold bg-white/70 dark:bg-brand-orange/5
+            hover:bg-brand-orange hover:text-white hover:border-brand-orange active:scale-[0.98] transition-all duration-200 cursor-pointer;
+    border-radius: 10px 8px 11px 9px;
   }
 
   .font-brand-hero {
@@ -67,70 +78,93 @@
   }
 
   .dashboard-section {
-    @apply bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-xl rounded-3xl 
-          shadow-lg shadow-slate-200/70 dark:shadow-2xl dark:shadow-black/70
-          border border-slate-200/80 dark:border-neutral-800/80
+    @apply bg-white dark:bg-[#0a0a0a] 
+          border border-slate-200/90 dark:border-neutral-800
+          shadow-[0_2px_8px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.5)]
           p-5 sm:p-8 
-          hover:border-slate-300 dark:hover:border-neutral-700
+          hover:border-slate-300 dark:hover:border-neutral-700 hover:-translate-y-0.5
           transition-all duration-200;
+    border-radius: 18px 15px 19px 16px;
   }
 
   .dashboard-danger-section {
-    @apply bg-red-50/50 dark:bg-[#140b10]/90 backdrop-blur-xl rounded-3xl 
-          shadow-lg shadow-red-100/50 dark:shadow-2xl dark:shadow-black/70
-          border border-red-200/70 dark:border-rose-900/50
+    @apply bg-rose-50/40 dark:bg-[#140b10] 
+          border border-rose-200/80 dark:border-rose-900/60
+          shadow-[0_2px_8px_rgba(244,63,94,0.04)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.5)]
           p-5 sm:p-8 
-          hover:border-red-300 dark:hover:border-rose-900/70
+          hover:border-rose-300 dark:hover:border-rose-900/80 hover:-translate-y-0.5
           transition-all duration-200;
+    border-radius: 18px 15px 19px 16px;
   }
 
   .dashboard-icon {
-    @apply w-11 h-11 rounded-2xl bg-linear-to-br from-brand-orange to-brand-orangeDark flex items-center justify-center shadow-md shadow-brand-orange/20 dark:shadow-brand-orange/25 text-white;
+    @apply w-11 h-11 bg-linear-to-br from-brand-orange to-brand-orangeDark flex items-center justify-center shadow-xs shadow-brand-orange/20 text-white;
+    border-radius: 14px 12px 15px 13px;
   }
 
   .glass-card {
-    @apply bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-2xl rounded-3xl 
-          border border-slate-200/80 dark:border-neutral-800/80
-          shadow-2xl shadow-slate-300/40 dark:shadow-2xl dark:shadow-black/70
-          hover:-translate-y-0.5 hover:shadow-slate-300/60 dark:hover:border-neutral-700
+    @apply bg-white dark:bg-[#0a0a0a] 
+          border border-slate-200/90 dark:border-neutral-800
+          shadow-[0_4px_20px_rgba(15,23,42,0.05)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.6)]
+          hover:-translate-y-0.5 hover:border-slate-300 dark:hover:border-neutral-700
           transition-all duration-300;
+    border-radius: 20px 18px 22px 19px;
   }
 
   .dashboard-sub-card {
-    @apply rounded-2xl bg-slate-50/80 dark:bg-[#121212]/90 
+    @apply bg-slate-50/90 dark:bg-[#121212] 
            border border-slate-200/80 dark:border-neutral-800/80 
            shadow-xs transition-colors duration-200;
+    border-radius: 14px 12px 15px 13px;
   }
 
   .input-field {
-    @apply block w-full rounded-xl 
+    @apply block w-full 
           border border-slate-200 dark:border-neutral-800
-          bg-white/90 dark:bg-[#121212]
+          bg-white dark:bg-[#121212]
           px-4 py-3 text-sm 
           text-slate-900 dark:text-slate-100
           placeholder:text-slate-400 dark:placeholder:text-slate-500
           transition-all duration-200 
           focus:border-brand-orange dark:focus:border-brand-orange
-          focus:bg-white dark:focus:bg-[#181818] 
-          focus:outline-none focus:ring-4 
-          focus:ring-brand-orange/20 dark:focus:ring-brand-orange/25 
+          focus:bg-white dark:focus:bg-[#161616] 
+          focus:outline-none focus:ring-2 
+          focus:ring-brand-orange/25 dark:focus:ring-brand-orange/30 
           disabled:bg-slate-50/80 dark:disabled:bg-neutral-900/60 
           disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed;
+    border-radius: 10px 9px 11px 8px;
   }
 
   .hover-scale {
-    @apply hover:scale-[1.015] active:scale-[0.985] transition-all duration-300;
+    @apply hover:scale-[1.012] active:scale-[0.988] transition-all duration-200;
   }
 
   .bg-theme {
-    background-image: linear-gradient(to bottom right, #f8fafc, rgba(255, 247, 237, 0.5), #f1f5f9);
+    background-image: linear-gradient(to bottom right, #f8fafc, rgba(254, 249, 225, 0.4), #f1f5f9);
   }
 
   :where(.dark, .dark *) .bg-theme {
     background-image: 
-      radial-gradient(ellipse at 15% 0%, rgba(255, 150, 68, 0.10) 0%, transparent 50%),
+      radial-gradient(ellipse at 15% 0%, rgba(255, 150, 68, 0.08) 0%, transparent 50%),
       linear-gradient(to bottom right, #000000, #0a0a0a, #000000) !important;
     background-color: #000000 !important;
+  }
+
+  /* Architectural Draftsman Radii Utilities */
+  .rounded-craftsman-sm {
+    border-radius: 10px 8px 11px 9px;
+  }
+  .rounded-craftsman-md {
+    border-radius: 14px 12px 15px 13px;
+  }
+  .rounded-craftsman-lg {
+    border-radius: 18px 15px 19px 16px;
+  }
+  .rounded-craftsman-xl {
+    border-radius: 22px 19px 24px 20px;
+  }
+  .rounded-craftsman-stamp {
+    border-radius: 7px 5px 8px 6px;
   }
 }
 
