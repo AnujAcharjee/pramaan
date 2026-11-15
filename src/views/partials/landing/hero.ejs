@@ -10,7 +10,7 @@
       <div class="lg:col-span-6 flex flex-col items-center lg:items-start text-center lg:text-left">
 
         <!-- Identity Provider Tag -->
-        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-orange/10 text-brand-orange border border-brand-orange/20 tracking-wider uppercase mb-4 sm:mb-6">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-brand-orange/10 text-brand-orange border border-brand-orange/20 tracking-wider uppercase mb-3.5 sm:mb-5">
           <svg class="w-3.5 h-3.5 text-brand-orange shrink-0" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
           </svg>
@@ -18,7 +18,7 @@
         </div>
 
         <!-- Hero Heading -->
-        <div class="relative inline-block mb-4 sm:mb-6">
+        <div class="relative inline-block mb-3.5 sm:mb-5">
           <!-- Ambient Glow -->
           <div
             class="absolute -top-8 left-1/2 -translate-x-1/2 lg:left-0 lg:translate-x-0 w-72 sm:w-96 h-36
@@ -28,15 +28,11 @@
           ></div>
 
           <h1
-            class="relative font-brand-hero text-3xl min-[380px]:text-4xl
-                   sm:text-5xl lg:text-6xl font-extrabold tracking-tight
-                   text-slate-900 dark:text-white leading-tight sm:leading-[1.12]"
+            class="relative font-brand-hero text-2xl min-[380px]:text-3xl sm:text-4xl lg:text-[2.65rem] xl:text-[3.25rem] font-bold tracking-tight text-slate-900 dark:text-white leading-[1.12]"
           >
-            Ship authentication in
-            <br class="hidden sm:inline" />
-
+            <span class="block">Ship authentication in</span>
             <span
-              class="text-transparent bg-clip-text
+              class="block text-transparent bg-clip-text
                      bg-linear-to-r from-brand-orange via-amber-500 to-orange-500
                      dark:from-brand-orange dark:via-amber-300 dark:to-orange-400
                      drop-shadow-[0_0_35px_rgba(255,150,68,0.22)]"
@@ -48,22 +44,22 @@
 
         <!-- Supporting Copy -->
         <p
-          class="text-base sm:text-lg text-slate-600 dark:text-slate-300
-                 leading-relaxed max-w-xl text-center lg:text-left"
+          class="text-sm sm:text-base text-slate-600 dark:text-slate-300
+                 leading-relaxed max-w-lg text-center lg:text-left"
         >
           Set up your application in Pramaan, grab your credentials,
           and use the official SDK to add secure authentication to your app.
         </p>
 
         <!-- CTA: Get Started Button -->
-        <div class="mt-6 sm:mt-8 flex items-center">
+        <div class="mt-5 sm:mt-7 flex items-center">
           <a
             href="<%= _user ? '/account' : '/signup' %>"
-            class="btn-orange rounded-2xl border border-brand-orange/40 dark:border-brand-orange/50
-                   text-base sm:text-lg shadow-xl shadow-brand-orange/20
-                   hover:shadow-2xl hover:shadow-brand-orange/30
+            class="btn-orange rounded-xl border border-brand-orange/40 dark:border-brand-orange/50
+                   text-sm sm:text-base font-semibold shadow-lg shadow-brand-orange/20
+                   hover:shadow-xl hover:shadow-brand-orange/30
                    hover:-translate-y-0.5 active:translate-y-0
-                   px-8 py-3.5"
+                   px-7 py-3"
           >
             Get Started
           </a>
@@ -111,7 +107,7 @@
           </div>
 
           <!-- Video Description / Caption (with info 'i' tag) -->
-          <div class="mt-3 sm:mt-4 flex items-center justify-center lg:justify-start gap-1.5 text-xs font-light text-slate-500 dark:text-slate-400 text-center lg:text-left px-2">
+          <div class="mt-3 flex items-center justify-center lg:justify-start gap-1.5 text-xs text-slate-500 dark:text-slate-400 text-center lg:text-left px-1">
             <span class="inline-flex items-center text-brand-orange shrink-0" aria-hidden="true">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
