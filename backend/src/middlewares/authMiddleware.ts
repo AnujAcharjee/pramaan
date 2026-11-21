@@ -32,6 +32,14 @@ export class Authentication {
     return (body.request_id as string) ?? (query.request_id as string) ?? req.requestId;
   }
 
+  private static toAbsoluteFrontendUrl(pathOrUrl: string): string {
+    if (pathOrUrl.startsWith('/')) {
+      const frontendUrl = (process.env.FRONTEND_URL || 'https://pramaan.anujacharjee.com').replace(/\/+$/, '');
+      return `${frontendUrl}${pathOrUrl}`;
+    }
+    return pathOrUrl;
+  }
+
   private constructor() {}
 
   static ssr = (flow: AuthenticationFlow = 'default') => {
@@ -71,10 +79,22 @@ export class Authentication {
         }
 
         // No valid session
+        if (flow === 'oauth') {
+          const requestId = Authentication.resolveOAuthRequestId(req);
+
+          const params = new URLSearchParams({
+            flow: 'oauth',
+          });
+
+          if (requestId) params.set('request_id', requestId);
+
+          return res.redirect(303, Authentication.toAbsoluteFrontendUrl(`/signin?${params.toString()}`));
+        }
+
         const isApi =
-          req.originalUrl?.startsWith('/api') ||
-          req.baseUrl?.startsWith('/api') ||
-          req.path?.startsWith('/api') ||
+          req.originalUrl?.startsWith('/api/v1') ||
+          req.baseUrl?.startsWith('/api/v1') ||
+          req.path?.startsWith('/api/v1') ||
           req.xhr ||
           req.headers.accept?.includes('application/json');
 
@@ -82,20 +102,7 @@ export class Authentication {
           throw new AppError('Authentication required', 401, ErrorCode.UNAUTHORIZED);
         }
 
-        if (flow === 'oauth') {
-          const requestId = Authentication.resolveOAuthRequestId(req);
-
-          const params = new URLSearchParams({
-            flow: 'oauth',
-            error: 'Session_expired',
-          });
-
-          if (requestId) params.set('request_id', requestId);
-
-          return res.redirect(303, `/signin?${params.toString()}`);
-        }
-
-        return res.redirect(303, '/signin?error=Session_expired');
+        return res.redirect(303, Authentication.toAbsoluteFrontendUrl('/signin?error=Session_expired'));
       } catch (error) {
         return next(error);
       }
@@ -171,13 +178,13 @@ export class Authentication {
               if (flow === 'oauth' && requestId) {
                 try {
                   const redirectURL = await oauthService.authorize(requestId, userId);
-                  return res.redirect(303, redirectURL);
+                  return res.redirect(303, Authentication.toAbsoluteFrontendUrl(redirectURL));
                 } catch {
-                  return res.redirect(303, redirectTo);
+                  return res.redirect(303, Authentication.toAbsoluteFrontendUrl(redirectTo));
                 }
               }
 
-              return res.redirect(303, redirectTo);
+              return res.redirect(303, Authentication.toAbsoluteFrontendUrl(redirectTo));
             }
           }
         }
@@ -195,13 +202,13 @@ export class Authentication {
             if (flow === 'oauth' && requestId) {
               try {
                 const redirectURL = await oauthService.authorize(requestId, data.userId);
-                return res.redirect(303, redirectURL);
+                return res.redirect(303, Authentication.toAbsoluteFrontendUrl(redirectURL));
               } catch {
-                return res.redirect(303, redirectTo);
+                return res.redirect(303, Authentication.toAbsoluteFrontendUrl(redirectTo));
               }
             }
 
-            return res.redirect(303, redirectTo);
+            return res.redirect(303, Authentication.toAbsoluteFrontendUrl(redirectTo));
           } catch {
             // Identity session invalid/expired, continue as guest
           }

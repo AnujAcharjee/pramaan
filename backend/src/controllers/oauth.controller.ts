@@ -32,7 +32,13 @@ export class OAuthController extends BaseController {
       const userId = req.user.id;
       const requestId = req.requestId;
 
-      const redirectURL = await this.oauthService.authorize(requestId, userId);
+      let redirectURL = await this.oauthService.authorize(requestId, userId);
+
+      // In decoupled SPA architecture, redirect relative paths (e.g. /oauth/consent) to Frontend
+      if (redirectURL.startsWith('/')) {
+        const frontendUrl = (process.env.FRONTEND_URL || 'https://pramaan.anujacharjee.com').replace(/\/+$/, '');
+        redirectURL = `${frontendUrl}${redirectURL}`;
+      }
 
       return res.redirect(303, redirectURL);
     } catch (error) {
