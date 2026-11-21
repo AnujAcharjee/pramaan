@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 import { PramaanLogo } from './PramaanLogo';
 import { ArrowRight, LogOut } from 'lucide-react';
@@ -6,6 +6,20 @@ import { useAuth } from '../context/AuthContext';
 
 export function Navbar() {
   const { isAuthenticated, user, signout } = useAuth();
+  const location = useLocation();
+
+  const cleanPath = location.pathname.replace(/\/+$/, '') || '/';
+  const hideNavbarRoutes = [
+    '/signin',
+    '/signup',
+    '/oauth/consent',
+    '/oauth/authorize',
+    '/authorize',
+  ];
+
+  if (hideNavbarRoutes.includes(cleanPath)) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-200 dark:border-neutral-800 transition-colors">

@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { OAuthHandshakeLoader } from '../components/OAuthHandshakeLoader';
 import { PramaanLogo } from '../components/PramaanLogo';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
 
 export function SignInPage() {
@@ -126,7 +127,10 @@ export function SignInPage() {
   }
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-white dark:bg-black transition-colors">
+    <div className="min-h-[85vh] relative flex items-center justify-center px-4 py-12 bg-white dark:bg-black transition-colors">
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         
         {/* Main Card */}

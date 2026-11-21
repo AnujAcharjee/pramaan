@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { PramaanLogo } from '../components/PramaanLogo';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 export function SignUpPage() {
   const [searchParams] = useSearchParams();
@@ -78,7 +79,10 @@ export function SignUpPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 bg-white dark:bg-black transition-colors">
+    <div className="min-h-[85vh] relative flex items-center justify-center px-4 py-12 bg-white dark:bg-black transition-colors">
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         
         <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-8 sm:p-10 shadow-xl">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ShieldCheck, Check, X, Globe, UserCheck, AlertTriangle } from 'lucide-react';
 import { PramaanLogo } from '../components/PramaanLogo';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 interface ClientInfo {
   id: string;
@@ -120,7 +121,10 @@ export function ConsentPage() {
   }
 
   return (
-    <div className="min-h-[85vh] flex flex-col items-center justify-center px-4 py-12 bg-white dark:bg-black transition-colors">
+    <div className="min-h-[85vh] relative flex flex-col items-center justify-center px-4 py-12 bg-white dark:bg-black transition-colors">
+      <div className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50">
+        <ThemeToggle />
+      </div>
       <div className="mb-6">
         <PramaanLogo size="lg" />
       </div>
