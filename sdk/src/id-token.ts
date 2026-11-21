@@ -5,7 +5,7 @@ import { validateNonce } from './transaction.js';
 import { TokenValidationError } from './errors.js';
 
 export interface IDTokenValidatorOptions {
-  issuer: string;
+  issuer: string | string[];
   clientId: string;
   jwksClient: JWKSClient;
   allowedAlgorithms?: string[];
@@ -13,14 +13,16 @@ export interface IDTokenValidatorOptions {
 }
 
 export class IDTokenValidator {
-  private readonly issuer: string;
+  private readonly issuer: string | string[];
   private readonly clientId: string;
   private readonly jwksClient: JWKSClient;
   private readonly allowedAlgorithms: string[];
   private readonly clockTolerance: number;
 
   constructor(options: IDTokenValidatorOptions) {
-    this.issuer = options.issuer.replace(/\/+$/, '');
+    this.issuer = Array.isArray(options.issuer)
+      ? options.issuer.map((i) => i.replace(/\/+$/, ''))
+      : options.issuer.replace(/\/+$/, '');
     this.clientId = options.clientId;
     this.jwksClient = options.jwksClient;
     this.allowedAlgorithms = options.allowedAlgorithms ?? ['RS256'];

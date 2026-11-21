@@ -321,9 +321,14 @@ export class ClientService {
           ErrorCode.INVALID_REDIRECT_URI,
         );
       }
-      if (normalizedDomain && hostname !== normalizedDomain) {
+      const isDomainOrSubdomain = Boolean(
+        normalizedDomain &&
+        (hostname === normalizedDomain || hostname.endsWith(`.${normalizedDomain}`))
+      );
+
+      if (!isDomainOrSubdomain) {
         throw new AppError(
-          `In production, redirect URI domain must match registered domain "${normalizedDomain}" (got "${hostname}")`,
+          `In production, redirect URI domain must match registered domain "${normalizedDomain}" or its subdomains (got "${hostname}")`,
           400,
           ErrorCode.INVALID_REDIRECT_URI,
         );
@@ -336,7 +341,10 @@ export class ClientService {
         normalizedDomain === 'localhost' ||
         normalizedDomain === '127.0.0.1' ||
         normalizedDomain.endsWith('.localhost');
-      const isRegisteredDomain = Boolean(normalizedDomain && hostname === normalizedDomain);
+      const isRegisteredDomain = Boolean(
+        normalizedDomain &&
+        (hostname === normalizedDomain || hostname.endsWith(`.${normalizedDomain}`))
+      );
 
       if (
         isRegisteredDomain &&
@@ -913,8 +921,16 @@ export class ClientService {
     let clearedRedirectsCount = 0;
 
     if (environment === OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION) {
-      clearedRedirectsCount = client.redirectURIs.length;
-      updates.redirectURIs = [];
+      const validProductionURIs = client.redirectURIs.filter((uri) => {
+        try {
+          this.normalizeAndValidateURI(uri, OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION, client.domain, client.domainStatus);
+          return true;
+        } catch {
+          return false;
+        }
+      });
+      clearedRedirectsCount = client.redirectURIs.length - validProductionURIs.length;
+      updates.redirectURIs = validProductionURIs;
     }
 
     const updatedClient = await this.update(clientId, updates);

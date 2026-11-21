@@ -263,8 +263,11 @@ export class PramaanClient {
     }
 
     if (!this.idTokenValidator) {
+      const allowedIssuers = Array.from(
+        new Set([this.issuer, discovery.issuer.replace(/\/+$/, '')]),
+      );
       this.idTokenValidator = new IDTokenValidator({
-        issuer: this.issuer,
+        issuer: allowedIssuers.length === 1 ? allowedIssuers[0]! : allowedIssuers,
         clientId: this.clientId,
         jwksClient: this.jwksClient,
         allowedAlgorithms: discovery.id_token_signing_alg_values_supported ?? ['RS256'],
