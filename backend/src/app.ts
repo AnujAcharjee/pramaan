@@ -1,6 +1,8 @@
 import express, { type Express, type Request, type Response } from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import ejsMate from 'ejs-mate';
 import methodOverride from 'method-override';
 
@@ -11,15 +13,30 @@ import { loggingMiddleware } from './middlewares/loggingMiddleware.js';
 import { setupSecurityHeaders } from './middlewares/securityHeaders.js';
 import { ensureRequestId } from './middlewares/requestId.js';
 import { apiLimiter } from './middlewares/rateLimiter.js';
+import { appCors } from './middlewares/corsMiddleware.js';
 import apiRouter from './routes/api/index.js';
 import webRouter from './routes/web/index.js';
 
 const app = express();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Resolve views directory regardless of root or backend cwd
+const viewsDir = fs.existsSync(path.resolve(__dirname, 'views'))
+  ? path.resolve(__dirname, 'views')
+  : fs.existsSync(path.join(process.cwd(), 'src', 'views'))
+    ? path.join(process.cwd(), 'src', 'views')
+    : path.join(process.cwd(), 'backend', 'src', 'views');
+
+const publicDir = fs.existsSync(path.resolve(__dirname, '..', 'public'))
+  ? path.resolve(__dirname, '..', 'public')
+  : fs.existsSync(path.join(process.cwd(), 'public'))
+    ? path.join(process.cwd(), 'public')
+    : path.join(process.cwd(), 'backend', 'public');
 
 // ejs setup
 app.engine('ejs', ejsMate);
 app.set('view engine', 'ejs');
-app.set('views', path.join(process.cwd(), 'src', 'views'));
+app.set('views', viewsDir);
 app.set('view cache', ENV.NODE_ENV === 'production');
 
 // Trust the first proxy in front of the app (e.g. Nginx, Caddy, load balancer, Docker)
@@ -28,6 +45,9 @@ app.set('view cache', ENV.NODE_ENV === 'production');
 app.set('trust proxy', 1);
 
 const setupMiddleware = (app: express.Application) => {
+  // CORS
+  app.use(appCors);
+
   // Security
   setupSecurityHeaders(app as Express);
   app.use(ensureRequestId);
@@ -37,7 +57,7 @@ const setupMiddleware = (app: express.Application) => {
   app.use(express.json({ limit: '10kb' }));
   app.use(cookieParser(ENV.COOKIE_SECRET));
   app.use(
-    express.static(path.join(process.cwd(), 'public'), {
+    express.static(publicDir, {
       maxAge: ENV.NODE_ENV === 'production' ? '7d' : 0,
       etag: true,
       lastModified: true,

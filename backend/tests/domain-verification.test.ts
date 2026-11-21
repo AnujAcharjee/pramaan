@@ -683,9 +683,3 @@ describe('DNS TXT Domain Ownership Verification', () => {
     prisma.oAuthClient.update = originalUpdate;
   });
 });
-
-describe('Test Suite Cleanup', () => {
-  it('should clean up and exit', async () => {
-    setTimeout(() => process.exit(0), 100).unref();
-  });
-});

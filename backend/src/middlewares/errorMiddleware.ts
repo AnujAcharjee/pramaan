@@ -17,9 +17,12 @@ export const errorMiddleware: ErrorRequestHandler = (error, req, res, next): voi
     return next(error);
   }
 
-  const isAppError = error instanceof AppError;
+  const isAppError =
+    error instanceof AppError ||
+    (Boolean(error) && typeof error === 'object' && 'statusCode' in error && 'isOperational' in error);
   const statusCode = isAppError ? error.statusCode : 500;
   const message = isAppError ? error.message : 'Internal server error';
+  const errorCode = isAppError && 'code' in error ? (error as any).code : undefined;
   const acceptsHtml = req.accepts(['html', 'json']) === 'html';
   const isApiError = req.url.startsWith('/api');
 
@@ -51,7 +54,7 @@ export const errorMiddleware: ErrorRequestHandler = (error, req, res, next): voi
   }
 
   // RFC 6749 Section 5.2 OAuth Token Endpoint Error Response
-  if (req.path === '/api/oauth/token' || req.path === '/token') {
+  if (req.path === '/api/oauth/token' || req.path === '/oauth/token' || req.path === '/token') {
     let oauthError = 'invalid_request';
     if (isAppError) {
       switch (error.code) {
@@ -90,5 +93,5 @@ export const errorMiddleware: ErrorRequestHandler = (error, req, res, next): voi
   }
 
   // JSON response
-  return ApiResponse.error(res, message, statusCode);
+  return ApiResponse.error(res, message, statusCode, errorCode);
 };

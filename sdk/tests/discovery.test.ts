@@ -11,51 +11,55 @@ describe('Discovery Module', () => {
   let mockDoc: DiscoveryDocument;
   let requestCount = 0;
 
-  before((_, done) => {
-    server = http.createServer((req, res) => {
-      requestCount++;
-      if (
-        req.url === '/.well-known/openid-configuration' ||
-        req.url === '/mismatch/.well-known/openid-configuration'
-      ) {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(mockDoc));
-      } else if (req.url === '/error/.well-known/openid-configuration') {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('Server Error');
-      } else if (req.url === '/invalid-json/.well-known/openid-configuration') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end('{ invalid json ');
-      } else {
-        res.writeHead(404);
-        res.end('Not Found');
-      }
-    });
+  before(async () => {
+    await new Promise<void>((resolve) => {
+      server = http.createServer((req, res) => {
+        requestCount++;
+        if (
+          req.url === '/.well-known/openid-configuration' ||
+          req.url === '/mismatch/.well-known/openid-configuration'
+        ) {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(mockDoc));
+        } else if (req.url === '/error/.well-known/openid-configuration') {
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          res.end('Server Error');
+        } else if (req.url === '/invalid-json/.well-known/openid-configuration') {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end('{ invalid json ');
+        } else {
+          res.writeHead(404);
+          res.end('Not Found');
+        }
+      });
 
-    server.listen(0, '127.0.0.1', () => {
-      const addr = server.address() as { port: number };
-      serverUrl = `http://127.0.0.1:${addr.port}`;
-      mockDoc = {
-        issuer: serverUrl,
-        authorization_endpoint: `${serverUrl}/api/oauth/authorize`,
-        token_endpoint: `${serverUrl}/api/oauth/token`,
-        userinfo_endpoint: `${serverUrl}/userinfo`,
-        jwks_uri: `${serverUrl}/.well-known/jwks.json`,
-        response_types_supported: ['code'],
-        subject_types_supported: ['public'],
-        id_token_signing_alg_values_supported: ['RS256'],
-        scopes_supported: ['openid', 'profile', 'email', 'avatar'],
-        token_endpoint_auth_methods_supported: ['client_secret_post'],
-        claims_supported: ['sub', 'email'],
-        code_challenge_methods_supported: ['S256', 'plain'],
-        grant_types_supported: ['authorization_code'],
-      };
-      done();
+      server.listen(0, '127.0.0.1', () => {
+        const addr = server.address() as { port: number };
+        serverUrl = `http://127.0.0.1:${addr.port}`;
+        mockDoc = {
+          issuer: serverUrl,
+          authorization_endpoint: `${serverUrl}/api/oauth/authorize`,
+          token_endpoint: `${serverUrl}/api/oauth/token`,
+          userinfo_endpoint: `${serverUrl}/userinfo`,
+          jwks_uri: `${serverUrl}/.well-known/jwks.json`,
+          response_types_supported: ['code'],
+          subject_types_supported: ['public'],
+          id_token_signing_alg_values_supported: ['RS256'],
+          scopes_supported: ['openid', 'profile', 'email', 'avatar'],
+          token_endpoint_auth_methods_supported: ['client_secret_post'],
+          claims_supported: ['sub', 'email'],
+          code_challenge_methods_supported: ['S256', 'plain'],
+          grant_types_supported: ['authorization_code'],
+        };
+        resolve();
+      });
     });
   });
 
-  after((_, done) => {
-    server.close(done);
+  after(async () => {
+    if (server) {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 
   it('should fetch and validate a valid discovery document', async () => {

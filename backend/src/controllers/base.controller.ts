@@ -75,7 +75,12 @@ export abstract class BaseController {
     const flow = (body.flow as AuthenticationFlow) ?? (query.flow as AuthenticationFlow) ?? 'default';
 
     const requestId =
-      flow === 'oauth' ? ((body.request_id as string) ?? (query.request_id as string)) : undefined;
+      flow === 'oauth'
+        ? ((body.request_id as string) ??
+          (body.requestId as string) ??
+          (query.request_id as string) ??
+          (query.requestId as string))
+        : undefined;
 
     return {
       flow,

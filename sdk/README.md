@@ -48,7 +48,7 @@ Integrate Pramaan OAuth 2.0 / OpenID Connect authentication into this Node.js/Ty
    - If (A) Session: install `express-session` & `@types/express-session`. Set `SESSION_SECRET` in `.env`.
    - If (B) JWT: install `cookie-parser`, `jsonwebtoken` (or `jose`) & `@types/jsonwebtoken`. Set `JWT_SECRET` in `.env`.
    - Add OAuth config to `.env`:
-     `PRAMAAN_ISSUER=https://pramaan.anujacharjee.com` (or `http://localhost:8080` if self-hosting)
+     `PRAMAAN_ISSUER=https://pramaan.anujacharjee.com` (or `http://localhost:5000` in local dev)
      `PRAMAAN_CLIENT_ID=<client-id>`
      `PRAMAAN_CLIENT_SECRET=<client-secret>`
      `PRAMAAN_REDIRECT_URI=http://localhost:3000/pramaan/callback`

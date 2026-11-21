@@ -9,61 +9,65 @@ describe('Token Module', () => {
   let tokenEndpoint: string;
   let lastRequestBody = '';
 
-  before((_, done) => {
-    server = http.createServer((req, res) => {
-      let body = '';
-      req.on('data', (chunk) => (body += chunk));
-      req.on('end', () => {
-        lastRequestBody = body;
-        if (req.url === '/token/success') {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(
-            JSON.stringify({
-              access_token: 'mock-access-token',
-              token_type: 'Bearer',
-              expires_in: 3600,
-              id_token: 'mock-id-token',
-              scope: 'openid profile email',
-            }),
-          );
-        } else if (req.url === '/token/envelope') {
-          // Test backward-compatible data envelope
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(
-            JSON.stringify({
-              success: true,
-              data: {
-                accessToken: 'envelope-access-token',
-                tokenType: 'Bearer',
-                expiresIn: 600,
-                idToken: 'envelope-id-token',
-              },
-            }),
-          );
-        } else if (req.url === '/token/invalid-grant') {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(
-            JSON.stringify({
-              error: 'invalid_grant',
-              error_description: 'The authorization code has expired or is invalid',
-            }),
-          );
-        } else {
-          res.writeHead(404);
-          res.end();
-        }
+  before(async () => {
+    await new Promise<void>((resolve) => {
+      server = http.createServer((req, res) => {
+        let body = '';
+        req.on('data', (chunk) => (body += chunk));
+        req.on('end', () => {
+          lastRequestBody = body;
+          if (req.url === '/token/success') {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(
+              JSON.stringify({
+                access_token: 'mock-access-token',
+                token_type: 'Bearer',
+                expires_in: 3600,
+                id_token: 'mock-id-token',
+                scope: 'openid profile email',
+              }),
+            );
+          } else if (req.url === '/token/envelope') {
+            // Test backward-compatible data envelope
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(
+              JSON.stringify({
+                success: true,
+                data: {
+                  accessToken: 'envelope-access-token',
+                  tokenType: 'Bearer',
+                  expiresIn: 600,
+                  idToken: 'envelope-id-token',
+                },
+              }),
+            );
+          } else if (req.url === '/token/invalid-grant') {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(
+              JSON.stringify({
+                error: 'invalid_grant',
+                error_description: 'The authorization code has expired or is invalid',
+              }),
+            );
+          } else {
+            res.writeHead(404);
+            res.end();
+          }
+        });
       });
-    });
 
-    server.listen(0, '127.0.0.1', () => {
-      const addr = server.address() as { port: number };
-      tokenEndpoint = `http://127.0.0.1:${addr.port}`;
-      done();
+      server.listen(0, '127.0.0.1', () => {
+        const addr = server.address() as { port: number };
+        tokenEndpoint = `http://127.0.0.1:${addr.port}`;
+        resolve();
+      });
     });
   });
 
-  after((_, done) => {
-    server.close(done);
+  after(async () => {
+    if (server) {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 
   it('should successfully exchange code for tokens', async () => {

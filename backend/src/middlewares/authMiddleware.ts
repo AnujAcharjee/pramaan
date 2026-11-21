@@ -71,6 +71,17 @@ export class Authentication {
         }
 
         // No valid session
+        const isApi =
+          req.originalUrl?.startsWith('/api') ||
+          req.baseUrl?.startsWith('/api') ||
+          req.path?.startsWith('/api') ||
+          req.xhr ||
+          req.headers.accept?.includes('application/json');
+
+        if (isApi) {
+          throw new AppError('Authentication required', 401, ErrorCode.UNAUTHORIZED);
+        }
+
         if (flow === 'oauth') {
           const requestId = Authentication.resolveOAuthRequestId(req);
 

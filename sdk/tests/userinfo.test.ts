@@ -9,50 +9,54 @@ describe('UserInfo Module', () => {
   let userinfoEndpoint: string;
   let lastAuthHeader = '';
 
-  before((_, done) => {
-    server = http.createServer((req, res) => {
-      lastAuthHeader = req.headers.authorization || '';
+  before(async () => {
+    await new Promise<void>((resolve) => {
+      server = http.createServer((req, res) => {
+        lastAuthHeader = req.headers.authorization || '';
 
-      if (req.url === '/userinfo') {
-        if (req.headers.authorization === 'Bearer valid-token-123') {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(
-            JSON.stringify({
-              sub: 'user-id-789',
-              email: 'jane@example.com',
-              email_verified: true,
-              name: 'Jane Doe',
-              picture: 'https://cdn.example.com/avatar.png',
-              avatar: 'https://cdn.example.com/avatar.png',
-            }),
-          );
+        if (req.url === '/userinfo') {
+          if (req.headers.authorization === 'Bearer valid-token-123') {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(
+              JSON.stringify({
+                sub: 'user-id-789',
+                email: 'jane@example.com',
+                email_verified: true,
+                name: 'Jane Doe',
+                picture: 'https://cdn.example.com/avatar.png',
+                avatar: 'https://cdn.example.com/avatar.png',
+              }),
+            );
+          } else {
+            res.writeHead(401, {
+              'Content-Type': 'application/json',
+              'WWW-Authenticate': 'Bearer error="invalid_token", error_description="Invalid or expired token"',
+            });
+            res.end(
+              JSON.stringify({
+                error: 'invalid_token',
+                error_description: 'The access token is invalid or expired',
+              }),
+            );
+          }
         } else {
-          res.writeHead(401, {
-            'Content-Type': 'application/json',
-            'WWW-Authenticate': 'Bearer error="invalid_token", error_description="Invalid or expired token"',
-          });
-          res.end(
-            JSON.stringify({
-              error: 'invalid_token',
-              error_description: 'The access token is invalid or expired',
-            }),
-          );
+          res.writeHead(404);
+          res.end();
         }
-      } else {
-        res.writeHead(404);
-        res.end();
-      }
-    });
+      });
 
-    server.listen(0, '127.0.0.1', () => {
-      const addr = server.address() as { port: number };
-      userinfoEndpoint = `http://127.0.0.1:${addr.port}/userinfo`;
-      done();
+      server.listen(0, '127.0.0.1', () => {
+        const addr = server.address() as { port: number };
+        userinfoEndpoint = `http://127.0.0.1:${addr.port}/userinfo`;
+        resolve();
+      });
     });
   });
 
-  after((_, done) => {
-    server.close(done);
+  after(async () => {
+    if (server) {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 
   it('should fetch UserInfo with Bearer access token', async () => {

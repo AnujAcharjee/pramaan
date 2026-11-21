@@ -51,6 +51,7 @@ const envSchema = z.object({
   APP_NAME: isDev ? z.string().optional().default('Pramaan') : z.string(),
   APP_DOMAIN: z.string({ error: 'APP_DOMAIN is required' }).min(1, 'APP_DOMAIN cannot be empty'),
   APP_DOC_URL: url('APP_DOC_URL'),
+  FRONTEND_URL: z.string().url().optional(),
 
   COOKIE_SECRET: z
     .string({ error: 'COOKIE_SECRET is required' })

@@ -6,6 +6,7 @@ import { ErrorCode } from '../utils/errorCodes.js';
 import type { AuthService } from '../services/auth.service.js';
 import type { OAuthService } from '../services/oauth.service.js';
 import { AuthZSchema } from '../validators/auth.validators.js';
+import { ENV } from '../config/env.js';
 
 /**
  * SIGN UP :
@@ -32,11 +33,16 @@ export class AuthController extends BaseController {
   private async handleOAuthFlow(res: Response, requestId: string, userId: string): Promise<void> {
     try {
       const redirectURL = await this.oauthService.authorize(requestId, userId);
-      return res.redirect(303, redirectURL);
+      const targetUrl =
+        redirectURL.startsWith('/') && ENV.FRONTEND_URL
+          ? `${ENV.FRONTEND_URL.replace(/\/+$/, '')}${redirectURL}`
+          : redirectURL;
+      return res.redirect(303, targetUrl);
     } catch {
+      const base = ENV.FRONTEND_URL ? ENV.FRONTEND_URL.replace(/\/+$/, '') : '';
       return res.redirect(
         303,
-        `/account?warning=${encodeURIComponent(
+        `${base}/account?warning=${encodeURIComponent(
           'OAuth authorization request expired. Your email is verified; please sign in from your application again.',
         )}`,
       );
@@ -139,7 +145,8 @@ export class AuthController extends BaseController {
         return this.handleOAuthFlow(res, requestId, data.userId);
       }
 
-      res.redirect(303, `/account`);
+      const base = ENV.FRONTEND_URL ? ENV.FRONTEND_URL.replace(/\/+$/, '') : '';
+      res.redirect(303, `${base}/account`);
     },
     'pages/auth/emailVerification',
     (req) => this.buildEmailVerificationViewData(req),

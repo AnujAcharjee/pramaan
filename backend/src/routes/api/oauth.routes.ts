@@ -12,18 +12,24 @@ import { oauthCors } from '../../middlewares/oauthCors.js';
 const router = Router();
 const oauthController = new OAuthController(oauthService, accountService, clientService);
 
-// Authorize endpoint
-router.get(
-  '/api/oauth/authorize',
+// Authorize endpoint (Standard /api/oauth/authorize plus root aliases to eliminate 404s)
+const authorizeStack = [
   validateRequest(OAuthZSchema.authorizeSchema),
   OAuthMiddleware.validateAndCacheReq,
   Authentication.ssr('oauth'),
   oauthController.authorize,
-);
+];
+
+router.get('/api/oauth/authorize', ...authorizeStack);
+router.get('/oauth/authorize', ...authorizeStack);
+router.get('/authorize', ...authorizeStack);
 
 // Token endpoint (with CORS for public SPA and mobile clients)
 router.use('/api/oauth/token', oauthCors);
 router.post('/api/oauth/token', validateRequest(OAuthZSchema.issueTokensSchema), oauthController.issueTokens);
+
+router.use('/oauth/token', oauthCors);
+router.post('/oauth/token', validateRequest(OAuthZSchema.issueTokensSchema), oauthController.issueTokens);
 
 // Standard OIDC UserInfo endpoints (GET and POST supported per OIDC Core 5.3.1 with CORS)
 router.use('/userinfo', oauthCors);

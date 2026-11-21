@@ -4,18 +4,15 @@
 # then pull image in EC2, then run
 # so we don't need git in EC2 and no docker build... reduces instance load
 
-name: Deploy App to EC2
+name: Deploy Backend to EC2
 
 on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'docs/**'
-      - 'sdk/**'
-      - '**.md'
-      - '.gitignore'
-      - '.dockerignore'
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy.yaml'
   workflow_dispatch:
 
 jobs:
@@ -31,13 +28,14 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      # Build Image + tag
-      - name: Build Docker Image
+      # Build Backend Image + tag (Context: backend/)
+      - name: Build Backend Docker Image
         run: |
           docker build \
-          -t ${{ secrets.DOCKER_USERNAME }}/pramaan:latest \
-          -t ${{ secrets.DOCKER_USERNAME }}/pramaan:${{ github.sha }} \
-          .
+            -f backend/Dockerfile \
+            -t ${{ secrets.DOCKER_USERNAME }}/pramaan:latest \
+            -t ${{ secrets.DOCKER_USERNAME }}/pramaan:${{ github.sha }} \
+            backend
 
       # Push Image
       - name: Push Image
@@ -55,6 +53,13 @@ jobs:
           script: |
             sudo mkdir -p /srv/pramaan
             sudo chown -R ubuntu:ubuntu /srv/pramaan
+
+      # Prepare EC2 files
+      - name: Prepare EC2 deployment files
+        run: |
+          cp backend/docker-compose.yml ./docker-compose.yml
+          cp backend/Caddyfile ./Caddyfile
+          cp backend/config.alloy ./config.alloy
 
       # Copy files to EC2
       - name: Copy files to EC2
@@ -88,6 +93,7 @@ jobs:
             APP_DOMAIN=pramaan.anujacharjee.com
             APP_DOC_URL=https://github.com/AnujAcharjee/pramaan/blob/main/readme.md
             AUTH_ISSUER=https://pramaan.anujacharjee.com
+            FRONTEND_URL=${{ secrets.FRONTEND_URL || 'https://pramaan.anujacharjee.com' }}
             EMAIL_FROM=no-reply@pramaan.anujacharjee.com
 
             # Session & Token Lifespans (seconds)

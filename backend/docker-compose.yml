@@ -27,7 +27,7 @@ services:
       - .env
     expose:
       - "8080"
-    command: ["node", "dist/index.js"]
+    command: ["bun", "dist/index.js"]
     networks:
       - pramaan-network
 
@@ -44,7 +44,7 @@ services:
     init: true
 
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:8080/health', r => { if(r.statusCode === 200) process.exit(0); else process.exit(1); }).on('error', () => process.exit(1));"]
+      test: ["CMD", "bun", "-e", "fetch('http://localhost:8080/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
