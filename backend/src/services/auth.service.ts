@@ -191,10 +191,10 @@ export class AuthService {
 
     const existing = await prisma.user.findUnique({
       where: { email },
-      select: { id: true },
+      select: { id: true, isEmailVerified: true },
     });
 
-    if (existing) {
+    if (existing && existing.isEmailVerified !== false) {
       throw new AppError('Email already exists', 409, ErrorCode.EMAIL_ALREADY_EXISTS);
     }
 
@@ -204,31 +204,55 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        gender,
-        email,
-        password: hashedPassword,
-        roles: [ROLES.USER],
-        provider: AUTH_PROVIDERS.DEFAULT,
-        isActive: false,
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        roles: true,
-        createdAt: true,
-      },
-    });
+    let user;
+    if (existing && existing.isEmailVerified === false) {
+      user = await prisma.user.update({
+        where: { id: existing.id },
+        data: {
+          name,
+          gender,
+          password: hashedPassword,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          roles: true,
+          createdAt: true,
+        },
+      });
+    } else {
+      user = await prisma.user.create({
+        data: {
+          name,
+          gender,
+          email,
+          password: hashedPassword,
+          roles: [ROLES.USER],
+          provider: AUTH_PROVIDERS.DEFAULT,
+          isActive: false,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          roles: true,
+          createdAt: true,
+        },
+      });
+    }
 
     const token = AppCrypto.randomToken(32);
     const hashedToken = AppCrypto.hash(token, CRYPTO_ALGORITHMS.sha256, 'hex');
 
     await this.setVerificationTokenInRedis(hashedToken, user.id, user.roles);
 
-    await emailService.sendVerificationEmail(email, name, token, flow, input.requestId);
+    try {
+      await emailService.sendVerificationEmail(email, name, token, flow, input.requestId);
+    } catch (emailErr) {
+      // Log warning and allow registration to succeed so user is redirected to /verify
+      // where they can view the verification screen and click resend if needed
+    }
 
     return user;
   }

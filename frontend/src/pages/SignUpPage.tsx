@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2, Check } from 'lucide-react';
 import { PramaanLogo } from '../components/PramaanLogo';
 import { ThemeToggle } from '../components/ThemeToggle';
 
@@ -20,10 +20,25 @@ export function SignUpPage() {
 
   const isOAuthFlow = flow === 'oauth' && Boolean(requestId);
 
+  const passwordRequirements = [
+    { label: 'At least 8 characters', met: password.length >= 8 },
+    { label: 'One uppercase letter (A-Z)', met: /[A-Z]/.test(password) },
+    { label: 'One lowercase letter (a-z)', met: /[a-z]/.test(password) },
+    { label: 'One number (0-9)', met: /\d/.test(password) },
+    { label: 'One special character (!@#$%*?&)', met: /[@$!%*?&#^~_.-]/.test(password) },
+  ];
+  const allRequirementsMet = passwordRequirements.every((r) => r.met);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMessage('');
+
+    if (!allRequirementsMet) {
+      setErrorMessage('Please ensure your password satisfies all requirements before proceeding.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const payload: Record<string, string> = {
@@ -46,33 +61,27 @@ export function SignUpPage() {
         body: JSON.stringify(payload),
       });
 
+      const data = await res.json().catch(() => ({}));
+
       if (res.ok) {
-        const verifyParams = new URLSearchParams({ email, success: 'Account created successfully 🎉' });
+        const verifyParams = new URLSearchParams({ email: email.trim(), success: 'Account created successfully 🎉' });
         if (isOAuthFlow && requestId) {
           verifyParams.set('flow', 'oauth');
           verifyParams.set('request_id', requestId);
         }
-        navigate(`/verify?${verifyParams.toString()}`);
+        const targetUrl = data.redirectUrl || `/verify?${verifyParams.toString()}`;
+        navigate(targetUrl);
+        // Fallback in case SPA route transition needs a direct push
+        setTimeout(() => {
+          if (!window.location.pathname.startsWith('/verify')) {
+            window.location.href = targetUrl;
+          }
+        }, 150);
       } else {
-        const err = await res.json().catch(() => ({}));
-        setErrorMessage(err.message || 'Unable to create account. Please check your details.');
+        setErrorMessage(data.message || 'Unable to create account. Please check your details.');
       }
     } catch {
-      // Fallback submission to backend SSR endpoint
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/signup';
-      const inputs = { name, email, gender, password, flow, request_id: requestId };
-      Object.entries(inputs).forEach(([k, v]) => {
-        if (v) {
-          const el = document.createElement('input');
-          el.name = k;
-          el.value = v;
-          form.appendChild(el);
-        }
-      });
-      document.body.appendChild(form);
-      form.submit();
+      setErrorMessage('Network error. Unable to reach authentication server. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -160,16 +169,46 @@ export function SignUpPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 8 characters"
+                  placeholder="Create a strong password"
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#FA812F] focus:ring-1 focus:ring-[#FA812F] transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200 cursor-pointer"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
+              </div>
+
+              {/* Password Requirements Checklist */}
+              <div className="mt-2.5 p-3 rounded-lg bg-slate-50 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-neutral-800 space-y-1.5 transition-all">
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-neutral-400 mb-1">
+                  Password requirements:
+                </p>
+                <div className="grid grid-cols-1 gap-1.5">
+                  {passwordRequirements.map((req, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex items-center gap-2 text-xs transition-colors duration-150 ${
+                        req.met
+                          ? 'text-emerald-600 dark:text-emerald-400 font-medium'
+                          : 'text-slate-400 dark:text-neutral-500'
+                      }`}
+                    >
+                      {req.met ? (
+                        <span className="w-4 h-4 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shrink-0">
+                          <Check className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400 stroke-[3]" />
+                        </span>
+                      ) : (
+                        <span className="w-4 h-4 rounded-full border border-slate-300 dark:border-neutral-700 flex items-center justify-center shrink-0">
+                          <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-neutral-700" />
+                        </span>
+                      )}
+                      <span>{req.label}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

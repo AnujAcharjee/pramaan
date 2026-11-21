@@ -31,18 +31,17 @@ export class AuthController extends BaseController {
 
   // Used when user not authenticated and tries OAuth
   private async handleOAuthFlow(res: Response, requestId: string, userId: string): Promise<void> {
+    const frontendBase =
+      ENV.FRONTEND_URL?.replace(/\/+$/, '') ||
+      (ENV.NODE_ENV === 'production' ? `https://${ENV.APP_DOMAIN}` : `http://${ENV.APP_DOMAIN}`);
     try {
       const redirectURL = await this.oauthService.authorize(requestId, userId);
-      const targetUrl =
-        redirectURL.startsWith('/') && ENV.FRONTEND_URL
-          ? `${ENV.FRONTEND_URL.replace(/\/+$/, '')}${redirectURL}`
-          : redirectURL;
+      const targetUrl = redirectURL.startsWith('/') ? `${frontendBase}${redirectURL}` : redirectURL;
       return res.redirect(303, targetUrl);
     } catch {
-      const base = ENV.FRONTEND_URL ? ENV.FRONTEND_URL.replace(/\/+$/, '') : '';
       return res.redirect(
         303,
-        `${base}/account?warning=${encodeURIComponent(
+        `${frontendBase}/account?warning=${encodeURIComponent(
           'OAuth authorization request expired. Your email is verified; please sign in from your application again.',
         )}`,
       );
@@ -144,8 +143,10 @@ export class AuthController extends BaseController {
         return this.handleOAuthFlow(res, requestId, data.userId);
       }
 
-      const base = ENV.FRONTEND_URL ? ENV.FRONTEND_URL.replace(/\/+$/, '') : '';
-      res.redirect(303, `${base}/account`);
+      const frontendBase =
+        ENV.FRONTEND_URL?.replace(/\/+$/, '') ||
+        (ENV.NODE_ENV === 'production' ? `https://${ENV.APP_DOMAIN}` : `http://${ENV.APP_DOMAIN}`);
+      res.redirect(303, `${frontendBase}/account`);
     },
     'pages/auth/emailVerification',
     (req) => this.buildEmailVerificationViewData(req),

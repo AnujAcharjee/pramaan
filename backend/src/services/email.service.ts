@@ -75,7 +75,7 @@ class EmailService {
   // -----------------------
   // REDIS RATE LIMIT
   // -----------------------
-  private async checkRateLimit(key: string, limitSeconds = 3600) {
+  private async checkRateLimit(key: string, limitSeconds = 60) {
     const redisKey = `email:rate:${key}`;
 
     const exists = await redis.get(redisKey);
@@ -306,7 +306,7 @@ class EmailService {
   ) {
     await this.init();
 
-    await this.checkRateLimit(`verify:${to}`);
+    await this.checkRateLimit(`verify:${to}`, 60);
 
     const url = this.buildUrl('/email/verify', token, flow, requestId, to);
 
@@ -329,7 +329,7 @@ class EmailService {
   ) {
     await this.init();
 
-    await this.checkRateLimit(`signin:${to}`);
+    await this.checkRateLimit(`signin:${to}`, 60);
 
     const url = this.buildUrl('/signin/verify', token, flow, requestId, to);
 
@@ -352,7 +352,7 @@ class EmailService {
   ) {
     await this.init();
 
-    await this.checkRateLimit(`reset:${to}`);
+    await this.checkRateLimit(`reset:${to}`, 60);
 
     const url = this.buildUrl('/reset-password', token, flow, requestId, to);
 
