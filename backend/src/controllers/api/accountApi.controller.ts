@@ -67,7 +67,7 @@ export class AccountApiController {
   revokeConsent = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const userId = req.user.id;
-      const { client_id } = req.body;
+      const client_id = req.body.client_id || req.body.clientId;
 
       if (!client_id) {
         throw new AppError('client_id is required', 400, ErrorCode.INVALID_REQUEST);

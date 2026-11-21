@@ -87,12 +87,16 @@ export function AccountPage() {
         if (data.consents && Array.isArray(data.consents)) {
           setConsents(
             data.consents.map((c: any) => ({
-              id: c.id,
-              clientId: c.clientId,
+              id: c.id || c.client?.id || String(Math.random()),
+              clientId: c.clientId || c.client?.id || '',
               clientName: c.client?.name || c.clientName || 'OAuth Client',
               domain: c.client?.domain || c.domain || 'localhost',
               scopes: c.scopes || ['openid', 'profile', 'email'],
-              createdAt: c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'Recent',
+              createdAt: c.createdAt
+                ? new Date(c.createdAt).toLocaleDateString()
+                : c.date
+                ? new Date(c.date).toLocaleDateString()
+                : 'Recent',
             }))
           );
         }
@@ -236,12 +240,16 @@ export function AccountPage() {
   };
 
   const handleRevokeConsent = async (clientId: string) => {
+    if (!clientId) {
+      showToast('error', 'Cannot revoke consent: client ID is missing.');
+      return;
+    }
     try {
       const res = await fetch('/api/v1/account/consent/revoke', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ client_id: clientId }),
+        body: JSON.stringify({ client_id: clientId, clientId }),
       });
 
       if (res.ok) {

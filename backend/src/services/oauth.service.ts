@@ -30,6 +30,8 @@ export interface AuthCodeReqCacheType extends AuthorizationCacheType {
 }
 
 export type OAuthConsentView = {
+  id?: string;
+  clientId?: string;
   client: {
     id: string;
     name: string;
@@ -368,6 +370,8 @@ export class OAuthService {
         userId,
       },
       select: {
+        id: true,
+        clientId: true,
         scopes: true,
         createdAt: true,
         updatedAt: true,
@@ -385,6 +389,8 @@ export class OAuthService {
     });
 
     return consents.map((consent) => ({
+      id: consent.id,
+      clientId: consent.clientId || consent.client.id,
       client: {
         id: consent.client.id,
         name: consent.client.name,
