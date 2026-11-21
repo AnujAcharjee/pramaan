@@ -4,11 +4,8 @@ import { Sun, Moon } from 'lucide-react';
 export function ThemeToggle() {
   const [isDark, setIsDark] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
-      return (
-        localStorage.getItem('pramaan_theme') === 'dark' ||
-        (!localStorage.getItem('pramaan_theme') &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches)
-      );
+      // Default to light screen; only use dark if user explicitly chose it
+      return localStorage.getItem('pramaan_theme') === 'dark';
     }
     return false;
   });
