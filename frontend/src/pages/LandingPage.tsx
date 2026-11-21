@@ -16,8 +16,10 @@ import {
   User,
 } from 'lucide-react';
 import { PramaanLogo } from '../components/PramaanLogo';
+import { useAuth } from '../context/AuthContext';
 
 export function LandingPage() {
+  const { isAuthenticated } = useAuth();
   const [copied, setCopied] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
 
@@ -104,10 +106,10 @@ app.get('/api/auth/callback', async (req, res) => {
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto mb-8">
                 <Link
-                  to="/signup"
+                  to={isAuthenticated ? "/developer" : "/signup"}
                   className="btn-orange w-full sm:w-auto px-8 py-3.5 text-base font-semibold group cursor-pointer"
                 >
-                  <span>Get Started</span>
+                  <span>{isAuthenticated ? "Go to Developer Hub" : "Get Started"}</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
 
@@ -638,17 +640,17 @@ app.get('/api/auth/callback', async (req, res) => {
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
-                  to="/signup"
+                  to={isAuthenticated ? "/developer" : "/signup"}
                   className="btn-orange w-full sm:w-auto px-8 py-3.5 text-base font-semibold"
                 >
-                  <span>Create Free Account</span>
+                  <span>{isAuthenticated ? "Go to Developer Hub" : "Create Free Account"}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  to="/developer"
+                  to={isAuthenticated ? "/account" : "/developer"}
                   className="w-full sm:w-auto px-6 py-3.5 rounded-lg border border-slate-300 dark:border-neutral-800 text-sm font-semibold text-slate-700 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-900 transition-colors"
                 >
-                  Go to Developer Hub
+                  {isAuthenticated ? "User Account Portal" : "Go to Developer Hub"}
                 </Link>
               </div>
             </div>

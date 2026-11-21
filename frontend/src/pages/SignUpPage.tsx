@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2, Check } from 'lucide-react';
 import { PramaanLogo } from '../components/PramaanLogo';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { useAuth } from '../context/AuthContext';
 
 export function SignUpPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { isAuthenticated, user, loading: authLoading } = useAuth();
   const flow = searchParams.get('flow');
   const requestId = searchParams.get('request_id');
 
@@ -19,6 +21,17 @@ export function SignUpPage() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const isOAuthFlow = flow === 'oauth' && Boolean(requestId);
+
+  // If user is already authenticated, redirect away from signup
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && user) {
+      if (isOAuthFlow && requestId) {
+        window.location.replace(`/oauth/consent?request_id=${encodeURIComponent(requestId)}`);
+      } else {
+        window.location.replace('/developer');
+      }
+    }
+  }, [authLoading, isAuthenticated, user, isOAuthFlow, requestId]);
 
   const passwordRequirements = [
     { label: 'At least 8 characters', met: password.length >= 8 },
