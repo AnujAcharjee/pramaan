@@ -1,105 +1,224 @@
 ---
 name: frontend
 description: >-
-  Architectural Stationery & Draftsman Aesthetic design system and UI implementation guide for Pramaan IdP.
-  Use when styling, polishing, or refining UI components, views, buttons, forms, badges, and layout elements.
+  Frontend architecture, UI component styling, and React 19 + Tailwind CSS v4 + Bun implementation guide for Pramaan IdP.
+  Use when creating or updating React pages, components, modals, navigation, forms, badges, and styles.
 ---
 
-# Pramaan IdP Frontend Design System: Architectural Stationery & Draftsman Aesthetic
+# Pramaan IdP Frontend Design System & React Architecture
 
-This design system defines the aesthetic standards, component styling, and implementation guidelines for **Pramaan Identity Provider (IdP)**. It translates the tactile atmosphere of architectural sketchbooks, fine stationery (reminiscent of Midori, Leuchtturm, and Smythson notebooks), and colored-pencil drafting into a modern, high-performance identity console.
-
----
-
-## 1. Core Atmosphere & Principles
-
-- **The Concept:** "A high-precision developer & identity workspace drafted with fine ink, crisp colored-pencil strokes, and delicate contour lines on tactile paper."
-- **Visual Tone:** Mature, editorial, artisanal, distraction-free, and exceptionally legible.
-- **Negative Constraints (What It Is NOT):**
-  - NO generic SaaS cards with heavy, muddy floating drop shadows.
-  - NO heavy glassy/frosted blur overlays (`backdrop-blur-2xl` / glassmorphism) that degrade contrast.
-  - NO purple/pink futuristic AI gradients.
-  - NO pixel art, faux-leather textures, or comic halftones.
-  - NO changing of existing page layouts, grid structures, or routing.
-  - NO modifying or rewriting existing application text, descriptions, error messages, or copy.
+This guide defines the aesthetic standards, component architecture, and implementation guidelines for the **Pramaan Identity Provider (IdP)** frontend. Pramaan uses a modern, decoupled single-page application (SPA) built with **React 19, TypeScript, Tailwind CSS v4, Vite, and Bun**, deployed seamlessly to **Vercel** and integrated with the headless Pramaan backend REST API.
 
 ---
 
-## 2. Preserved Color Hierarchy (Pramaan Native Palette)
+## 1. Core Principles & Negative Constraints
 
-Maintain a 60-30-10 distribution utilizing Pramaan's established brand tokens:
-
-### ~60% Canvas & Paper Surfaces
-- **Light Mode Paper Base:** Soft warm paper base (`#F8FAFC` blending into warm ivory `#FEF9E1`/30 and sand `#E9DAC1`/20).
-- **Workspace Desk Cards:** Clean, warm natural parchment surfaces (`#FFFFFF` to `#FCFAF8`) with delicate contour lines.
-- **Dark Mode ("Draftsman Blackbook"):** Rich ink black and deep graphite slate (`#000000`, surface `#0A0A0A`, sub-cards `#121212`, borders `#262626`).
-
-### ~30% Secondary Surfaces, Dividers & Contours
-- **Delicate Pencil Contours:** Ultra-crisp 1px to 1.5px subtle border lines (`border-slate-200/90` in light mode, `border-neutral-800` in dark mode).
-- **Stationery Accent Lines:** Subtle contouring with Pramaan Sand (`#E9DAC1`/60) and slate dividers instead of heavy drop shadows.
-
-### ~10% Colored-Pencil Interactive Accents
-- **Primary Drafting Pencil (Brand Orange):** Pramaan Brand Orange (`#FF9644` / `#FA812F`) for active primary states, key buttons, and focus indicators.
-- **Presence & Verified Badges (Pencil Mint/Sage):** `#D4E2D4` and Emerald tones for verified domains, active sessions, and security checks.
-- **Pending & Attention States (Pencil Apricot/Amber):** `#FFD4B2` and `#FAEFD4` for pending verification and warning indicators.
-- **Destructive & Revocation Alerts (Pencil Rose/Peach):** `#FFCACC`, `#F39F9F`, and Rose tones for deactivation, secret rotation, and session termination.
-
-### Ink & Typography Contrast
-- **Primary Ink:** Deep walnut-charcoal `#0F172A` (light) / Crisp ivory `#F8FAFC` (dark).
-- **Muted Graphite:** Technical metadata & labels in `#475569` (light) / `#94A3B8` (dark).
-- **Technical Monospace:** Draftsman font `JetBrains Mono` for tokens, client IDs, secrets, and hashes.
-- **Editorial Headings:** `Instrument Serif` for brand titles and section hero headers.
+- **The Concept:** A high-precision, distraction-free developer identity workspace featuring crisp typography, razor-sharp 1px borders, and vivid signature orange accents.
+- **Strict Color Scheme (No Shades/Tints):**
+  - **Light Mode Background:** Pure White (`#FFFFFF`, `bg-white`). Strictly **NO** off-white, yellowed parchment, warm ivory (`#FEF9E1`), or sand (`#E9DAC1`).
+  - **Dark Mode Background:** Pure Black (`#000000`, `dark:bg-black`). Cards and elevated sheets use pure black or deep slate (`dark:bg-neutral-950`) bounded by crisp borders (`dark:border-neutral-800`).
+  - **Primary Brand Accent:** Pramaan Orange (`#FF9644` to `#FA812F`, `--brand-orange`, `--brand-orange-dark`).
+  - **Code Blocks:** High-contrast neutral containers — light gray in light mode (`bg-slate-100 border-slate-300`) and dark gray in dark mode (`dark:bg-neutral-900 dark:border-neutral-800`) with colorful syntax highlighting.
+- **Negative Constraints:**
+  - **NO** heavy muddy box shadows (`shadow-2xl`).
+  - **NO** glassy backdrop overlays (`backdrop-blur-2xl`) that destroy contrast.
+  - **NO** generic AI purple/cyan gradients.
+  - **NO** EJS / SSR rendering in the frontend workspace (all views are decoupled React components).
 
 ---
 
-## 3. Organic Geometry & Tactile Craftsmanship
+## 2. Color Palette & Typography Tokens
 
-Replace rigid machine-stamped corners and heavy blur overlays with smooth, subtle craftsman contours:
+### Canvas & Surfaces
 
-- **Small Controls / Action Buttons:**
-  `border-radius: 10px 8px 11px 9px;`
-- **Stationery Cards & Dashboard Panels:**
-  `border-radius: 18px 15px 19px 16px;`
-- **Form Inputs & Data Fields:**
-  `border-radius: 10px 9px 11px 8px;`
-- **Sub-cards & Nested Containers:**
-  `border-radius: 14px 12px 15px 13px;`
-- **Modal Containers & Dialogs:**
-  `border-radius: 24px 21px 25px 22px;`
-- **Pencil Outlines:**
-  Prioritize fine 1px / 1.5px solid pencil contours (`border border-slate-200/90 dark:border-neutral-800/90`) over floating box shadows.
+| Surface                  | Light Mode             | Dark Mode               | Tailwind Classes                                                            |
+| :----------------------- | :--------------------- | :---------------------- | :-------------------------------------------------------------------------- |
+| **Page Canvas**          | `#FFFFFF` (Pure White) | `#000000` (Pure Black)  | `bg-white dark:bg-black`                                                    |
+| **Card / Modal Surface** | `#FFFFFF`              | `#000000` / `#0A0A0A`   | `bg-white dark:bg-black dark:border-neutral-800`                            |
+| **Secondary Surface**    | `#F8FAFC` (Slate-50)   | `#111111` (Neutral-900) | `bg-slate-50 dark:bg-neutral-900`                                           |
+| **Code Block Container** | `#F1F5F9` (Slate-100)  | `#171717` (Neutral-900) | `bg-slate-100 border-slate-300 dark:bg-neutral-900 dark:border-neutral-800` |
+| **Pencil Contours**      | `1px solid #E2E8F0`    | `1px solid #262626`     | `border border-slate-200 dark:border-neutral-800`                           |
 
----
+### Brand Accents & Interactive States
 
-## 4. Component-Level Polish & Smoothing Rules
+- **Primary Orange Gradient:** `bg-linear-to-r from-[#FF9644] to-[#FA812F]` (active buttons, hero badges, highlights).
+- **Focus Rings:** `focus:ring-2 focus:ring-[#FF9644]/30 focus:border-[#FF9644]`.
+- **Status Badges:**
+  - _Active / Verified:_ Emerald wash (`bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800`).
+  - _Pending / In Verification:_ Amber wash (`bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800`).
+  - _Revoked / Destructive:_ Rose wash (`bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800`).
+  - _Development / Sandbox:_ Sky wash (`bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800`).
 
-1. **Dashboard Sections & Console Cards (`.dashboard-section`, `.glass-card`):**
-   - Eliminate heavy frosted blur (`backdrop-blur-2xl`).
-   - Use clean paper surfaces (`bg-white dark:bg-[#0A0A0A]`) with 1px tactile contour borders (`border border-slate-200 dark:border-neutral-800`).
-   - Add a subtle tactile lift on hover (`hover:-translate-y-0.5 hover:border-brand-orange/40 transition-all duration-200`).
+### Typography & Fonts
 
-2. **Buttons (`.btn-orange`, outline variants):**
-   - Render primary buttons as solid colored-pencil blocks (`bg-linear-to-r from-brand-orange to-brand-orangeDark text-white`) with organic radii (`10px 8px 11px 9px`) and a tactile press feel (`active:scale-[0.98]`).
-   - Outline buttons feature crisp 1.5px draftsman pencil borders with smooth, low-opacity wash hovers.
-
-3. **Form Fields & Inputs (`.input-field`):**
-   - Render input fields with a fine stationery notebook feel: crisp 1px borders, smooth background transition (`focus:bg-white dark:focus:bg-[#151515]`), and an architectural drafting focus ring (`focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange`).
-
-4. **Status Badges & Chips:**
-   - Style badges as hand-pressed notebook stamps (subtle tinted wash backgrounds, fine pencil borders, and high-contrast ink typography).
-   - *Verified*: Soft mint/emerald wash with forest pencil text.
-   - *Pending*: Soft apricot wash with deep amber pencil text.
-   - *Confidential/Public*: Slate drafting wash with crisp dark ink.
-
-5. **Console Header & Navigation Bar:**
-   - Streamline into an architectural ruler bar: 1px bottom border, warm subtle wash, and crisp icon buttons with organic curvature.
-
-6. **Code Blocks & Secrets Ledger:**
-   - Format client IDs, secrets, and DNS TXT records with notebook ledger styling: monospace typography (`JetBrains Mono`), 1px bordered recessed paper blocks, and custom colored-pencil scrollbars (`.scrollbar-thin` with brand-orange thumb).
+- **Primary Sans:** System sans stack (`-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`).
+- **Brand Title / Hero:** High-contrast tracking font (`font-bold text-slate-900 dark:text-white`).
+- **Technical Monospace:** Monospace font (`font-mono` / `JetBrains Mono`) for client IDs, client secrets, hashes, DNS TXT records, and code blocks.
 
 ---
 
-## 5. Build & Execution Rules
+## 3. Brand Assets & The Pramaan "P" Logo
 
-- **Mandatory CSS Recompilation:** Run `npm run css:build` whenever `input.css`, Tailwind configuration, or EJS markup classes are updated.
-- **Code Integrity:** Run `npm run lint` before committing to ensure formatting and lint standards are upheld.
+Always use the official `<PramaanLogo />` component (`frontend/src/components/PramaanLogo.tsx`) across all user-facing headers, auth pages, loaders, and footers:
+
+```tsx
+import { PramaanLogo } from '../components/PramaanLogo';
+
+// Variants:
+<PramaanLogo size="sm" />  // 24x24 px (table rows, compact headers)
+<PramaanLogo size="md" />  // 36x36 px (main navbar)
+<PramaanLogo size="lg" />  // 48x48 px (auth card headers)
+<PramaanLogo size="xl" />  // 64x64 px (handshake loader, landing hero)
+```
+
+- **Static Asset Path:** `/android-chrome-192x192.png` located in `frontend/public/`.
+- **Fallback:** Automatic stylized orange gradient box with bold letter "P".
+
+---
+
+## 4. Component Design Patterns
+
+### 1. Primary Buttons (`.btn-orange`)
+
+Use the `.btn-orange` class or Tailwind utility combination:
+
+```tsx
+<button className="btn-orange px-4 py-2.5 text-sm font-semibold rounded-lg">Get Started</button>
+```
+
+_Properties:_
+
+- Linear gradient from `#FF9644` to `#FA812F`.
+- Subtle brand shadow `box-shadow: 0 4px 14px rgba(250, 129, 47, 0.22)`.
+- Smooth hover elevation: `hover:-translate-y-0.5 hover:shadow-orange-500/30`.
+- Tactile click feedback: `active:translate-y-0 active:scale-[0.99]`.
+
+### 2. Outline & Secondary Buttons
+
+```tsx
+<button className="px-4 py-2.5 text-sm font-semibold rounded-lg border border-slate-300 dark:border-neutral-700 bg-white dark:bg-black text-slate-800 dark:text-neutral-200 hover:border-[#FF9644] dark:hover:border-[#FF9644] hover:text-[#FA812F] transition-all">
+  Documentation
+</button>
+```
+
+### 3. Form Inputs & Selects
+
+Inputs must feature crisp 1px borders, pure white/black background, and brand orange focus rings:
+
+```tsx
+<input
+  type="text"
+  className="w-full px-3.5 py-2.5 text-sm rounded-lg bg-white dark:bg-black border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-neutral-600 focus:outline-none focus:ring-2 focus:ring-[#FF9644]/30 focus:border-[#FF9644] transition-all"
+/>
+```
+
+### 4. Interactive Modals & Dialogs
+
+- Backdrop: Subtle dark scrim (`bg-black/60 dark:bg-black/80`).
+- Container: Pure white (`bg-white`) in light mode, pure black (`dark:bg-black`) in dark mode with a 1px border (`border border-slate-200 dark:border-neutral-800 shadow-xl rounded-xl`).
+- Listen for `Escape` key and clicks on backdrop to close.
+
+### 5. Code Blocks with Colorful Syntax Highlighting
+
+On the landing page and developer docs, code blocks are housed in high-contrast neutral containers:
+
+- **Light mode:** `bg-slate-100 border border-slate-300`
+- **Dark mode:** `dark:bg-neutral-900 dark:border dark:border-neutral-800`
+- **Header:** Window controls (traffic light red/yellow/green dots) + framework selector tabs (Express, Next.js, Fastify).
+- **Syntax Tokens:**
+  - Keywords (`import`, `export`, `const`): `#F43F5E` (rose)
+  - Modules & strings: `#10B981` (emerald)
+  - Identifiers & parameters: `#38BDF8` (sky) / `#A855F7` (purple)
+  - Brand token constants: `#FA812F` (brand orange)
+
+### 6. OAuth Handshake Loader (`<OAuthHandshakeLoader />`)
+
+When third-party applications initiate an OAuth handshake (e.g. OpenSpace `https://api.openspace.anujacharjee.com/api/v1/auth/pramaan?mode=signin`), display `<OAuthHandshakeLoader />`:
+
+- Animated pulsing `<PramaanLogo size="xl" />`.
+- Contextual loading step indicator (Validating Client ID, Checking Scope, Verifying PKCE challenge).
+- Automatic smooth redirection without 404 flashes.
+
+---
+
+## 5. Directory & File Structure
+
+```
+frontend/
+├── public/                 # Static assets (favicons, manifests, images)
+│   ├── favicon_io/
+│   ├── android-chrome-192x192.png
+│   └── favicon.ico
+├── src/
+│   ├── components/         # Reusable UI components & modals
+│   │   ├── PramaanLogo.tsx
+│   │   ├── Navbar.tsx
+│   │   ├── Footer.tsx
+│   │   ├── OAuthHandshakeLoader.tsx
+│   │   ├── ClientModal.tsx
+│   │   ├── DomainVerificationModal.tsx
+│   │   ├── RotateSecretModal.tsx
+│   │   ├── RevokeConsentModal.tsx
+│   │   └── Toast.tsx
+│   ├── context/            # React context providers
+│   │   ├── AuthContext.tsx
+│   │   └── ThemeContext.tsx
+│   ├── pages/              # Route views
+│   │   ├── LandingPage.tsx
+│   │   ├── SignInPage.tsx
+│   │   ├── SignUpPage.tsx
+│   │   ├── VerifyEmailPage.tsx
+│   │   ├── ForgotPasswordPage.tsx
+│   │   ├── ResetPasswordPage.tsx
+│   │   ├── ConsentPage.tsx
+│   │   ├── OAuthAuthorizePage.tsx
+│   │   ├── AccountPage.tsx
+│   │   ├── DeveloperPage.tsx
+│   │   ├── ClientPage.tsx
+│   │   └── NotFoundPage.tsx
+│   ├── services/           # Headless API client
+│   │   └── api.ts
+│   ├── App.tsx             # Route definitions & router shell
+│   ├── main.tsx            # Application entrypoint
+│   └── index.css           # Tailwind CSS v4 & theme variables
+├── package.json            # React 19, Vite, Tailwind v4, Bun scripts
+├── tsconfig.json           # TypeScript configuration
+├── vercel.json             # SPA routing rewrite for Vercel
+└── vite.config.ts          # Vite configuration
+```
+
+---
+
+## 6. Backend API Integration Rules
+
+- All API communications must route through `frontend/src/services/api.ts` or standard fetch with `{ credentials: 'include' }` to ensure secure HTTP-only session cookies are transmitted.
+- **REST Endpoints:**
+  - `POST /api/v1/auth/signin`
+  - `POST /api/v1/auth/signup`
+  - `POST /api/v1/auth/signout`
+  - `GET /api/v1/auth/me`
+  - `GET /api/v1/developer/clients`
+  - `POST /api/v1/developer/clients`
+  - `GET /api/v1/developer/clients/:client_id`
+  - `PATCH /api/v1/developer/clients/:client_id`
+  - `POST /api/v1/developer/clients/:client_id/rotate-secret`
+  - `POST /api/v1/developer/clients/:client_id/verify-domain`
+  - `GET /api/v1/account/profile`
+  - `GET /api/v1/account/sessions`
+  - `GET /api/v1/account/consents`
+- All JSON errors return `{ success: false, error: { message, code } }`. Always handle graceful error toasts.
+
+---
+
+## 7. Developer & Bun Workflow Commands
+
+Execute commands inside `frontend/` or via monorepo scripts from the project root:
+
+| Command           | Action           | Description                                            |
+| :---------------- | :--------------- | :----------------------------------------------------- |
+| `bun run dev`     | Local Dev Server | Starts Vite dev server at `http://localhost:3000`      |
+| `bun run build`   | Production Build | Runs `tsc -b` and bundles with `vite build` to `dist/` |
+| `bun run lint`    | Linter           | Runs `oxlint` for high-speed code inspection           |
+| `bun run preview` | Local Preview    | Serves production build preview                        |
+
+> **Monorepo Notice:** Never run `git commit` automatically; only commit when the user explicitly requests a commit.
