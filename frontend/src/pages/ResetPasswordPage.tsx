@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, CheckCircle, Loader2 } from 'lucide-react';
 import { PramaanLogo } from '../components/PramaanLogo';
 
 export function ResetPasswordPage() {
@@ -134,10 +134,19 @@ export function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-orange w-full py-3 text-sm font-semibold mt-2"
+              className="btn-orange w-full py-3 text-sm font-semibold mt-2 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
             >
-              <span>{loading ? 'Updating…' : 'Reset password'}</span>
-              <ArrowRight className="w-4 h-4" />
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0 text-white" />
+                  <span>Updating…</span>
+                </>
+              ) : (
+                <>
+                  <span>Reset password</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </>
+              )}
             </button>
           </form>
         )}

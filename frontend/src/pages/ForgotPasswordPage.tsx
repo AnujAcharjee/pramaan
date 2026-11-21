@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 import { PramaanLogo } from '../components/PramaanLogo';
 import { useAuth } from '../context/AuthContext';
 
@@ -96,10 +96,19 @@ export function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-orange w-full py-3 text-sm font-semibold mt-2"
+              className="btn-orange w-full py-3 text-sm font-semibold mt-2 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
             >
-              <span>{loading ? 'Sending link…' : 'Send reset link'}</span>
-              <ArrowRight className="w-4 h-4" />
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0 text-white" />
+                  <span>Sending link…</span>
+                </>
+              ) : (
+                <>
+                  <span>Send reset link</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </>
+              )}
             </button>
 
             <div className="text-center pt-4">

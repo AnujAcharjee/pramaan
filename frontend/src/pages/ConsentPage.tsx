@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { ShieldCheck, Check, X, Globe, UserCheck, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, Check, X, Globe, UserCheck, AlertTriangle, Loader2 } from 'lucide-react';
 import { PramaanLogo } from '../components/PramaanLogo';
 import { ThemeToggle } from '../components/ThemeToggle';
 
@@ -225,10 +225,19 @@ export function ConsentPage() {
           <button
             onClick={() => handleDecision('approve')}
             disabled={loading}
-            className="btn-orange w-1/2 py-2.5 text-xs sm:text-sm font-semibold cursor-pointer"
+            className="btn-orange w-1/2 py-2.5 text-xs sm:text-sm font-semibold cursor-pointer flex items-center justify-center gap-1.5 disabled:opacity-75 disabled:cursor-not-allowed"
           >
-            <Check className="w-4 h-4" />
-            <span>{loading ? 'Authorizing…' : 'Authorize'}</span>
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin shrink-0 text-white" />
+                <span>Authorizing…</span>
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4 shrink-0" />
+                <span>Authorize</span>
+              </>
+            )}
           </button>
         </div>
 

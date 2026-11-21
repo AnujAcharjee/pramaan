@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { OAuthHandshakeLoader } from '../components/OAuthHandshakeLoader';
 import { PramaanLogo } from '../components/PramaanLogo';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -210,10 +210,19 @@ export function SignInPage() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-orange w-full py-3 text-sm font-semibold mt-2"
+              className="btn-orange w-full py-3 text-sm font-semibold mt-2 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
             >
-              <span>{loading ? 'Signing in…' : 'Sign in'}</span>
-              <ArrowRight className="w-4 h-4" />
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin shrink-0 text-white" />
+                  <span>Signing in…</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign in</span>
+                  <ArrowRight className="w-4 h-4 shrink-0" />
+                </>
+              )}
             </button>
           </form>
 
