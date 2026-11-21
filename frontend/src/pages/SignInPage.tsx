@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { OAuthHandshakeLoader } from '../components/OAuthHandshakeLoader';
@@ -6,7 +6,7 @@ import { PramaanLogo } from '../components/PramaanLogo';
 import { useAuth } from '../context/AuthContext';
 
 export function SignInPage() {
-  const { checkAuth, setUser } = useAuth();
+  const { user, isAuthenticated, loading: authLoading, checkAuth, setUser } = useAuth();
   const [searchParams] = useSearchParams();
   const flow = searchParams.get('flow');
   const requestId = searchParams.get('request_id');
@@ -22,6 +22,17 @@ export function SignInPage() {
   );
 
   const isOAuthFlow = flow === 'oauth' && Boolean(requestId);
+
+  // If user is already authenticated, skip sign-in form
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && user) {
+      if (isOAuthFlow && requestId) {
+        window.location.replace(`/oauth/consent?request_id=${encodeURIComponent(requestId)}`);
+      } else {
+        window.location.replace(redirectParam || '/account');
+      }
+    }
+  }, [authLoading, isAuthenticated, user, isOAuthFlow, requestId, redirectParam]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,8 +112,17 @@ export function SignInPage() {
     }
   };
 
-  if (loading && isOAuthFlow) {
-    return <OAuthHandshakeLoader stepMessage="Authenticating credentials & preparing authorization..." />;
+  if (isOAuthFlow && (loading || authLoading || (isAuthenticated && user))) {
+    return (
+      <OAuthHandshakeLoader
+        clientName="Pramaan"
+        stepMessage={
+          isAuthenticated && user
+            ? 'Active session verified. Connecting to authorization consent...'
+            : 'Authenticating credentials & preparing authorization...'
+        }
+      />
+    );
   }
 
   return (

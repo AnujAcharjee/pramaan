@@ -1,5 +1,5 @@
 import { BaseController } from './base.controller.js';
-import { COOKIE_NAMES } from '../utils/cookies.js';
+import { COOKIE_NAMES, clearSessionCookies } from '../utils/cookies.js';
 import { SERVER_URL } from '../utils/constant.js';
 import type { Request } from 'express';
 import type { AuthService } from '../services/auth.service.js';
@@ -120,8 +120,7 @@ export class AccountController extends BaseController {
       await this.sessionService.revokeActiveSession(asid);
     }
 
-    res.clearCookie(COOKIE_NAMES.IDENTITY_SESSION, { signed: true });
-    res.clearCookie(COOKIE_NAMES.ACTIVE_SESSION, { signed: true });
+    clearSessionCookies(res);
 
     return res.redirect(
       303,
@@ -148,8 +147,7 @@ export class AccountController extends BaseController {
       await this.sessionService.revokeActiveSession(asid);
     }
 
-    res.clearCookie(COOKIE_NAMES.IDENTITY_SESSION, { signed: true });
-    res.clearCookie(COOKIE_NAMES.ACTIVE_SESSION, { signed: true });
+    clearSessionCookies(res);
 
     return res.redirect(303, `/signin?success=${encodeURIComponent('User account deleted permanently')}`);
   });

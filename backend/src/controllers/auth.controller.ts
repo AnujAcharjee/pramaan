@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { COOKIE_NAMES, setSessionCookies } from '../utils/cookies.js';
+import { COOKIE_NAMES, setSessionCookies, clearSessionCookies } from '../utils/cookies.js';
 import { BaseController } from './base.controller.js';
 import { AppError } from '../utils/appError.js';
 import { ErrorCode } from '../utils/errorCodes.js';
@@ -86,8 +86,7 @@ export class AuthController extends BaseController {
 
       await this.authService.signup({ email, name, gender, password, flow, requestId });
 
-      res.clearCookie(COOKIE_NAMES.IDENTITY_SESSION, { signed: true });
-      res.clearCookie(COOKIE_NAMES.ACTIVE_SESSION, { signed: true });
+      clearSessionCookies(res);
 
       const params = new URLSearchParams({ email });
       if (isOAuthFlow && requestId) {
@@ -386,8 +385,7 @@ export class AuthController extends BaseController {
 
     await this.authService.signout(isid, asid);
 
-    res.clearCookie(COOKIE_NAMES.IDENTITY_SESSION, { signed: true });
-    res.clearCookie(COOKIE_NAMES.ACTIVE_SESSION, { signed: true });
+    clearSessionCookies(res);
 
     return res.redirect(303, `/`);
   });

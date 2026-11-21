@@ -25,9 +25,15 @@ export function ConsentPage() {
   useEffect(() => {
     // In production, fetches client metadata from /api/v1/oauth/consent-details?request_id=...
     if (requestId) {
-      fetch(`/api/v1/oauth/consent-details?request_id=${encodeURIComponent(requestId)}`)
+      fetch(`/api/v1/oauth/consent-details?request_id=${encodeURIComponent(requestId)}`, {
+        credentials: 'include',
+      })
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
+          if (data?.alreadyConsented && data?.redirectUrl) {
+            window.location.replace(data.redirectUrl);
+            return;
+          }
           if (data?.client) setClient(data.client);
           if (data?.scopes) setScopes(data.scopes);
           if (data?.user) {
@@ -64,6 +70,7 @@ export function ConsentPage() {
       const res = await fetch('/api/v1/oauth/consent/decision', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ request_id: requestId, decision }),
       });
 

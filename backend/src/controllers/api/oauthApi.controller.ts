@@ -93,7 +93,24 @@ export class OAuthApiController {
       const client = await clientService.getClient(authReq.clientId);
       const user = req.user?.id ? await accountService.get(req.user.id) : null;
 
+      let alreadyConsented = false;
+      let redirectUrl: string | undefined = undefined;
+
+      if (user) {
+        const hasConsent = await oauthService.hasConsent(user.id, client.id, authReq.scopes);
+        if (hasConsent) {
+          alreadyConsented = true;
+          const authCode = await oauthService.issueAuthorizationCode(authReq, user.id);
+          const redirectURL = new URL(authReq.redirectUri);
+          redirectURL.searchParams.set('code', authCode);
+          if (authReq.state) redirectURL.searchParams.set('state', authReq.state);
+          redirectUrl = redirectURL.toString();
+        }
+      }
+
       res.status(200).json({
+        alreadyConsented,
+        redirectUrl,
         requestId: authReq.id,
         scopes: authReq.scopes,
         redirectUri: authReq.redirectUri,

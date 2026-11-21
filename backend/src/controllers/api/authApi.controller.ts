@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { authService, type AuthenticationFlow } from '../../services/auth.service.js';
 import { oauthService } from '../../services/oauth.service.js';
 import { accountService } from '../../services/account.service.js';
-import { setSessionCookies, COOKIE_NAMES } from '../../utils/cookies.js';
+import { setSessionCookies, clearSessionCookies, COOKIE_NAMES } from '../../utils/cookies.js';
 import { AppError } from '../../utils/appError.js';
 import { ErrorCode } from '../../utils/errorCodes.js';
 
@@ -99,8 +99,7 @@ export class AuthApiController {
         requestId: effectiveRequestId,
       });
 
-      res.clearCookie(COOKIE_NAMES.IDENTITY_SESSION, { signed: true });
-      res.clearCookie(COOKIE_NAMES.ACTIVE_SESSION, { signed: true });
+      clearSessionCookies(res);
 
       const params = new URLSearchParams({ email });
       if (authFlow === 'oauth' && effectiveRequestId) {
@@ -269,8 +268,7 @@ export class AuthApiController {
 
       await authService.signout(isid, asid);
 
-      res.clearCookie(COOKIE_NAMES.IDENTITY_SESSION, { signed: true });
-      res.clearCookie(COOKIE_NAMES.ACTIVE_SESSION, { signed: true });
+      clearSessionCookies(res);
 
       res.status(200).json({
         success: true,

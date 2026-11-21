@@ -66,16 +66,20 @@ export class Authentication {
 
         // Fallback -> Refresh using Identity Session
         if (isid) {
-          const data = await sessionService.refreshActiveSession(isid);
+          try {
+            const data = await sessionService.refreshActiveSession(isid);
 
-          await setSessionCookies(res, null, data.activeSessId);
+            await setSessionCookies(res, null, data.activeSessId);
 
-          req.user = {
-            id: data.userId,
-            roles: data.roles,
-          };
+            req.user = {
+              id: data.userId,
+              roles: data.roles,
+            };
 
-          return next();
+            return next();
+          } catch {
+            // Identity session invalid or expired, continue to unauthenticated flow
+          }
         }
 
         // No valid session
