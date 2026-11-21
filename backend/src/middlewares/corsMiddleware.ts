@@ -5,6 +5,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:8080',
   'https://pramaan.anujacharjee.com',
+  'https://api.pramaan.anujacharjee.com',
   'https://openspace.anujacharjee.com',
 ];
 

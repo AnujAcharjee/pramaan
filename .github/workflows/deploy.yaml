@@ -90,9 +90,9 @@ jobs:
 
             # Application Configuration
             APP_NAME=pramaan
-            APP_DOMAIN=pramaan.anujacharjee.com
+            APP_DOMAIN=api.pramaan.anujacharjee.com
             APP_DOC_URL=https://github.com/AnujAcharjee/pramaan/blob/main/readme.md
-            AUTH_ISSUER=https://pramaan.anujacharjee.com
+            AUTH_ISSUER=https://api.pramaan.anujacharjee.com
             FRONTEND_URL=${{ secrets.FRONTEND_URL || 'https://pramaan.anujacharjee.com' }}
             EMAIL_FROM=no-reply@pramaan.anujacharjee.com
 

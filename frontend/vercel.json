@@ -3,10 +3,10 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://pramaan.anujacharjee.com/api/$1" },
-    { "source": "/oauth/(.*)", "destination": "https://pramaan.anujacharjee.com/oauth/$1" },
-    { "source": "/.well-known/(.*)", "destination": "https://pramaan.anujacharjee.com/.well-known/$1" },
-    { "source": "/health", "destination": "https://pramaan.anujacharjee.com/health" },
+    { "source": "/api/(.*)", "destination": "https://api.pramaan.anujacharjee.com/api/$1" },
+    { "source": "/oauth/(.*)", "destination": "https://api.pramaan.anujacharjee.com/oauth/$1" },
+    { "source": "/.well-known/(.*)", "destination": "https://api.pramaan.anujacharjee.com/.well-known/$1" },
+    { "source": "/health", "destination": "https://api.pramaan.anujacharjee.com/health" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

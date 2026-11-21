@@ -1,4 +1,4 @@
-pramaan.anujacharjee.com {
+api.pramaan.anujacharjee.com {
 
   encode gzip zstd
 
