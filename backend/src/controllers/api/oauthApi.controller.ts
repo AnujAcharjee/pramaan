@@ -142,9 +142,10 @@ export class OAuthApiController {
   submitConsentDecision = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { request_id, decision } = req.body;
+      const effectiveDecision = Array.isArray(decision) ? decision[0] : decision;
       const userId = req.user.id;
 
-      if (!request_id || !decision) {
+      if (!request_id || !effectiveDecision) {
         throw new AppError('request_id and decision are required', 400, ErrorCode.INVALID_REQUEST);
       }
 
@@ -154,7 +155,7 @@ export class OAuthApiController {
       }
 
       // DENY
-      if (decision === 'deny') {
+      if (effectiveDecision === 'deny') {
         const redirectURL = new URL(authReq.redirectUri);
         redirectURL.searchParams.set('error', 'access_denied');
         redirectURL.searchParams.set('error_description', 'The resource owner denied the request');
@@ -168,7 +169,7 @@ export class OAuthApiController {
       }
 
       // APPROVE
-      if (decision === 'approve') {
+      if (effectiveDecision === 'approve') {
         await oauthService.storeConsent(userId, authReq.clientId, authReq.scopes);
         const authCode = await oauthService.issueAuthorizationCode(authReq, userId);
 

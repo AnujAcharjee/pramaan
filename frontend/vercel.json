@@ -4,7 +4,8 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "https://api.pramaan.anujacharjee.com/api/$1" },
-    { "source": "/oauth/(.*)", "destination": "https://api.pramaan.anujacharjee.com/oauth/$1" },
+    { "source": "/oauth/token", "destination": "https://api.pramaan.anujacharjee.com/oauth/token" },
+    { "source": "/userinfo", "destination": "https://api.pramaan.anujacharjee.com/userinfo" },
     { "source": "/.well-known/(.*)", "destination": "https://api.pramaan.anujacharjee.com/.well-known/$1" },
     { "source": "/health", "destination": "https://api.pramaan.anujacharjee.com/health" },
     { "source": "/(.*)", "destination": "/index.html" }

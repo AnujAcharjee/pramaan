@@ -13,7 +13,11 @@ const oauthController = new OAuthController(oauthService, accountService, client
 
 router
   .route('/oauth/consent')
-  .get(Authentication.ssr('oauth'), Authorize.role([ROLES.USER]), oauthController.renderConsentPage)
+  .get((req, res) => {
+    const frontendUrl = (process.env.FRONTEND_URL || 'https://pramaan.anujacharjee.com').replace(/\/+$/, '');
+    const queryString = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    return res.redirect(303, `${frontendUrl}/oauth/consent${queryString}`);
+  })
   .post(
     Authentication.ssr('oauth'),
     Authorize.role([ROLES.USER]),

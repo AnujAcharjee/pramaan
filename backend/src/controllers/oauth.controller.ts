@@ -75,6 +75,7 @@ export class OAuthController extends BaseController {
   consent = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { request_id, decision } = req.body;
+      const effectiveDecision = Array.isArray(decision) ? decision[0] : decision;
       const userId = req.user.id;
 
       const authReq = (await this.oauthService.getAuthorizationRequest(request_id)) as AuthorizationCacheType;
@@ -83,7 +84,7 @@ export class OAuthController extends BaseController {
       }
 
       // DENY
-      if (decision === 'deny') {
+      if (effectiveDecision === 'deny') {
         const redirectURL = new URL(authReq.redirectUri);
         redirectURL.searchParams.set('error', 'access_denied');
         redirectURL.searchParams.set('error_description', 'The resource owner denied the request');
@@ -93,7 +94,7 @@ export class OAuthController extends BaseController {
       }
 
       // APPROVE
-      if (decision === 'approve') {
+      if (effectiveDecision === 'approve') {
         await this.oauthService.storeConsent(userId, authReq.clientId, authReq.scopes);
 
         const authCode = await this.oauthService.issueAuthorizationCode(authReq, userId);

@@ -32,7 +32,12 @@ export class OAuthZSchema {
   static consentSchema = z.object({
     body: z.object({
       request_id: z.string().min(1, 'request_id is required'),
-      decision: z.enum(['approve', 'deny']),
+      decision: z.preprocess(
+        (val) => (Array.isArray(val) ? val[0] : val),
+        z.enum(['approve', 'deny'], {
+          message: 'Invalid decision: expected one of "approve" | "deny"',
+        }),
+      ),
     }),
   });
 

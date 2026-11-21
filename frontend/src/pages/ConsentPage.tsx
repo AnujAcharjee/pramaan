@@ -75,12 +75,15 @@ export function ConsentPage() {
         body: JSON.stringify({ request_id: requestId, decision }),
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl;
-          return;
-        }
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Authorization decision could not be processed.');
       }
     } catch {
       // Fallback submit to backend SSR /oauth/consent
