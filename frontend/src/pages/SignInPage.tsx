@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2, Mail } from 'lucide-react';
 import { OAuthHandshakeLoader } from '../components/OAuthHandshakeLoader';
 import { PramaanLogo } from '../components/PramaanLogo';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -18,6 +18,7 @@ export function SignInPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [mfaSent, setMfaSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState(
     errorParam === 'Session_expired' ? 'Your session expired. Please sign in to authorize.' : ''
   );
@@ -61,6 +62,11 @@ export function SignInPage() {
 
       if (res.ok) {
         const data = await res.json();
+        if (data.requiresMfa) {
+          setMfaSent(true);
+          return;
+        }
+
         if (data.user) {
           setUser(data.user);
         }
@@ -82,32 +88,7 @@ export function SignInPage() {
         setErrorMessage(err.message || 'Invalid email or password.');
       }
     } catch {
-      // Fallback for SSR endpoint during deprecation transition
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/signin';
-      const emailInput = document.createElement('input');
-      emailInput.name = 'email';
-      emailInput.value = email;
-      form.appendChild(emailInput);
-      const pwInput = document.createElement('input');
-      pwInput.name = 'password';
-      pwInput.value = password;
-      form.appendChild(pwInput);
-      if (flow) {
-        const flowInput = document.createElement('input');
-        flowInput.name = 'flow';
-        flowInput.value = flow;
-        form.appendChild(flowInput);
-      }
-      if (requestId) {
-        const reqInput = document.createElement('input');
-        reqInput.name = 'request_id';
-        reqInput.value = requestId;
-        form.appendChild(reqInput);
-      }
-      document.body.appendChild(form);
-      form.submit();
+      setErrorMessage('Network error. Unable to reach authentication server. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -159,72 +140,96 @@ export function SignInPage() {
             </div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
-                Email address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#FA812F] focus:ring-1 focus:ring-[#FA812F] transition-all"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-slate-700 dark:text-neutral-300">
-                  Password
-                </label>
-                <Link
-                  to={isOAuthFlow ? `/forgot-password?flow=oauth&request_id=${encodeURIComponent(requestId!)}` : '/forgot-password'}
-                  className="text-xs font-semibold text-[#FA812F] hover:underline"
-                >
-                  Forgot password?
-                </Link>
+          {/* Form or MFA Verification Prompt */}
+          {mfaSent ? (
+            <div className="text-center py-2 space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-[#FA812F] flex items-center justify-center mx-auto mb-2">
+                <Mail className="w-7 h-7" />
               </div>
-
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#FA812F] focus:ring-1 focus:ring-[#FA812F] transition-all"
-                />
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Two-Factor Verification
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 leading-relaxed">
+                A secure sign-in verification link has been sent to <strong className="text-slate-900 dark:text-white">{email}</strong>.
+                Please check your inbox and click the link to verify your identity and finish signing in.
+              </p>
+              <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200"
+                  onClick={() => setMfaSent(false)}
+                  className="text-xs font-semibold text-[#FA812F] hover:underline cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  Back to sign in
                 </button>
               </div>
             </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#FA812F] focus:ring-1 focus:ring-[#FA812F] transition-all"
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-orange w-full py-3 text-sm font-semibold mt-2 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin shrink-0 text-white" />
-                  <span>Signing in…</span>
-                </>
-              ) : (
-                <>
-                  <span>Sign in</span>
-                  <ArrowRight className="w-4 h-4 shrink-0" />
-                </>
-              )}
-            </button>
-          </form>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-neutral-300">
+                    Password
+                  </label>
+                  <Link
+                    to={isOAuthFlow ? `/forgot-password?flow=oauth&request_id=${encodeURIComponent(requestId!)}` : '/forgot-password'}
+                    className="text-xs font-semibold text-[#FA812F] hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 text-slate-900 dark:text-white text-sm focus:outline-none focus:border-[#FA812F] focus:ring-1 focus:ring-[#FA812F] transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-neutral-200 cursor-pointer"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-orange w-full py-3 text-sm font-semibold mt-2 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin shrink-0 text-white" />
+                    <span>Signing in…</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign in</span>
+                    <ArrowRight className="w-4 h-4 shrink-0" />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
 
           {/* Footer Link */}
           <div className="mt-6 pt-6 border-t border-slate-100 dark:border-neutral-900 text-center text-xs text-slate-500 dark:text-neutral-400">

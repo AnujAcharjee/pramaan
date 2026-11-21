@@ -3,9 +3,25 @@ import { clientService } from '../../services/client.service.js';
 import { accountService } from '../../services/account.service.js';
 import { AppError } from '../../utils/appError.js';
 import { ErrorCode } from '../../utils/errorCodes.js';
-import { OAUTH_CLIENT_ENVIRONMENTS, OAUTH_CLIENT_TYPES, ROLES } from '../../utils/constant.js';
+import {
+  OAUTH_CLIENT_ENVIRONMENTS,
+  OAUTH_CLIENT_TYPES,
+  ROLES,
+  type OAuthClientEnvironment,
+} from '../../utils/constant.js';
 
 export class DeveloperApiController {
+  /**
+   * Helper: Ensure client belongs to authenticated user
+   */
+  private async getOwnedClient(clientId: string, userId: string) {
+    const client = await clientService.getClient(clientId);
+    if (client.userId && client.userId !== userId) {
+      throw new AppError('Forbidden: you do not have permission to manage this client', 403, ErrorCode.UNAUTHORIZED);
+    }
+    return client;
+  }
+
   /**
    * List All Clients Registered by Authenticated Developer
    */
@@ -68,7 +84,7 @@ export class DeveloperApiController {
   getClient = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const clientId = String(req.params.client_id);
-      const client = await clientService.getClient(clientId);
+      const client = await this.getOwnedClient(clientId, req.user.id);
 
       res.status(200).json({
         client,
@@ -108,6 +124,7 @@ export class DeveloperApiController {
   rotateSecret = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const clientId = String(req.params.client_id);
+      await this.getOwnedClient(clientId, req.user.id);
       const { clientSecret } = await clientService.rotateClientSecret(clientId);
 
       res.status(200).json({
@@ -132,7 +149,7 @@ export class DeveloperApiController {
         throw new AppError('Redirect URI is required', 400, ErrorCode.INVALID_REQUEST);
       }
 
-      const client = await clientService.getClient(clientId);
+      const client = await this.getOwnedClient(clientId, req.user.id);
       const updated = await clientService.addRedirectURI({
         clientId,
         normalizedURI: uri.trim(),
@@ -161,7 +178,7 @@ export class DeveloperApiController {
         throw new AppError('Redirect URI is required', 400, ErrorCode.INVALID_REQUEST);
       }
 
-      const client = await clientService.getClient(clientId);
+      const client = await this.getOwnedClient(clientId, req.user.id);
       const updated = await clientService.deleteRedirectURI({
         clientId,
         normalizedURI: uri.trim(),
@@ -197,11 +214,132 @@ export class DeveloperApiController {
   };
 
   /**
+   * Switch Client Environment (Development <-> Production)
+   */
+  switchEnvironment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const clientId = String(req.params.client_id);
+      const { environment } = req.body;
+
+      const client = await this.getOwnedClient(clientId, req.user.id);
+      const currentEnv = String(client.environment).toLowerCase();
+      const targetEnvironment =
+        environment ? (String(environment).toLowerCase() as OAuthClientEnvironment)
+        : currentEnv === OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT
+        ? OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION
+        : OAUTH_CLIENT_ENVIRONMENTS.DEVELOPMENT;
+
+      const { client: updatedClient, clearedRedirectsCount } = await clientService.setClientEnvironment(
+        clientId,
+        targetEnvironment,
+      );
+
+      res.status(200).json({
+        success: true,
+        message:
+          targetEnvironment === OAUTH_CLIENT_ENVIRONMENTS.PRODUCTION
+            ? `Switched to Production mode. ${clearedRedirectsCount} development redirect URI(s) cleared.`
+            : 'Switched to Development mode.',
+        client: updatedClient,
+        environment: updatedClient.environment,
+        clearedRedirectsCount,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Switch Client Type (Confidential <-> Public)
+   */
+  switchClientType = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const clientId = String(req.params.client_id);
+      const userId = req.user.id;
+      const { client_type } = req.body;
+
+      const client = await this.getOwnedClient(clientId, userId);
+      const targetType =
+        client_type ||
+        (client.clientType === OAUTH_CLIENT_TYPES.CONFIDENTIAL
+          ? OAUTH_CLIENT_TYPES.PUBLIC
+          : OAUTH_CLIENT_TYPES.CONFIDENTIAL);
+
+      const { client: updatedClient, clientSecret } = await clientService.updateClientType(
+        clientId,
+        userId,
+        targetType,
+      );
+
+      res.status(200).json({
+        success: true,
+        message: `Client type updated to ${targetType}.`,
+        client: updatedClient,
+        clientSecret,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Toggle PKCE Enforcement
+   */
+  togglePkce = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const clientId = String(req.params.client_id);
+      const { enforcePKCE } = req.body;
+
+      const client = await this.getOwnedClient(clientId, req.user.id);
+      const targetVal = enforcePKCE !== undefined ? Boolean(enforcePKCE) : !client.enforcePKCE;
+
+      const updated = await clientService.update(clientId, { enforcePKCE: targetVal });
+
+      res.status(200).json({
+        success: true,
+        message: `PKCE enforcement ${targetVal ? 'enabled' : 'disabled'}.`,
+        client: updated,
+        enforcePKCE: updated.enforcePKCE,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * Toggle Application Active Status (Activate / Suspend)
+   */
+  toggleStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const clientId = String(req.params.client_id);
+      const { isActive } = req.body;
+
+      const client = await this.getOwnedClient(clientId, req.user.id);
+      const targetVal = isActive !== undefined ? Boolean(isActive) : !client.isActive;
+
+      const updated = await clientService.update(clientId, {
+        isActive: targetVal,
+        revokedAt: targetVal ? null : new Date(),
+      });
+
+      res.status(200).json({
+        success: true,
+        message: `Application ${targetVal ? 'activated' : 'suspended'}.`,
+        client: updated,
+        isActive: updated.isActive,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * Delete Client
    */
   deleteClient = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const clientId = String(req.params.client_id);
+      await this.getOwnedClient(clientId, req.user.id);
       await clientService.delete(clientId);
 
       res.status(200).json({

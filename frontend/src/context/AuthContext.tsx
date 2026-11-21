@@ -6,6 +6,7 @@ export interface AuthUser {
   email: string;
   avatar?: string | null;
   roles?: string[];
+  mfaEnabled?: boolean;
 }
 
 interface AuthContextType {

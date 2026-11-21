@@ -62,6 +62,27 @@ export class AccountApiController {
   };
 
   /**
+   * Manage Two-Factor Authentication (Enable / Disable MFA)
+   */
+  manageMfa = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.user.id;
+      const { action, enable } = req.body;
+      const isEnable = enable !== undefined ? Boolean(enable) : action === 'enable';
+
+      await accountService.manageMfa(userId, isEnable);
+
+      res.status(200).json({
+        success: true,
+        mfaEnabled: isEnable,
+        message: `Two-factor authentication ${isEnable ? 'enabled' : 'disabled'} successfully.`,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
    * Revoke OAuth Consent for Client
    */
   revokeConsent = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

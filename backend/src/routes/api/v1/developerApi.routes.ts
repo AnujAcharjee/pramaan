@@ -46,6 +46,26 @@ router.post(
   Authorize.clientOwnership,
   developerApiController.verifyDomain,
 );
+router.post(
+  '/clients/:client_id/environment',
+  Authorize.clientOwnership,
+  developerApiController.switchEnvironment,
+);
+router.post(
+  '/clients/:client_id/type',
+  Authorize.clientOwnership,
+  developerApiController.switchClientType,
+);
+router.post(
+  '/clients/:client_id/pkce',
+  Authorize.clientOwnership,
+  developerApiController.togglePkce,
+);
+router.post(
+  '/clients/:client_id/status',
+  Authorize.clientOwnership,
+  developerApiController.toggleStatus,
+);
 router.delete(
   '/clients/:client_id',
   Authorize.clientOwnership,

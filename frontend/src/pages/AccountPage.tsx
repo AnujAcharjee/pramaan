@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import {
   User,
   Shield,
+  ShieldCheck,
+  ShieldAlert,
   Laptop,
   Key,
   Trash2,
@@ -52,6 +54,8 @@ export function AccountPage() {
   const [saving, setSaving] = useState(false);
   const [resetSending, setResetSending] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [mfaEnabled, setMfaEnabled] = useState(user?.mfaEnabled || false);
+  const [mfaLoading, setMfaLoading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -63,6 +67,9 @@ export function AccountPage() {
       if (user.avatar !== undefined) {
         setAvatar(user.avatar);
         setAvatarUrlText(user.avatar || '');
+      }
+      if (user.mfaEnabled !== undefined) {
+        setMfaEnabled(user.mfaEnabled);
       }
     }
   }, [user]);
@@ -81,6 +88,7 @@ export function AccountPage() {
           setEmail(data.user.email || '');
           setAvatar(data.user.avatar || null);
           setAvatarUrlText(data.user.avatar || '');
+          setMfaEnabled(Boolean(data.user.mfaEnabled));
         }
 
         // Parse consents
@@ -236,6 +244,34 @@ export function AccountPage() {
       showToast('error', 'Network error while requesting password reset.');
     } finally {
       setResetSending(false);
+    }
+  };
+
+  const handleToggleMfa = async () => {
+    setMfaLoading(true);
+    try {
+      const nextState = !mfaEnabled;
+      const res = await fetch('/api/v1/account/mfa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ enable: nextState }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const updated = data.mfaEnabled ?? nextState;
+        setMfaEnabled(updated);
+        setUser((prev) => (prev ? { ...prev, mfaEnabled: updated } : null));
+        showToast('success', data.message || `Two-factor authentication ${updated ? 'enabled' : 'disabled'} successfully.`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('error', err.message || 'Failed to update two-factor authentication.');
+      }
+    } catch {
+      showToast('error', 'Error connecting to account security service.');
+    } finally {
+      setMfaLoading(false);
     }
   };
 
@@ -498,44 +534,103 @@ export function AccountPage() {
             </form>
           </div>
 
-          <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-              <Lock className="w-5 h-5 text-[#FA812F]" />
-              <span>Password & Security</span>
-            </h2>
+          <div className="space-y-6">
+            {/* Two-Factor Authentication Card */}
+            <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-[#FA812F]" />
+                  <span>Two-Factor Authentication</span>
+                </h2>
+                {mfaEnabled ? (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Active</span>
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 border border-slate-200 dark:border-neutral-700">
+                    Disabled
+                  </span>
+                )}
+              </div>
 
-            <p className="text-xs text-slate-500 dark:text-neutral-400 mb-4 leading-relaxed">
-              Ensure your identity credentials remain secure. Since you are already signed in, you can request a single-use password reset link sent directly to your registered primary email without re-typing it.
-            </p>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mb-5 leading-relaxed">
+                Add an extra layer of defense to your Pramaan account. When enabled, every sign-in attempt requires a secure one-time verification link dispatched to your registered primary email address before granting access.
+              </p>
 
-            <div className="mb-5 p-3 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 text-xs">
-              <span className="text-slate-400 block mb-0.5 font-semibold">Registered Primary Email:</span>
-              <span className="font-mono font-semibold text-slate-900 dark:text-white">
-                {email || user?.email || 'Loading…'}
-              </span>
+              <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200/80 dark:border-neutral-800 mb-5">
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-neutral-300">
+                  <span className="w-2 h-2 rounded-full bg-[#FA812F]" />
+                  <span>Primary Verification Channel:</span>
+                </div>
+                <span className="text-xs font-mono font-semibold text-slate-900 dark:text-white ml-4 mt-0.5 block">
+                  {email || user?.email || 'Loading…'}
+                </span>
+              </div>
+
+              {mfaEnabled ? (
+                <button
+                  type="button"
+                  onClick={handleToggleMfa}
+                  disabled={mfaLoading}
+                  className="px-4 py-2.5 rounded-lg border border-rose-200 dark:border-rose-900/40 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <ShieldAlert className="w-4 h-4 shrink-0" />
+                  <span>{mfaLoading ? 'Updating 2FA…' : 'Disable Two-Factor Authentication'}</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleToggleMfa}
+                  disabled={mfaLoading}
+                  className="btn-orange px-4 py-2.5 text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <ShieldCheck className="w-4 h-4 shrink-0" />
+                  <span>{mfaLoading ? 'Enabling 2FA…' : 'Enable Two-Factor Authentication'}</span>
+                </button>
+              )}
             </div>
 
-            {resetSent ? (
-              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 space-y-1">
-                <p className="font-bold flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span>Password Reset Link Dispatched!</span>
-                </p>
-                <p>
-                  Please check your inbox at <strong>{email || user?.email}</strong> and click the link to choose a new password.
-                </p>
+            {/* Password & Security Card */}
+            <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                <Lock className="w-5 h-5 text-[#FA812F]" />
+                <span>Password & Security</span>
+              </h2>
+
+              <p className="text-xs text-slate-500 dark:text-neutral-400 mb-4 leading-relaxed">
+                Ensure your identity credentials remain secure. Since you are already signed in, you can request a single-use password reset link sent directly to your registered primary email without re-typing it.
+              </p>
+
+              <div className="mb-5 p-3 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 text-xs">
+                <span className="text-slate-400 block mb-0.5 font-semibold">Registered Primary Email:</span>
+                <span className="font-mono font-semibold text-slate-900 dark:text-white">
+                  {email || user?.email || 'Loading…'}
+                </span>
               </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handleRequestPasswordReset}
-                disabled={resetSending || !(email || user?.email)}
-                className="btn-orange px-4 py-2.5 text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                <Key className="w-4 h-4" />
-                <span>{resetSending ? 'Sending Reset Link…' : 'Send Password Reset Link'}</span>
-              </button>
-            )}
+
+              {resetSent ? (
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 space-y-1">
+                  <p className="font-bold flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    <span>Password Reset Link Dispatched!</span>
+                  </p>
+                  <p>
+                    Please check your inbox at <strong>{email || user?.email}</strong> and click the link to choose a new password.
+                  </p>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleRequestPasswordReset}
+                  disabled={resetSending || !(email || user?.email)}
+                  className="btn-orange px-4 py-2.5 text-xs font-semibold inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <Key className="w-4 h-4" />
+                  <span>{resetSending ? 'Sending Reset Link…' : 'Send Password Reset Link'}</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}

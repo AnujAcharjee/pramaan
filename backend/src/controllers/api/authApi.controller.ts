@@ -251,6 +251,7 @@ export class AuthApiController {
           email: account.email,
           avatar: account.avatar,
           roles: req.user.roles,
+          mfaEnabled: account.mfaEnabled,
         },
       });
     } catch (error) {

@@ -18,6 +18,7 @@ import {
 
 export type ClientView = {
   id: string;
+  userId?: string;
   name: string;
   domain: string;
   avatar: string | null;
@@ -37,11 +38,17 @@ export type ClientView = {
 
 export type AllClientsView = {
   id: string;
+  userId?: string;
   name: string;
   domain: string;
   avatar: string | null;
   environment: OAuthClientEnvironment;
+  domainStatus: 'PENDING' | 'VERIFIED';
+  clientType: OAuthClientType;
+  enforcePKCE: boolean;
+  redirectURIs: string[];
   isActive: boolean;
+  createdAt: Date;
 };
 
 export interface ClientUpdateInput {
@@ -56,6 +63,7 @@ export interface ClientUpdateInput {
   redirectURIs?: string[];
   clientSecretHash?: string | null;
   environment?: OAuthClientEnvironment;
+  enforcePKCE?: boolean;
   isActive?: boolean;
   revokedAt?: Date | null;
 }
@@ -508,6 +516,7 @@ export class ClientService {
       where: { id: clientId },
       select: {
         id: true,
+        userId: true,
         name: true,
         domain: true,
         avatar: true,
@@ -567,11 +576,13 @@ export class ClientService {
         ...(updates.redirectURIs !== undefined && { redirectURIs: updates.redirectURIs }),
         ...(updates.clientSecretHash !== undefined && { clientSecretHash: updates.clientSecretHash }),
         ...(updates.environment !== undefined && { environment: updates.environment }),
+        ...(updates.enforcePKCE !== undefined && { enforcePKCE: updates.enforcePKCE }),
         ...(updates.isActive !== undefined && { isActive: updates.isActive }),
         ...(updates.revokedAt !== undefined && { revokedAt: updates.revokedAt }),
       },
       select: {
         id: true,
+        userId: true,
         name: true,
         domain: true,
         avatar: true,
@@ -832,11 +843,17 @@ export class ClientService {
       where: { userId },
       select: {
         id: true,
+        userId: true,
         name: true,
         domain: true,
         avatar: true,
         environment: true,
+        domainStatus: true,
+        clientType: true,
+        enforcePKCE: true,
+        redirectURIs: true,
         isActive: true,
+        createdAt: true,
       },
       orderBy: {
         createdAt: 'desc',

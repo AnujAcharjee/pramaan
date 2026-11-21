@@ -263,11 +263,15 @@ export class AuthController extends BaseController {
 
       await setSessionCookies(res, ids.identitySessionId, ids.activeSessionId);
 
+      const frontendBase =
+        ENV.FRONTEND_URL?.replace(/\/+$/, '') ||
+        (ENV.NODE_ENV === 'production' ? `https://${ENV.APP_DOMAIN}` : `http://${ENV.APP_DOMAIN}`);
+
       if (isOAuthFlow && requestId) {
         return this.handleOAuthFlow(res, requestId, user.id);
       }
 
-      return res.redirect(303, `/account`);
+      return res.redirect(303, `${frontendBase}/account`);
     },
     'pages/auth/signin',
     (req) => this.buildSigninViewData(req),

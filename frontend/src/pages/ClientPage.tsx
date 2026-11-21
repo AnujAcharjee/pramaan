@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
   Key,
@@ -16,6 +16,10 @@ import {
   Clock,
   Edit3,
   X,
+  Rocket,
+  Server,
+  Terminal,
+  Sliders,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -30,7 +34,7 @@ interface ClientDetail {
   domainVerificationMethod?: string;
   domainVerifiedAt?: string | null;
   clientType: 'CONFIDENTIAL' | 'PUBLIC';
-  environment: 'DEVELOPMENT' | 'PRODUCTION';
+  environment: 'development' | 'production' | 'DEVELOPMENT' | 'PRODUCTION';
   enforcePKCE: boolean;
   redirectURIs: string[];
   isActive: boolean;
@@ -39,6 +43,7 @@ interface ClientDetail {
 
 export function ClientPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { showToast } = useToast();
 
@@ -49,8 +54,15 @@ export function ClientPage() {
   const [secretRevealed, setSecretRevealed] = useState(false);
   const [newUri, setNewUri] = useState('');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  // Action loaders
   const [verifying, setVerifying] = useState(false);
   const [rotating, setRotating] = useState(false);
+  const [switchingEnv, setSwitchingEnv] = useState(false);
+  const [switchingType, setSwitchingType] = useState(false);
+  const [togglingPkce, setTogglingPkce] = useState(false);
+  const [togglingStatus, setTogglingStatus] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Edit client name and domain modal state
   const [showEditModal, setShowEditModal] = useState(false);
@@ -94,6 +106,159 @@ export function ClientPage() {
     }
   }, [isAuthenticated, id, fetchClient]);
 
+  // ----------------- ENVIRONMENT SWITCHER -----------------
+  const handleSwitchEnvironment = async () => {
+    if (!id || !client) return;
+    const isCurrentProd = String(client.environment).toLowerCase() === 'production';
+    const nextEnv = isCurrentProd ? 'development' : 'production';
+
+    if (nextEnv === 'production') {
+      if (client.domainStatus !== 'VERIFIED') {
+        showToast(
+          'error',
+          `Cannot switch to Production: domain "${client.domain}" must be verified via DNS TXT record first.`
+        );
+        return;
+      }
+      if (
+        !confirm(
+          `Switching to Production mode enforces HTTPS-only callbacks matching your verified domain "${client.domain}". Any development redirect URIs will be cleared. Continue?`
+        )
+      ) {
+        return;
+      }
+    }
+
+    setSwitchingEnv(true);
+    try {
+      const res = await fetch(`/api/v1/developer/clients/${encodeURIComponent(id)}/environment`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ environment: nextEnv }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setClient(data.client);
+        showToast('success', data.message || `Switched to ${nextEnv} mode.`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('error', err.message || 'Failed to switch environment mode.');
+      }
+    } catch {
+      showToast('error', 'Error connecting to developer service.');
+    } finally {
+      setSwitchingEnv(false);
+    }
+  };
+
+  // ----------------- CLIENT TYPE SWITCHER -----------------
+  const handleSwitchClientType = async () => {
+    if (!id || !client) return;
+    const nextType = client.clientType === 'CONFIDENTIAL' ? 'PUBLIC' : 'CONFIDENTIAL';
+
+    if (
+      !confirm(
+        `Switch this application from ${client.clientType} to ${nextType}? ${
+          nextType === 'CONFIDENTIAL'
+            ? 'A new Client Secret will be generated for server-side token exchange.'
+            : 'Client Secret will be disabled in favor of PKCE (RFC 7636).'
+        }`
+      )
+    ) {
+      return;
+    }
+
+    setSwitchingType(true);
+    try {
+      const res = await fetch(`/api/v1/developer/clients/${encodeURIComponent(id)}/type`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ client_type: nextType }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setClient(data.client);
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+          setSecretRevealed(true);
+          showToast('success', 'Switched to Confidential client. New secret generated!');
+        } else {
+          showToast('success', 'Switched to Public client with PKCE.');
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('error', err.message || 'Failed to switch client type.');
+      }
+    } catch {
+      showToast('error', 'Error connecting to developer service.');
+    } finally {
+      setSwitchingType(false);
+    }
+  };
+
+  // ----------------- TOGGLE PKCE -----------------
+  const handleTogglePkce = async () => {
+    if (!id || !client) return;
+    const nextVal = !client.enforcePKCE;
+
+    setTogglingPkce(true);
+    try {
+      const res = await fetch(`/api/v1/developer/clients/${encodeURIComponent(id)}/pkce`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ enforcePKCE: nextVal }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setClient(data.client);
+        showToast('success', `PKCE enforcement ${nextVal ? 'enabled' : 'disabled'}.`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('error', err.message || 'Failed to update PKCE setting.');
+      }
+    } catch {
+      showToast('error', 'Error connecting to developer service.');
+    } finally {
+      setTogglingPkce(false);
+    }
+  };
+
+  // ----------------- TOGGLE ACTIVE STATUS -----------------
+  const handleToggleStatus = async () => {
+    if (!id || !client) return;
+    const nextVal = !client.isActive;
+
+    setTogglingStatus(true);
+    try {
+      const res = await fetch(`/api/v1/developer/clients/${encodeURIComponent(id)}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive: nextVal }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setClient(data.client);
+        showToast('success', `Application ${nextVal ? 'activated' : 'suspended'}.`);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('error', err.message || 'Failed to update application status.');
+      }
+    } catch {
+      showToast('error', 'Error connecting to developer service.');
+    } finally {
+      setTogglingStatus(false);
+    }
+  };
+
+  // ----------------- REDIRECT URIs -----------------
   const handleAddUri = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUri || !id) return;
@@ -154,6 +319,7 @@ export function ClientPage() {
     }
   };
 
+  // ----------------- ROTATE SECRET -----------------
   const handleRotateSecret = async () => {
     if (!id) return;
     if (
@@ -188,6 +354,7 @@ export function ClientPage() {
     }
   };
 
+  // ----------------- DOMAIN VERIFICATION -----------------
   const handleVerifyDomain = async () => {
     if (!id) return;
     setVerifying(true);
@@ -215,6 +382,39 @@ export function ClientPage() {
     }
   };
 
+  // ----------------- DELETE APPLICATION -----------------
+  const handleDeleteClient = async () => {
+    if (!id || !client) return;
+    if (
+      !confirm(
+        `Are you sure you want to permanently delete "${client.name}"? All issued tokens and credentials will be invalidated immediately.`
+      )
+    ) {
+      return;
+    }
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/v1/developer/clients/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (res.ok) {
+        showToast('success', 'Application deleted permanently.');
+        navigate('/developer');
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast('error', err.message || 'Failed to delete application.');
+      }
+    } catch {
+      showToast('error', 'Error connecting to developer service.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // ----------------- EDIT DETAILS MODAL -----------------
   const openEditModal = () => {
     setEditName(client?.name || '');
     setEditDomain(client?.domain || '');
@@ -285,19 +485,12 @@ export function ClientPage() {
               <span>Sign In to Continue</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link
-              to="/signup"
-              className="block text-xs font-semibold text-slate-600 dark:text-neutral-400 hover:text-[#FA812F] transition-colors py-1"
-            >
-              Don't have an account? Create one
-            </Link>
           </div>
         </div>
       </div>
     );
   }
 
-  // ----------------- CLIENT LOADING SKELETON -----------------
   if (loading && !client) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-colors">
@@ -310,7 +503,6 @@ export function ClientPage() {
     );
   }
 
-  // ----------------- NOT FOUND ERROR -----------------
   if (error && !client) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
@@ -329,54 +521,127 @@ export function ClientPage() {
 
   const clientId = client?.id || id || '';
   const clientName = client?.name || 'OAuth Application';
-  const environment = client?.environment || 'DEVELOPMENT';
+  const environment = String(client?.environment || 'development').toUpperCase();
+  const isProd = String(client?.environment || '').toLowerCase() === 'production';
   const domain = client?.domain || 'localhost';
   const domainStatus = client?.domainStatus || 'PENDING';
   const redirectUris = client?.redirectURIs || [];
   const verificationToken = client?.domainVerificationToken || 'pending-token-generation';
+  const clientType = client?.clientType || 'CONFIDENTIAL';
+  const enforcePKCE = client?.enforcePKCE ?? true;
+  const isActive = client?.isActive ?? true;
+
+  const authEndpoint = `${window.location.origin}/api/oauth/authorize`;
+  const tokenEndpoint = `${window.location.origin}/api/oauth/token`;
+  const userinfoEndpoint = `${window.location.origin}/userinfo`;
+  const discoveryDoc = `${window.location.origin}/.well-known/openid-configuration`;
+  const jwksUri = `${window.location.origin}/.well-known/jwks.json`;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 transition-colors">
+      
+      {/* Top Breadcrumb & Actions Bar */}
+      <div className="mb-6">
+        <Link
+          to="/developer"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-neutral-400 hover:text-[#FA812F] transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Back to Developer Hub</span>
+        </Link>
+      </div>
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-8">
         <div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5 mb-1.5">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
               {clientName}
             </h1>
-            <span className="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400">
+
+            {/* Environment Badge */}
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold border ${
+                isProd
+                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                  : 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
+              }`}
+            >
               {environment}
             </span>
+
+            {/* Type Badge */}
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-semibold bg-slate-100 dark:bg-neutral-900 text-slate-600 dark:text-neutral-400 border border-slate-200 dark:border-neutral-800">
+              {clientType}
+            </span>
+
+            {/* Active / Suspended Badge */}
+            <span
+              className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                isActive
+                  ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20'
+                  : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
+              }`}
+            >
+              {isActive ? 'Active' : 'Suspended'}
+            </span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 flex items-center gap-1.5 mt-1">
-            <Globe className="w-4 h-4 text-slate-400" />
-            <span>{domain}</span>
+
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1">
+              <Globe className="w-3.5 h-3.5 text-slate-400" />
+              <strong className="text-slate-700 dark:text-neutral-300">{domain}</strong>
+            </span>
+            <span>•</span>
             {domainStatus === 'VERIFIED' ? (
-              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold text-xs ml-2">
+              <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-semibold text-xs">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Domain Verified
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-amber-500 font-semibold text-xs ml-2">
+              <span className="inline-flex items-center gap-1 text-amber-500 font-semibold text-xs">
                 <Clock className="w-3.5 h-3.5" />
-                Pending DNS Verification
+                DNS TXT Verification Required for Production
               </span>
             )}
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Quick Top Actions */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Switch Environment Button */}
+          <button
+            onClick={handleSwitchEnvironment}
+            disabled={switchingEnv}
+            className={`px-3.5 py-2 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors ${
+              isProd
+                ? 'border border-amber-300 dark:border-amber-700/50 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20'
+                : 'btn-orange'
+            }`}
+          >
+            <Rocket className={`w-3.5 h-3.5 ${switchingEnv ? 'animate-spin' : ''}`} />
+            <span>
+              {switchingEnv
+                ? 'Switching…'
+                : isProd
+                ? 'Switch to Development'
+                : 'Switch to Production'}
+            </span>
+          </button>
+
           <button
             onClick={openEditModal}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-200 dark:border-neutral-800 text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:border-[#FA812F] hover:text-[#FA812F] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-200 dark:border-neutral-800 text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:border-[#FA812F] hover:text-[#FA812F] transition-colors cursor-pointer"
           >
             <Edit3 className="w-3.5 h-3.5" />
-            <span>Edit Details</span>
+            <span>Edit App</span>
           </button>
+
           <button
             onClick={handleRotateSecret}
-            disabled={rotating}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-neutral-800 text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:bg-slate-50 dark:hover:bg-neutral-900 transition-colors cursor-pointer disabled:opacity-50"
+            disabled={rotating || clientType === 'PUBLIC'}
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-slate-200 dark:border-neutral-800 text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:bg-slate-50 dark:hover:bg-neutral-900 transition-colors cursor-pointer disabled:opacity-40"
+            title={clientType === 'PUBLIC' ? 'Public clients do not use client secrets' : 'Rotate Client Secret'}
           >
             <RefreshCw className={`w-3.5 h-3.5 ${rotating ? 'animate-spin' : ''}`} />
             <span>Rotate Secret</span>
@@ -384,19 +649,166 @@ export function ClientPage() {
         </div>
       </div>
 
+      {/* Main Console Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column: Credentials & Domain Verification */}
+        
+        {/* Left Column: Developer Architecture, Options & Credentials */}
         <div className="lg:col-span-6 space-y-6">
+
+          {/* 1. DEVELOPER CONTROLS & ENVIRONMENT OPTIONS */}
+          <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+              <Sliders className="w-5 h-5 text-[#FA812F]" />
+              <span>Developer Options & Architecture</span>
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-neutral-400 mb-6">
+              Configure OAuth 2.0 operational behavior, runtime environment, and security policies.
+            </p>
+
+            <div className="space-y-4">
+              
+              {/* Option A: Environment Mode (Dev vs Prod) */}
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                      Environment Mode
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                        isProd
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                          : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                      }`}
+                    >
+                      {environment}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">
+                    {isProd
+                      ? 'Production mode enforces strict HTTPS callbacks matching your verified domain.'
+                      : 'Development mode allows localhost, http callbacks, and unverified domains for testing.'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSwitchEnvironment}
+                  disabled={switchingEnv}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 bg-white dark:bg-black text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:text-[#FA812F] hover:border-[#FA812F] transition-colors shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  {isProd ? 'Switch to Dev' : 'Switch to Prod'}
+                </button>
+              </div>
+
+              {/* Option B: Client Authentication Type (Confidential vs Public) */}
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                      Client Type
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-200 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300">
+                      {clientType}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">
+                    {clientType === 'CONFIDENTIAL'
+                      ? 'Confidential clients (backend servers) authenticate with client_secret.'
+                      : 'Public clients (SPAs/Mobile apps) authenticate via PKCE without secrets.'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSwitchClientType}
+                  disabled={switchingType}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 bg-white dark:bg-black text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:text-[#FA812F] hover:border-[#FA812F] transition-colors shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  {clientType === 'CONFIDENTIAL' ? 'Make Public' : 'Make Confidential'}
+                </button>
+              </div>
+
+              {/* Option C: PKCE Enforcement (RFC 7636) */}
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 flex items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                      Enforce PKCE (RFC 7636)
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                        enforcePKCE
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                          : 'bg-slate-200 dark:bg-neutral-800 text-slate-500 dark:text-neutral-400'
+                      }`}
+                    >
+                      {enforcePKCE ? 'Required' : 'Optional'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">
+                    Mandates S256 code_challenge parameter on /authorize requests to block interception attacks.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleTogglePkce}
+                  disabled={togglingPkce}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 bg-white dark:bg-black text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:text-[#FA812F] hover:border-[#FA812F] transition-colors shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  {enforcePKCE ? 'Disable' : 'Enable'}
+                </button>
+              </div>
+
+              {/* Option D: Application Lifecycle Status */}
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 flex items-center justify-between gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">
+                      Application Status
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                        isActive
+                          ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                          : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                      }`}
+                    >
+                      {isActive ? 'Active' : 'Suspended'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 mt-0.5">
+                    {isActive
+                      ? 'Application is accepting OAuth consent and token exchange requests.'
+                      : 'Application is paused; all OAuth handshakes are blocked.'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleToggleStatus}
+                  disabled={togglingStatus}
+                  className="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 bg-white dark:bg-black text-xs font-semibold text-slate-700 dark:text-neutral-300 hover:text-[#FA812F] hover:border-[#FA812F] transition-colors shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  {isActive ? 'Suspend' : 'Activate'}
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          {/* 2. OAUTH CREDENTIALS CARD */}
           <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
               <Key className="w-5 h-5 text-[#FA812F]" />
-              <span>OAuth Credentials</span>
+              <span>OAuth Client Credentials</span>
             </h2>
 
-            {/* ACTUAL Client ID */}
+            {/* Client ID */}
             <div className="mb-4">
               <label className="block text-xs font-semibold text-slate-700 dark:text-neutral-300 mb-1.5">
-                Client ID (Production & Dev)
+                Client ID
               </label>
               <div className="flex items-center gap-2">
                 <input
@@ -431,25 +843,35 @@ export function ClientPage() {
                   value={clientSecret}
                   className="w-full px-3.5 py-2 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 font-mono text-xs text-slate-700 dark:text-neutral-300"
                 />
+                {secretRevealed && (
+                  <button
+                    onClick={() => copyToClipboard(clientSecret, 'clientSecret')}
+                    className="p-2 rounded-lg border border-slate-200 dark:border-neutral-800 hover:text-[#FA812F] transition-colors cursor-pointer shrink-0"
+                    title="Copy Secret"
+                  >
+                    {copiedKey === 'clientSecret' ? (
+                      <Check className="w-4 h-4 text-emerald-500" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </button>
+                )}
                 <button
-                  onClick={() => copyToClipboard(clientSecret, 'clientSecret')}
-                  className="p-2 rounded-lg border border-slate-200 dark:border-neutral-800 hover:text-[#FA812F] transition-colors cursor-pointer shrink-0"
-                  title="Copy Secret"
+                  onClick={handleRotateSecret}
+                  disabled={rotating || clientType === 'PUBLIC'}
+                  className="px-3 py-2 rounded-lg border border-slate-200 dark:border-neutral-800 hover:text-[#FA812F] text-xs font-semibold shrink-0 cursor-pointer disabled:opacity-40"
+                  title="Rotate Secret"
                 >
-                  {copiedKey === 'clientSecret' ? (
-                    <Check className="w-4 h-4 text-emerald-500" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
+                  Rotate
                 </button>
               </div>
               <p className="text-[11px] text-slate-400 dark:text-neutral-500 mt-1">
-                Client secret is encrypted at rest. Click Rotate Secret to generate a new key if compromised.
+                Client secret is encrypted at rest using envelope encryption. Click Rotate to generate a new key if compromised.
               </p>
             </div>
           </div>
 
-          {/* Domain Verification */}
+          {/* 3. DOMAIN VERIFICATION CARD */}
           <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -466,7 +888,7 @@ export function ClientPage() {
               To promote this client to Production mode, add a DNS TXT record to verify you own this domain:
             </p>
 
-            <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 font-mono text-xs text-slate-700 dark:text-neutral-300 mb-4 space-y-1.5">
+            <div className="p-3.5 rounded-lg bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 font-mono text-xs text-slate-700 dark:text-neutral-300 mb-4 space-y-2">
               <div className="flex items-center justify-between">
                 <span>
                   <strong className="text-slate-400">Type:</strong> TXT
@@ -478,7 +900,7 @@ export function ClientPage() {
                 </span>
                 <button
                   onClick={() => copyToClipboard(`_pramaan-verification.${domain}`, 'host')}
-                  className="text-slate-400 hover:text-[#FA812F] p-0.5"
+                  className="text-slate-400 hover:text-[#FA812F] p-0.5 cursor-pointer"
                 >
                   {copiedKey === 'host' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
@@ -489,7 +911,7 @@ export function ClientPage() {
                 </span>
                 <button
                   onClick={() => copyToClipboard(`pramaan-verification=${verificationToken}`, 'val')}
-                  className="text-slate-400 hover:text-[#FA812F] p-0.5"
+                  className="text-slate-400 hover:text-[#FA812F] p-0.5 cursor-pointer"
                 >
                   {copiedKey === 'val' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                 </button>
@@ -507,10 +929,13 @@ export function ClientPage() {
               </button>
             )}
           </div>
+
         </div>
 
-        {/* Right Column: Redirect URIs */}
-        <div className="lg:col-span-6">
+        {/* Right Column: Redirect URIs, OIDC Endpoints & SDK Integration */}
+        <div className="lg:col-span-6 space-y-6">
+
+          {/* 4. REDIRECT URIs CARD */}
           <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
               Allowed Callback Redirect URIs
@@ -563,6 +988,145 @@ export function ClientPage() {
               </button>
             </form>
           </div>
+
+          {/* 5. PROTOCOL ENDPOINTS CONSOLE */}
+          <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+              <Server className="w-5 h-5 text-[#FA812F]" />
+              <span>OAuth 2.0 & OIDC Endpoints</span>
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-neutral-400 mb-4">
+              Standard protocol URLs for client integrations, token exchanges, and user claims.
+            </p>
+
+            <div className="space-y-3 font-mono text-xs">
+              
+              {/* Authorization Endpoint */}
+              <div className="p-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 flex items-center justify-between gap-2">
+                <div className="truncate">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block font-sans">
+                    Authorization Endpoint (GET)
+                  </span>
+                  <span className="text-slate-800 dark:text-neutral-200 truncate">{authEndpoint}</span>
+                </div>
+                <button
+                  onClick={() => copyToClipboard(authEndpoint, 'auth_ep')}
+                  className="p-1 text-slate-400 hover:text-[#FA812F] cursor-pointer shrink-0"
+                >
+                  {copiedKey === 'auth_ep' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              {/* Token Endpoint */}
+              <div className="p-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 flex items-center justify-between gap-2">
+                <div className="truncate">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block font-sans">
+                    Token Endpoint (POST)
+                  </span>
+                  <span className="text-slate-800 dark:text-neutral-200 truncate">{tokenEndpoint}</span>
+                </div>
+                <button
+                  onClick={() => copyToClipboard(tokenEndpoint, 'tok_ep')}
+                  className="p-1 text-slate-400 hover:text-[#FA812F] cursor-pointer shrink-0"
+                >
+                  {copiedKey === 'tok_ep' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              {/* UserInfo Endpoint */}
+              <div className="p-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 flex items-center justify-between gap-2">
+                <div className="truncate">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block font-sans">
+                    Userinfo Endpoint (GET)
+                  </span>
+                  <span className="text-slate-800 dark:text-neutral-200 truncate">{userinfoEndpoint}</span>
+                </div>
+                <button
+                  onClick={() => copyToClipboard(userinfoEndpoint, 'userinfo_ep')}
+                  className="p-1 text-slate-400 hover:text-[#FA812F] cursor-pointer shrink-0"
+                >
+                  {copiedKey === 'userinfo_ep' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              {/* Discovery Document */}
+              <div className="p-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 flex items-center justify-between gap-2">
+                <div className="truncate">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block font-sans">
+                    Discovery Document (.well-known)
+                  </span>
+                  <span className="text-slate-800 dark:text-neutral-200 truncate">{discoveryDoc}</span>
+                </div>
+                <button
+                  onClick={() => copyToClipboard(discoveryDoc, 'disc_ep')}
+                  className="p-1 text-slate-400 hover:text-[#FA812F] cursor-pointer shrink-0"
+                >
+                  {copiedKey === 'disc_ep' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+              {/* JWKS URI */}
+              <div className="p-2.5 rounded-lg border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900 flex items-center justify-between gap-2">
+                <div className="truncate">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block font-sans">
+                    JWKS URI (Public Signing Keys)
+                  </span>
+                  <span className="text-slate-800 dark:text-neutral-200 truncate">{jwksUri}</span>
+                </div>
+                <button
+                  onClick={() => copyToClipboard(jwksUri, 'jwks_ep')}
+                  className="p-1 text-slate-400 hover:text-[#FA812F] cursor-pointer shrink-0"
+                >
+                  {copiedKey === 'jwks_ep' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          {/* 6. SDK INTEGRATION CODE */}
+          <div className="bg-white dark:bg-black border border-slate-200 dark:border-neutral-800 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+              <Terminal className="w-5 h-5 text-[#FA812F]" />
+              <span>Integration Example (@anuj304/pramaan)</span>
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-neutral-400 mb-4">
+              Install the official Pramaan SDK and initialize with your client credentials.
+            </p>
+
+            <pre className="p-3.5 rounded-xl bg-slate-100 dark:bg-neutral-900 border border-slate-300 dark:border-neutral-800 text-[11px] font-mono text-slate-800 dark:text-neutral-200 overflow-x-auto leading-relaxed">
+{`import { PramaanClient } from '@anuj304/pramaan';
+
+const client = new PramaanClient({
+  clientId: '${clientId}',
+  clientSecret: process.env.PRAMAAN_CLIENT_SECRET, // Never expose in frontend
+  redirectUri: '${redirectUris[0] || 'https://' + domain + '/callback'}',
+  issuer: '${window.location.origin}',
+});`}
+            </pre>
+          </div>
+
+          {/* 7. DANGER ZONE */}
+          <div className="bg-white dark:bg-black border border-rose-200 dark:border-rose-950/40 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <h2 className="text-lg font-bold text-rose-600 dark:text-rose-400 mb-2 flex items-center gap-2">
+              <Trash2 className="w-5 h-5" />
+              <span>Danger Zone</span>
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-neutral-400 mb-4">
+              Permanently delete this application and invalidate all user tokens.
+            </p>
+
+            <button
+              type="button"
+              onClick={handleDeleteClient}
+              disabled={deleting}
+              className="px-4 py-2.5 rounded-lg border border-rose-300 dark:border-rose-900/60 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <Trash2 className="w-4 h-4 shrink-0" />
+              <span>{deleting ? 'Deleting Application…' : 'Delete Application'}</span>
+            </button>
+          </div>
+
         </div>
       </div>
 
