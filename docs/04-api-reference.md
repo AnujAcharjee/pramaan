@@ -1,74 +1,48 @@
 # Pramaan API & Claims Reference
 
-This document provides a comprehensive technical specification of all OpenID Connect and OAuth 2.0 endpoints exposed by Pramaan, including request/response formats, parameter validations, and claim schemas.
+This reference documents the endpoints, payload formats, query parameters, claim schemas, and error responses exposed by the Pramaan Identity Provider.
 
-Base URL: `https://pramaan.anujacharjee.com` (or your self-hosted domain).
-
----
-
-## Table of Contents
-
-1. [OpenID Provider Configuration](#1-openid-provider-configuration)
-2. [JSON Web Key Set (JWKS)](#2-json-web-key-set-jwks)
-3. [Authorization Endpoint](#3-authorization-endpoint)
-4. [Token Endpoint](#4-token-endpoint)
-5. [UserInfo Endpoint](#5-userinfo-endpoint)
-6. [Supported Scopes & Claims](#6-supported-scopes--claims)
-7. [Standard Error Codes](#7-standard-error-codes)
+Base URL: `https://api.yourdomain.com` (or `http://localhost:5000` in local development).
 
 ---
 
-## 1. OpenID Provider Configuration
+## 1. OpenID Connect Discovery & JWKS
 
-Discovers the server's OAuth 2.0 and OpenID Connect capabilities.
-
+### A. OpenID Provider Configuration
 - **Method:** `GET`
-- **Path:** `/.well-known/openid-configuration`
-- **Auth:** None (Public)
+- **Path:** `/.well-known/openid-configuration` (also `/api/.well-known/openid-configuration`)
+- **Authentication:** None (Public)
 
-### Response (`200 OK`)
-
+#### Response (`200 OK`)
 ```json
 {
-  "issuer": "https://pramaan.anujacharjee.com",
-  "authorization_endpoint": "https://pramaan.anujacharjee.com/api/oauth/authorize",
-  "token_endpoint": "https://pramaan.anujacharjee.com/api/oauth/token",
-  "userinfo_endpoint": "https://pramaan.anujacharjee.com/userinfo",
-  "jwks_uri": "https://pramaan.anujacharjee.com/.well-known/jwks.json",
+  "issuer": "https://api.yourdomain.com",
+  "authorization_endpoint": "https://api.yourdomain.com/api/oauth/authorize",
+  "token_endpoint": "https://api.yourdomain.com/api/oauth/token",
+  "userinfo_endpoint": "https://api.yourdomain.com/userinfo",
+  "jwks_uri": "https://api.yourdomain.com/.well-known/jwks.json",
   "response_types_supported": ["code"],
   "subject_types_supported": ["public"],
   "id_token_signing_alg_values_supported": ["RS256"],
   "scopes_supported": ["openid", "profile", "email", "avatar"],
-  "token_endpoint_auth_methods_supported": ["client_secret_post", "none"],
+  "token_endpoint_auth_methods_supported": ["client_secret_post"],
   "claims_supported": [
-    "sub",
-    "iss",
-    "aud",
-    "exp",
-    "iat",
-    "nonce",
-    "name",
-    "email",
-    "email_verified",
-    "picture",
-    "avatar"
+    "sub", "iss", "aud", "exp", "iat", "nonce",
+    "email", "email_verified", "name", "picture", "avatar"
   ],
-  "code_challenge_methods_supported": ["S256"]
+  "code_challenge_methods_supported": ["S256", "plain"],
+  "grant_types_supported": ["authorization_code"]
 }
 ```
 
 ---
 
-## 2. JSON Web Key Set (JWKS)
-
-Returns the public cryptographic keys used by Pramaan to sign asymmetric JSON Web Tokens (ID Tokens and Access Tokens).
-
+### B. JSON Web Key Set (JWKS)
 - **Method:** `GET`
-- **Path:** `/.well-known/jwks.json`
-- **Auth:** None (Public)
+- **Path:** `/.well-known/jwks.json` (also `/api/.well-known/jwks.json`)
+- **Authentication:** None (Public)
 
-### Response (`200 OK`)
-
+#### Response (`200 OK`)
 ```json
 {
   "keys": [
@@ -76,161 +50,162 @@ Returns the public cryptographic keys used by Pramaan to sign asymmetric JSON We
       "kty": "RSA",
       "use": "sig",
       "alg": "RS256",
-      "kid": "pramaan-key-2026",
-      "n": "u1w2x3y4z5...",
+      "kid": "pramaan-rs256-key-id",
+      "n": "...",
       "e": "AQAB"
     }
   ]
 }
 ```
 
-Clients should cache keys based on HTTP caching headers and re-fetch only if encountering an unknown `kid` in a token header.
-
 ---
 
-## 3. Authorization Endpoint
+## 2. Standard OAuth 2.0 & OIDC Endpoints
 
-Initiates the Authorization Code flow. The user's browser is redirected here to authenticate and provide consent.
-
+### A. Authorization Endpoint
 - **Method:** `GET`
-- **Path:** `/api/oauth/authorize`
-- **Auth:** Browser session (user is prompted to log in if not already authenticated)
+- **Path:** `/api/oauth/authorize` (aliases: `/oauth/authorize`, `/authorize`)
+- **Authentication:** Browser session (prompts login/signup if unauthenticated)
 
-### Query Parameters
-
-| Parameter               | Type     | Required    | Description                                                                                            |
-| :---------------------- | :------- | :---------- | :----------------------------------------------------------------------------------------------------- |
-| `response_type`         | `string` | **Yes**     | Must be `code`.                                                                                        |
-| `client_id`             | `string` | **Yes**     | Client ID obtained from the Pramaan dashboard.                                                         |
-| `redirect_uri`          | `string` | **Yes**     | Exact callback URL registered in the client settings.                                                  |
-| `scope`                 | `string` | **Yes**     | Space-separated list of scopes (e.g. `openid profile email`).                                          |
-| `state`                 | `string` | **Yes**     | Opaque, unguessable value generated by your app for CSRF mitigation.                                   |
-| `code_challenge`        | `string` | **Yes**     | Base64URL-encoded SHA-256 hash of the `code_verifier` (RFC 7636).                                      |
-| `code_challenge_method` | `string` | **Yes**     | Must be `S256`.                                                                                        |
-| `nonce`                 | `string` | Conditional | String value to associate a Client session with an ID Token (required if `openid` scope is requested). |
-| `prompt`                | `string` | No          | `consent` to force re-consent, `login` to force credential prompt.                                     |
-
-### Successful Callback
-
-Redirects the browser back to `redirect_uri` with:
-
-```
-HTTP/1.1 302 Found
-Location: https://yourapp.com/callback?code=AUTH_CODE_XYZ&state=YOUR_STATE
-```
-
-- `code`: One-time authorization code (valid for 5 minutes).
-- `state`: The identical state value sent in the initial request.
-
-### Error Callback
-
-If the user denies consent or validation fails:
-
-```
-HTTP/1.1 302 Found
-Location: https://yourapp.com/callback?error=access_denied&error_description=User+denied+access&state=YOUR_STATE
-```
+#### Query Parameters
+| Parameter | Required | Description |
+| :--- | :---: | :--- |
+| `response_type` | Yes | Must be `code`. |
+| `client_id` | Yes | Registered application identifier. |
+| `redirect_uri` | Yes | Exact callback URL registered for the client. |
+| `scope` | Yes | Space-delimited scopes (e.g. `openid profile email`). |
+| `state` | Yes | Random cryptographic string for CSRF mitigation. |
+| `nonce` | Required for `openid` | Cryptographic string embedded in the ID Token. |
+| `code_challenge` | Yes | Base64URL-encoded SHA-256 hash of `code_verifier`. |
+| `code_challenge_method`| Yes | Must be `S256` (or `plain`). |
 
 ---
 
-## 4. Token Endpoint
-
-Exchanges an authorization code and PKCE verifier for an Access Token and ID Token.
-
+### B. Token Endpoint
 - **Method:** `POST`
-- **Path:** `/api/oauth/token`
-- **Content-Type:** `application/x-www-form-urlencoded`
-- **Auth:** Client authentication (`client_secret_post` or `none` for public clients with PKCE)
+- **Path:** `/api/oauth/token` (alias: `/oauth/token`)
+- **Headers:** `Content-Type: application/x-www-form-urlencoded`
+- **CORS:** Enabled for public SPA and mobile clients.
 
-### Request Body
+#### Request Body (URL-Encoded)
+```
+grant_type=authorization_code
+&code=AUTHORIZATION_CODE
+&redirect_uri=https://yourapp.com/callback
+&client_id=YOUR_CLIENT_ID
+&client_secret=YOUR_CLIENT_SECRET
+&code_verifier=YOUR_CODE_VERIFIER
+```
 
-| Field           | Type     | Required    | Description                                                               |
-| :-------------- | :------- | :---------- | :------------------------------------------------------------------------ |
-| `grant_type`    | `string` | **Yes**     | Must be `authorization_code`.                                             |
-| `code`          | `string` | **Yes**     | The authorization code received from `/api/oauth/authorize`.              |
-| `redirect_uri`  | `string` | **Yes**     | The same redirect URI used in the authorization request.                  |
-| `client_id`     | `string` | **Yes**     | Your Client ID.                                                           |
-| `client_secret` | `string` | Conditional | Required for confidential clients.                                        |
-| `code_verifier` | `string` | **Yes**     | Raw PKCE code verifier (43-128 characters) matching the `code_challenge`. |
-
-### Response (`200 OK`)
-
+#### Response (`200 OK`)
 ```json
 {
-  "access_token": "eyJhbGciOiJSUzI1NiIs...",
+  "access_token": "pramaan_at_...",
   "token_type": "Bearer",
-  "expires_in": 600,
-  "scope": "openid profile email",
-  "id_token": "eyJhbGciOiJSUzI1NiIs..."
-}
-```
-
-### ID Token Payload Decoded
-
-```json
-{
-  "iss": "https://pramaan.anujacharjee.com",
-  "sub": "usr_94a73e82",
-  "aud": "client_abc123",
-  "exp": 1725883200,
-  "iat": 1725879600,
-  "nonce": "secure_random_nonce_value"
-}
-```
-
-### Error Response (`400 Bad Request`)
-
-```json
-{
-  "error": "invalid_grant",
-  "error_description": "Invalid, expired, or previously redeemed authorization code"
+  "expires_in": 3600,
+  "id_token": "eyJhbGciOiJSUzI1NiIs...",
+  "scope": "openid profile email"
 }
 ```
 
 ---
 
-## 5. UserInfo Endpoint
-
-Returns authenticated user claims corresponding to granted scopes.
-
-- **Method:** `GET`
-- **Path:** `/userinfo`
+### C. UserInfo Endpoint
+- **Method:** `GET` or `POST`
+- **Path:** `/userinfo` (alias: `/api/oauth/userinfo`)
 - **Headers:** `Authorization: Bearer <access_token>`
 
-### Response (`200 OK`)
-
+#### Response (`200 OK`)
 ```json
 {
-  "sub": "usr_94a73e82",
-  "name": "Jane Doe",
-  "email": "jane.doe@example.com",
+  "sub": "usr_9b1deb4d3b7d4bad9bdd2b0d7b3dcb6d",
+  "email": "user@example.com",
   "email_verified": true,
-  "picture": "https://pramaan.anujacharjee.com/avatars/usr_94a73e82.jpg"
+  "name": "Jane Doe",
+  "picture": "https://cdn.example.com/avatars/usr_123.png",
+  "avatar": "https://cdn.example.com/avatars/usr_123.png"
 }
 ```
 
 ---
 
-## 6. Supported Scopes & Claims
+## 3. Headless REST API v1 (`/api/v1/*`)
 
-| Scope     | Claims Included           | Description                                                                 |
-| :-------- | :------------------------ | :-------------------------------------------------------------------------- |
-| `openid`  | `sub`                     | Identifies user uniquely across sessions. Returns standard OIDC `id_token`. |
-| `profile` | `name`, `picture`         | User's full name and profile avatar.                                        |
-| `email`   | `email`, `email_verified` | User's primary email and boolean verification status.                       |
-| `avatar`  | `avatar`, `picture`       | Direct image URL to the user's avatar.                                      |
+All headless endpoints accept and return `application/json` with credentials enabled (`{ credentials: 'include' }`).
+
+### A. Authentication (`/api/v1/auth`)
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/v1/auth/signin` | `POST` | Authenticate user; establishes session cookies (`isid`, `asid`). |
+| `/api/v1/auth/signup` | `POST` | Register new user. Accepts `flow: 'oauth'` & `request_id`. |
+| `/api/v1/auth/verify-email` | `GET`/`POST` | Verify email token, activate account, route to consent if OAuth flow. |
+| `/api/v1/auth/resend-verification` | `GET`/`POST` | Resend verification email, preserving OAuth flow context. |
+| `/api/v1/auth/forgot-password` | `POST` | Dispatch password reset email. |
+| `/api/v1/auth/reset-password` | `POST` | Set new password with reset token. |
+| `/api/v1/auth/signout` | `POST` | Terminate active and identity sessions; clear cookies. |
+| `/api/v1/auth/me` | `GET` | Get current authenticated user session details. |
 
 ---
 
-## 7. Standard Error Codes
+### B. Headless OAuth Handshake (`/api/v1/oauth`)
 
-| Code                        | RFC Context       | Description                                                                   |
-| :-------------------------- | :---------------- | :---------------------------------------------------------------------------- |
-| `invalid_request`           | RFC 6749 §4.1.2.1 | Missing required parameter or invalid format.                                 |
-| `unauthorized_client`       | RFC 6749 §4.1.2.1 | Client is not authorized to request this grant or scope.                      |
-| `access_denied`             | RFC 6749 §4.1.2.1 | Resource owner or server denied the request (e.g. cancelled consent).         |
-| `unsupported_response_type` | RFC 6749 §4.1.2.1 | Authorization server does not support response type.                          |
-| `invalid_scope`             | RFC 6749 §4.1.2.1 | Requested scope is invalid, unknown, or malformed.                            |
-| `server_error`              | RFC 6749 §4.1.2.1 | Internal server error.                                                        |
-| `invalid_grant`             | RFC 6749 §5.2     | Provided authorization code or PKCE verifier is invalid, expired, or revoked. |
-| `invalid_client`            | RFC 6749 §5.2     | Client authentication failed (invalid secret or unknown client).              |
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/v1/oauth/authorize` | `GET` | Validates OAuth params and returns JSON state (`unauthenticated`, `consent_required`, `authorized`). |
+| `/api/v1/oauth/consent-details` | `GET` | Returns client name, avatar, and requested scope descriptions for the consent screen. |
+| `/api/v1/oauth/consent/decision` | `POST` | Submits consent decision (`decision: 'approve'` or `'deny'`). Returns redirect URL with authorization code. |
+
+---
+
+### C. Developer Hub & Client Management (`/api/v1/developer`)
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/v1/developer/clients` | `GET` | List all OAuth clients registered by the authenticated user. |
+| `/api/v1/developer/clients` | `POST` | Register a new OAuth client. |
+| `/api/v1/developer/clients/:id` | `GET` | Get detailed client metadata, credentials, and verification status. |
+| `/api/v1/developer/clients/:id` | `PUT` | Update client name, domain, redirect URIs, or environment tier. |
+| `/api/v1/developer/clients/:id` | `DELETE` | Delete an OAuth client. |
+| `/api/v1/developer/clients/:id/secret` | `POST` | Rotate client secret; immediately revokes previous secret. |
+| `/api/v1/developer/clients/:id/verify-domain` | `POST` | Run live DNS TXT lookup against `_pramaan-verification.<domain>` to verify domain ownership. |
+
+---
+
+## 4. Standard Response & Error Envelope
+
+All headless API responses conform to a predictable envelope:
+
+### Success Response
+```json
+{
+  "success": true,
+  "message": "Action completed successfully",
+  "data": { ... }
+}
+```
+
+### Error Response
+```json
+{
+  "success": false,
+  "message": "Detailed error message",
+  "code": "ERR_4006"
+}
+```
+
+### Standard Error Codes
+| Code | Constant | Meaning |
+| :--- | :--- | :--- |
+| `ERR_4001` | `INVALID_CREDENTIALS` | Invalid email or password provided. |
+| `ERR_4002` | `INVALID_INPUT` | Missing or malformed request parameters. |
+| `ERR_4003` | `INVALID_REQUEST` | General request constraint violation. |
+| `ERR_4004` | `INVALID_CLIENT` | Client ID does not exist or client is disabled. |
+| `ERR_4005` | `INVALID_REDIRECT_URI` | Redirect URI is not registered for this client. |
+| `ERR_4006` | `EMAIL_ALREADY_EXISTS` | Registration attempt with an existing email. |
+| `ERR_4007` | `UNAUTHORIZED_CLIENT` | Client not authorized to request this grant or scope. |
+| `ERR_4008` | `UNSUPPORTED_GRANT_TYPE`| Only `authorization_code` grant is supported. |
+| `ERR_4009` | `INVALID_SCOPE` | Requested scopes are unrecognized or forbidden. |
+| `ERR_4010` | `INVALID_GRANT` | Authorization code is expired, invalid, or reused. |
+| `ERR_4020` | `RATE_LIMITED` | Rate limit threshold exceeded. Please retry later. |
+| `ERR_5001` | `INTERNAL_SERVER_ERROR` | Server-side execution failure. |

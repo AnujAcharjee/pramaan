@@ -1,0 +1,20 @@
+{
+  "name": "pramaan",
+  "private": true,
+  "description": "Pramaan - OAuth 2.0 & OIDC Identity Provider",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "sdk"
+  ],
+  "scripts": {
+    "dev": "bunx concurrently -n \"backend,frontend\" -c \"blue,yellow\" \"bun run dev:backend\" \"bun run dev:frontend\"",
+    "dev:backend": "bun --cwd backend dev",
+    "build:backend": "bun --cwd backend run build",
+    "test:backend": "bun --cwd backend test",
+    "dev:frontend": "bun --cwd frontend dev",
+    "build:frontend": "bun --cwd frontend run build",
+    "lint": "bun --cwd backend run lint",
+    "format": "bunx prettier --write \"**/*.{ts,tsx,md,json}\""
+  }
+}

@@ -75,6 +75,7 @@ Pramaan utilizes **Bun** across both backend and frontend workspaces.
 
 | Command                  | Action                                                            |
 | :----------------------- | :---------------------------------------------------------------- |
+| `bun run dev`            | Runs both backend (`:5000`) and frontend (`:3000`) concurrently   |
 | `bun run dev:backend`    | Starts backend server in watch mode (`http://localhost:5000`)     |
 | `bun run dev:frontend`   | Starts Vite frontend dev server (`http://localhost:3000`)         |
 | `bun run build:backend`  | Compiles backend TypeScript (`tsc --build`)                       |

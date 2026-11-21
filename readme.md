@@ -1,8 +1,11 @@
-# Pramaan — Identity Provider
+# Pramaan — Modern OAuth 2.0 & OpenID Connect Identity Provider
 
-**Pramaan** is a self-hostable OAuth 2.0 and OpenID Connect identity provider built for developers who want full control over their authentication infrastructure without third-party lock-in.
+**Pramaan** is an open-source, standards-compliant, self-hostable OAuth 2.0 and OpenID Connect (OIDC) Identity Provider built for modern engineering teams who demand complete ownership of their authentication infrastructure without proprietary lock-in.
 
-It implements the **Authorization Code flow with PKCE** (RFC 7636) and **OpenID Connect Core 1.0**, issuing RS256-signed tokens verifiable via standard JWKS discovery.
+Pramaan features a modern, completely decoupled architecture:
+- **Headless Backend (`backend/`)**: High-performance REST API and OAuth/OIDC engine powered by **Bun**, **Express 5**, **TypeScript**, **Prisma ORM (PostgreSQL)**, and **Redis**. Supports PKCE (RFC 7636), RS256/ES256 asymmetric signing, automated JWKS rotation, envelope encryption at rest, and DNS TXT domain verification.
+- **Modern Frontend SPA (`frontend/`)**: React 19 Single Page Application built with **TypeScript**, **Tailwind CSS v4**, **Vite**, and **Bun**, featuring a zero-tint high-contrast interface, interactive Developer Hub, and zero-config deployment on **Vercel**.
+- **Official SDK (`sdk/`)**: Lightweight, framework-agnostic [`@anuj304/pramaan`](./sdk/) TypeScript client library.
 
 ---
 
@@ -16,43 +19,128 @@ Watch how Pramaan delivers frictionless user sign-in, scope authorization, and i
       <img src="https://res.cloudinary.com/ddsbhdeju/image/upload/pramaan-demo-thumbnail.jpg" alt="Pramaan in Action Demo" width="100%" style="max-width: 780px; border-radius: 12px;" />
     </a>
   </video>
-  <p><sub><em>Demonstration: Frictionless OAuth 2.0 / OIDC sign-in and consent flow powered by Pramaan.</em></sub></p>
+  <p><sub><em>Demonstration: Frictionless OAuth 2.0 / OIDC sign-in, Developer Hub, and consent flow powered by Pramaan.</em></sub></p>
 </div>
 
 > 📺 **Direct Video Link:** If your markdown viewer does not render embedded video, [watch the demo video directly on Cloudinary](https://res.cloudinary.com/ddsbhdeju/video/upload/pramaan-demo.mp4).
 
 ---
 
-## Get Started
+## 🏛️ Monorepo Architecture
 
-Use the hosted Pramaan instance, self-host on your own infrastructure, or let your AI agent configure everything in one shot.
-
-🌐 **Hosted:** [pramaan.anujacharjee.com](https://pramaan.anujacharjee.com/)
-
-🛠️ **Self-host:** Clone the repository and run Pramaan on your own infrastructure. [Deployment Guide →](./docs/deployment.md)
+```
+├── backend/             # Headless REST API & OIDC Engine (Bun + Express 5 + Prisma + Redis)
+│   ├── prisma/          # PostgreSQL schema (schema.prisma) & migrations
+│   ├── src/             # Headless controllers, services, routes, validators
+│   ├── tests/           # Integration, crypto, and security test suites (96 tests)
+│   ├── Dockerfile       # Lightweight container image based on oven/bun:1-alpine
+│   └── docker-compose.yml # Backend container + Caddy reverse proxy + Grafana Alloy
+├── frontend/            # High-performance React 19 SPA (Tailwind CSS v4 + Vite + Bun)
+│   ├── src/pages/       # Landing, Developer Hub, Client Dashboard, Account Portal, Auth
+│   ├── src/components/  # High-contrast UI components, modals, PramaanLogo
+│   ├── src/services/    # Centralized headless API client (api.ts)
+│   └── vercel.json      # Zero-config Vercel SPA rewrite configuration
+├── sdk/                 # Official @anuj304/pramaan TypeScript SDK
+│   ├── src/             # Discovery, PKCE, Token exchange, JWKS, UserInfo
+│   └── tests/           # Comprehensive test suite (39 tests)
+├── docs/                # Architecture, API specs, and deployment guides
+├── package.json         # Bun workspaces root orchestrator
+└── AGENTS.md            # AI agent & developer guidelines
+```
 
 ---
 
-## Endpoints
+## ⚡ Quick Start
 
-Pramaan exposes the following OIDC-compliant endpoints. All paths are discoverable via the OpenID Configuration document.
+### 1. Monorepo Local Development
 
-| Endpoint             | Path                                |
-| :------------------- | :---------------------------------- |
-| OpenID Configuration | `/.well-known/openid-configuration` |
-| JWKS                 | `/.well-known/jwks.json`            |
-| Authorization        | `/api/oauth/authorize`              |
-| Token                | `/api/oauth/token`                  |
-| UserInfo             | `/userinfo`                         |
+Pramaan utilizes **Bun** across all workspaces. Ensure [Bun](https://bun.sh) is installed on your system.
+
+```bash
+# Clone the repository
+git clone https://github.com/AnujAcharjee/pramaan.git
+cd pramaan
+
+# Install all workspace dependencies
+bun install
+
+# Start both backend (http://localhost:5000) and frontend (http://localhost:3000) concurrently
+bun run dev
+```
+
+### Orchestrator Commands
+
+| Command | Action |
+| :--- | :--- |
+| `bun run dev` | Starts both backend (`:5000`) and frontend (`:3000`) concurrently |
+| `bun run dev:backend` | Starts backend in watch mode (`http://localhost:5000`) |
+| `bun run dev:frontend` | Starts Vite frontend dev server (`http://localhost:3000`) |
+| `bun run build:backend` | Compiles backend TypeScript (`tsc --build`) |
+| `bun run build:frontend` | Compiles frontend TypeScript and bundles Vite (`dist/`) |
+| `bun run test:backend` | Executes backend test suite (96 tests across 3 suites) |
+| `bun run test:sdk` | Executes SDK test suite (39 tests across 8 suites) |
+| `bun run lint` | Runs linting across codebase |
+| `bun run format` | Prettier code formatting across all files |
 
 ---
 
-## Quick Start with Official SDK
+## 🚀 Deployment Overview
 
-The fastest and most secure way to integrate Pramaan with Node.js / TypeScript is using the official SDK:
+Pramaan's decoupled architecture enables independent, optimal hosting for frontend and backend:
+
+- **Backend (API & OIDC Engine)**: Deployed to **AWS EC2** (or any VPS/cloud VM) using Docker (`anuj304/pramaan:latest` on `oven/bun:1-alpine`), with **Caddy** providing automatic HTTPS certificates, reverse proxying, and **Grafana Alloy** shipping logs to Grafana Loki. Automated via GitHub Actions on push to `backend/**`.
+- **Frontend (Web Console & SPA)**: Deployed to **Vercel** with single-click zero-config routing (`vercel.json`), pointing to the backend API via `VITE_API_URL`.
+
+👉 Read the complete [**Self-Hosting & Deployment Guide →**](./docs/deployment.md)
+
+---
+
+## 🌐 Endpoints
+
+Pramaan exposes standard RFC-compliant OIDC and OAuth 2.0 endpoints alongside headless REST APIs:
+
+### Standard OAuth 2.0 & OIDC Endpoints
+
+| Endpoint | Path | Description |
+| :--- | :--- | :--- |
+| **OpenID Configuration** | `/.well-known/openid-configuration` | OpenID Connect discovery metadata |
+| **JWKS** | `/.well-known/jwks.json` | Public RS256 signing keys |
+| **Authorization** | `/api/oauth/authorize` | RFC 6749 authorization code initiation |
+| **Token Exchange** | `/api/oauth/token` | Exchanges authorization code for access & ID tokens |
+| **UserInfo** | `/userinfo` | OIDC user profile claims (Bearer access token) |
+
+### Headless REST APIs (v1)
+
+| Route Prefix | Purpose |
+| :--- | :--- |
+| `/api/v1/auth/*` | Headless sign-in, sign-up, verification, and password recovery |
+| `/api/v1/oauth/*` | Headless OAuth handshake, consent details, and decision submission |
+| `/api/v1/developer/*` | Developer Hub client CRUD, secret rotation, and DNS verification |
+| `/api/v1/account/*` | User profile management, password updates, active sessions, consents |
+
+---
+
+## 🛠️ Developer Hub & Client Management
+
+Access the self-service **Developer Hub** at [`/developer`](https://pramaan.anujacharjee.com/developer):
+
+- **Register OAuth Clients**: Configure client name, application domain, client type (`Confidential` vs `Public`), environment (`Development` vs `Production`), and redirect URIs.
+- **Update Client Metadata**: Modify client name and application domain on the fly.
+- **Credential Rotation**: Instantly rotate client secrets with zero downtime.
+- **DNS TXT Domain Verification**: Verify ownership of custom apex domains or subdomains by setting a `_pramaan-verification.<domain>` TXT record, unlocking production-grade OAuth security.
+
+👉 Read the complete [**Client Registration & Management Guide →**](./docs/01-create-client.md)
+
+---
+
+## 📦 Quick Start with Official SDK
+
+The fastest and most secure way to integrate Pramaan into Node.js / TypeScript applications is with the official [`@anuj304/pramaan`](./sdk/) client library:
 
 ```bash
 npm install @anuj304/pramaan
+# or
+bun add @anuj304/pramaan
 ```
 
 ```typescript
@@ -65,16 +153,18 @@ const pramaan = new PramaanClient({
   redirectUri: 'http://localhost:3000/pramaan/callback',
 });
 
-// 1. Initiate login
+// 1. Initiate login (creates PKCE, state, and nonce)
 const { url, transaction } = await pramaan.createAuthorizationRequest({
   scope: ['openid', 'profile', 'email'],
 });
+req.session.oauth = transaction;
+res.redirect(url);
 
 // 2. Complete callback & verify ID token via JWKS
 const tokens = await pramaan.handleCallback({
   code: req.query.code,
   state: req.query.state,
-  transaction: req.session.transaction,
+  transaction: req.session.oauth,
 });
 
 // 3. Fetch user profile
@@ -85,94 +175,31 @@ const user = await pramaan.getUserInfo(tokens.accessToken);
 
 ---
 
-## Documentation Suite
+## 📚 Documentation Suite
 
 Comprehensive guides for every stage of integration and hosting:
 
-| Guide                                                                 | Description                                                                                   |
-| :-------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
-| 🐳 [**Self-Hosting & Deployment**](./docs/deployment.md)              | How to deploy your own instance of Pramaan with Docker Compose, Caddy, Postgres, and Redis.   |
-| 📄 [**01 — Registering an OAuth Client**](./docs/01-create-client.md) | How to register your application, configure redirect URIs, and retrieve credentials.          |
-| 🚀 [**02 — Manual Protocol Guide**](./docs/02-signup-flow.md)         | Step-by-step RFC-compliant flow for Python, Go, Rust, Java, or raw HTTP integrations.         |
-| ⚡ [**03 — Official SDK Guide**](./docs/03-sdk-guide.md)              | Detailed documentation for `@anuj304/pramaan` with full options, typed errors, and utilities. |
-| 📚 [**04 — API & Claims Reference**](./docs/04-api-reference.md)      | Endpoints, query parameters, token response formats, claim mappings, and error codes.         |
-| 🛡️ [**05 — Security & Best Practices**](./docs/05-security.md)        | Threat model, PKCE rationale, timing-safe state comparison, and production checklist.         |
-| 💻 [**Runnable Express Example**](./sdk/examples/express/)            | Full, production-ready Express reference application with sessions and UI.                    |
-
-```
-docs/
-├── deployment.md             # Docker Compose, Caddy & self-hosting instructions
-├── 01-create-client.md       # Register and manage OAuth clients
-├── 02-signup-flow.md         # Protocol flow & manual integration (Python, Go, etc.)
-├── 03-sdk-guide.md           # Official Node.js/TypeScript SDK guide
-├── 04-api-reference.md       # Endpoints, schemas, claims & error reference
-└── 05-security.md            # Threat model, PKCE, and production checklist
-```
+| Guide | Description |
+| :--- | :--- |
+| 🐳 [**Self-Hosting & Deployment**](./docs/deployment.md) | AWS EC2 backend deployment (Docker + Caddy + Alloy) and Vercel frontend hosting. |
+| 📄 [**01 — Registering an OAuth Client**](./docs/01-create-client.md) | Developer Hub, client creation, metadata updates, secret rotation, and DNS verification. |
+| 🚀 [**02 — Manual Protocol Guide**](./docs/02-signup-flow.md) | Step-by-step RFC-compliant flow and headless handshake for any backend stack. |
+| ⚡ [**03 — Official SDK Guide**](./docs/03-sdk-guide.md) | Detailed documentation for `@anuj304/pramaan` with full options, typed errors, and utilities. |
+| 📚 [**04 — API & Claims Reference**](./docs/04-api-reference.md) | Headless REST APIs, OAuth endpoints, claim schemas, and error codes. |
+| 🛡️ [**05 — Security & Best Practices**](./docs/05-security.md) | Threat model, PKCE rationale, timing-safe state comparison, and production checklist. |
+| 💻 [**Runnable Express Example**](./sdk/examples/express/) | Full, production-ready Express reference application with sessions and UI. |
 
 ---
 
-## Token Model
+## 🔒 Security Practices
 
-Pramaan issues two token types. Understanding the distinction from your application session is critical.
-
-|                 | Access Token                           | ID Token                     |
-| :-------------- | :------------------------------------- | :--------------------------- |
-| **Purpose**     | Authorize API calls (e.g. `/userinfo`) | Prove user identity          |
-| **Audience**    | Resource server (`userinfo`)           | Your client (`client_id`)    |
-| **Signed with** | RS256 (asymmetric)                     | RS256 (asymmetric)           |
-| **Lifetime**    | Short-lived (configurable)             | Short-lived (configurable)   |
-| **Contains**    | `sub`, `scope`                         | `sub`, `nonce`, `aud`, `iss` |
-
-> ⚠️ Never use OAuth tokens as your application session. After verifying the ID token, create your own session (cookie, JWT, etc.) with appropriate expiration and security flags.
+- **Zero Third-Party Lock-In**: Complete control over your identities, database, and encryption keys.
+- **Envelope Encryption at Rest**: RSA/ECDSA private keys are encrypted using AES-256-GCM envelope encryption in PostgreSQL.
+- **Mandatory PKCE (S256)**: Proof Key for Code Exchange (RFC 7636) prevents authorization code interception attacks.
+- **Automated JWKS Key Rotation**: Automated rotation scripts and standard JWKS discovery.
+- **DNS TXT Domain Verification**: Enforces verifiable domain ownership for production redirect URIs.
 
 ---
 
-## Supported Scopes
-
-| Scope     | Claims Returned           |
-| :-------- | :------------------------ |
-| `openid`  | `sub`                     |
-| `profile` | `name`, `picture`         |
-| `email`   | `email`, `email_verified` |
-| `avatar`  | `avatar`, `picture`       |
-
----
-
-## Common Issues
-
-| Problem                  | Fix                                                                                         |
-| :----------------------- | :------------------------------------------------------------------------------------------ |
-| **Invalid Redirect URI** | Must exactly match the URI registered in the client dashboard                               |
-| **State Mismatch**       | Possible CSRF or expired session — validate the `state` parameter against your stored value |
-| **Invalid ID Token**     | Verify `issuer`, `audience`, `nonce`, RS256 signature (via JWKS), and `exp`                 |
-| **Access Token Expired** | Re-authenticate the user; Pramaan does not currently issue refresh tokens                   |
-
----
-
-## Production Checklist
-
-- [ ] HTTPS on all redirect URIs
-- [ ] Secure cookies (`httpOnly`, `secure`, `sameSite: 'lax'`)
-- [ ] PKCE enforced for all clients
-- [ ] ID token signature verified via JWKS
-- [ ] Session expiration configured
-- [ ] Rate limiting on login/token endpoints
-- [ ] `state` and `nonce` validated on every callback
-- [ ] Client secret rotated periodically
-- [ ] Logging and monitoring enabled
-
----
-
-## Security Practices
-
-- Never expose `CLIENT_SECRET` in frontend code or version control
-- Always validate `state` and `nonce` on the callback
-- Verify ID token signatures using the JWKS endpoint — never skip verification
-- Use server-side sessions; do not store OAuth tokens in localStorage
-- Expire OAuth parameters (state, nonce, code_verifier) within 5–10 minutes
-- Enforce RS256 as the only accepted signing algorithm
-
----
-
-**Last Updated:** September 2026
-**Version:** 2.1
+**License:** MIT  
+**Author:** Anuj Acharjee ([@anuj304](https://github.com/AnujAcharjee))
