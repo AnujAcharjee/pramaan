@@ -1,10 +1,27 @@
 import { BookOpen, Terminal, User, ExternalLink, ShieldCheck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { PramaanLogo } from './PramaanLogo';
 
 const currentYear = new Date().getFullYear();
 
 export function Footer() {
+  const location = useLocation();
+  const cleanPath = location.pathname.replace(/\/+$/, '') || '/';
+  const hideFooterRoutes = [
+    '/signin',
+    '/signup',
+    '/oauth/consent',
+    '/oauth/authorize',
+    '/authorize',
+    '/verify',
+    '/forgot-password',
+    '/reset-password',
+  ];
+
+  if (hideFooterRoutes.includes(cleanPath)) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-950 pt-12 pb-8 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -12,27 +29,7 @@ export function Footer() {
         {/* Main 3-Column Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 pb-10 border-b border-slate-200 dark:border-neutral-900">
           
-          {/* Column 1: Developer Hub */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#FA812F]">
-              <Terminal className="w-4 h-4" />
-              <span>Developer Hub</span>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 leading-relaxed">
-              Register OAuth 2.0 & OIDC applications, rotate client secrets, configure callback redirect URIs, and verify custom domains via DNS TXT records.
-            </p>
-            <div className="pt-1">
-              <Link
-                to="/developer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FA812F] hover:underline"
-              >
-                <span>Launch Developer Hub</span>
-                <span>→</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Column 2: Account Portal */}
+           {/* Column 1: Account Portal */}
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
               <User className="w-4 h-4" />
@@ -47,6 +44,26 @@ export function Footer() {
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline"
               >
                 <span>Access Account Portal</span>
+                <span>→</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Column 2: Developer Hub */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#FA812F]">
+              <Terminal className="w-4 h-4" />
+              <span>Developer Hub</span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 leading-relaxed">
+              Register OAuth 2.0 & OIDC applications, rotate client secrets, configure callback redirect URIs, and verify custom domains via DNS TXT records.
+            </p>
+            <div className="pt-1">
+              <Link
+                to="/developer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FA812F] hover:underline"
+              >
+                <span>Launch Developer Hub</span>
                 <span>→</span>
               </Link>
             </div>

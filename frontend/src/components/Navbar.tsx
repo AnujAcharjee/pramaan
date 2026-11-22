@@ -15,6 +15,9 @@ export function Navbar() {
     '/oauth/consent',
     '/oauth/authorize',
     '/authorize',
+    '/verify',
+    '/forgot-password',
+    '/reset-password',
   ];
 
   if (hideNavbarRoutes.includes(cleanPath)) {

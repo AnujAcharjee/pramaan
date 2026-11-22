@@ -153,7 +153,7 @@ app.get('/api/auth/callback', async (req, res) => {
                 <div className="absolute -inset-1.5 bg-linear-to-r from-[#FF9644]/40 via-amber-500/25 to-purple-600/30 rounded-3xl blur-xl opacity-75 group-hover:opacity-100 transition-opacity duration-300" />
 
                 <div className="relative rounded-2xl bg-white dark:bg-black p-1.5 border border-slate-200 dark:border-neutral-800 shadow-2xl">
-                  <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-black flex items-center justify-center">
+                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-black flex items-center justify-center">
                     <video
                       className="w-full h-full object-cover"
                       autoPlay
@@ -161,10 +161,10 @@ app.get('/api/auth/callback', async (req, res) => {
                       loop
                       playsInline
                       preload="auto"
-                      poster="https://res.cloudinary.com/ddsbhdeju/image/upload/f_auto,q_auto,w_900/pramaan-demo-thumbnail.jpg"
+                      poster="https://res.cloudinary.com/ddsbhdeju/video/upload/so_0,f_auto,q_auto,w_1200/Video_Project_3_houcs8.jpg"
                     >
                       <source
-                        src="https://res.cloudinary.com/ddsbhdeju/video/upload/pramaan-demo.mp4"
+                        src="https://res.cloudinary.com/ddsbhdeju/video/upload/Video_Project_3_houcs8.mp4"
                         type="video/mp4"
                       />
                       Your browser does not support HTML5 video.
@@ -271,18 +271,16 @@ app.get('/api/auth/callback', async (req, res) => {
             {/* User Account Portal Card */}
             <div className="relative bg-white dark:bg-black border-2 border-slate-200 dark:border-neutral-800 rounded-2xl p-8 sm:p-10 shadow-sm hover:border-purple-500/50 dark:hover:border-purple-500/50 transition-all flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/25 text-purple-500 flex items-center justify-center font-extrabold text-lg">
+                {/* Header: Icon + Name */}
+                <div className="flex items-center gap-3.5 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/25 text-purple-500 flex items-center justify-center font-extrabold text-lg shrink-0">
                     <User className="w-6 h-6" />
                   </div>
-                  <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900/50 uppercase tracking-wider">
-                    For Identity Owners & End Users
-                  </span>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    User Account Portal
+                  </h3>
                 </div>
 
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  User Account Portal
-                </h3>
                 <p className="text-sm text-slate-600 dark:text-neutral-400 mb-6 leading-relaxed">
                   Your personal identity center to manage your profile, customize your user avatar picture, review active device sessions, and manage third-party consents.
                 </p>
@@ -310,10 +308,10 @@ app.get('/api/auth/callback', async (req, res) => {
               <div>
                 <Link
                   to="/account"
-                  className="w-full py-3 text-sm font-semibold rounded-lg border-2 border-slate-300 dark:border-neutral-700 bg-white dark:bg-black text-slate-800 dark:text-neutral-200 hover:border-purple-500 dark:hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full py-3.5 text-sm font-semibold rounded-xl border-2 border-purple-500 text-purple-600 dark:text-purple-400 hover:bg-purple-500 hover:text-white dark:hover:bg-purple-500 dark:hover:text-white flex items-center justify-center gap-2 transition-all cursor-pointer group/btn"
                 >
                   <span>Checkout User Portal</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                 </Link>
                 <p className="text-center text-[11px] text-slate-400 dark:text-neutral-500 mt-2">
                   For individual users. Manage your personal credentials and authorized apps.
@@ -324,18 +322,16 @@ app.get('/api/auth/callback', async (req, res) => {
             {/* Developer Hub Card */}
             <div className="relative bg-white dark:bg-black border-2 border-slate-200 dark:border-neutral-800 rounded-2xl p-8 sm:p-10 shadow-sm hover:border-[#FA812F] dark:hover:border-[#FA812F] transition-all flex flex-col justify-between group">
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/25 text-[#FA812F] flex items-center justify-center font-extrabold text-lg">
+                {/* Header: Icon + Name */}
+                <div className="flex items-center gap-3.5 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-orange-500/10 border border-orange-500/25 text-[#FA812F] flex items-center justify-center font-extrabold text-lg shrink-0">
                     <Terminal className="w-6 h-6" />
                   </div>
-                  <span className="text-xs font-bold font-mono px-2.5 py-1 rounded-md bg-orange-50 dark:bg-orange-950/40 text-[#FA812F] border border-orange-200 dark:border-orange-900/50 uppercase tracking-wider">
-                    For Developers & Teams
-                  </span>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                    Developer Hub
+                  </h3>
                 </div>
 
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                  Developer Hub
-                </h3>
                 <p className="text-sm text-slate-600 dark:text-neutral-400 mb-6 leading-relaxed">
                   The primary control plane to register OAuth 2.0 & OIDC applications, configure callback URIs, rotate client secrets, and verify domain ownership.
                 </p>
@@ -363,10 +359,10 @@ app.get('/api/auth/callback', async (req, res) => {
               <div>
                 <Link
                   to="/developer"
-                  className="btn-orange w-full py-3 text-sm font-semibold flex items-center justify-center gap-2 group-hover:shadow-lg transition-shadow"
+                  className="w-full py-3.5 text-sm font-semibold rounded-xl border-2 border-[#FA812F] text-[#FA812F] hover:bg-[#FA812F] hover:text-white dark:hover:text-black flex items-center justify-center gap-2 transition-all cursor-pointer group/btn"
                 >
                   <span>Get Started as Developer</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                 </Link>
                 <p className="text-center text-[11px] text-slate-400 dark:text-neutral-500 mt-2">
                   For engineers building apps. Generate Client ID & Secret, set redirect URIs.
