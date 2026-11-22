@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, Eye, EyeOff, AlertCircle, Loader2, Mail } from 'lucide-react';
 import { OAuthHandshakeLoader } from '../components/OAuthHandshakeLoader';
 import { PramaanLogo } from '../components/PramaanLogo';
@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 export function SignInPage() {
   const { user, isAuthenticated, loading: authLoading, checkAuth, setUser } = useAuth();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const flow = searchParams.get('flow');
   const requestId = searchParams.get('request_id');
   const errorParam = searchParams.get('error');
@@ -24,16 +25,17 @@ export function SignInPage() {
 
   const isOAuthFlow = flow === 'oauth' && Boolean(requestId);
 
-  // If user is already authenticated, skip sign-in form
+  // If user is already authenticated, skip sign-in form using instant in-memory routing
   useEffect(() => {
     if (!authLoading && isAuthenticated && user) {
       if (isOAuthFlow && requestId) {
-        window.location.replace(`/oauth/consent?request_id=${encodeURIComponent(requestId)}`);
+        navigate(`/oauth/consent?request_id=${encodeURIComponent(requestId)}`, { replace: true });
       } else {
-        window.location.replace(redirectParam || '/account');
+        const target = redirectParam && redirectParam.startsWith('/') ? redirectParam : '/account';
+        navigate(target, { replace: true });
       }
     }
-  }, [authLoading, isAuthenticated, user, isOAuthFlow, requestId, redirectParam]);
+  }, [authLoading, isAuthenticated, user, isOAuthFlow, requestId, redirectParam, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,16 +74,27 @@ export function SignInPage() {
         await checkAuth();
 
         if (data.redirectUrl) {
-          window.location.href = data.redirectUrl;
+          if (data.redirectUrl.startsWith('/')) {
+            navigate(data.redirectUrl, { replace: true });
+          } else {
+            window.location.href = data.redirectUrl;
+          }
           return;
         }
 
         if (redirectParam) {
-          window.location.href = redirectParam;
+          if (redirectParam.startsWith('/')) {
+            navigate(redirectParam, { replace: true });
+          } else {
+            window.location.href = redirectParam;
+          }
           return;
         }
 
-        window.location.href = isOAuthFlow && requestId ? `/oauth/consent?request_id=${encodeURIComponent(requestId)}` : '/account';
+        const target = isOAuthFlow && requestId
+          ? `/oauth/consent?request_id=${encodeURIComponent(requestId)}`
+          : '/account';
+        navigate(target, { replace: true });
       } else {
         const err = await res.json().catch(() => ({}));
         setErrorMessage(err.message || 'Invalid email or password.');
@@ -93,7 +106,8 @@ export function SignInPage() {
     }
   };
 
-  if (isOAuthFlow && (loading || authLoading || (isAuthenticated && user))) {
+  // Only show full loader if submitting credentials (loading) or already confirmed logged in
+  if (isOAuthFlow && (loading || (!authLoading && isAuthenticated && user))) {
     return (
       <OAuthHandshakeLoader
         clientName="Pramaan"

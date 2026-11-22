@@ -21,16 +21,16 @@ export function SignUpPage() {
 
   const isOAuthFlow = flow === 'oauth' && Boolean(requestId);
 
-  // If user is already authenticated, redirect away from signup
+  // If user is already authenticated, redirect away from signup using instant in-memory routing
   useEffect(() => {
     if (!authLoading && isAuthenticated && user) {
       if (isOAuthFlow && requestId) {
-        window.location.replace(`/oauth/consent?request_id=${encodeURIComponent(requestId)}`);
+        navigate(`/oauth/consent?request_id=${encodeURIComponent(requestId)}`, { replace: true });
       } else {
-        window.location.replace('/developer');
+        navigate('/developer', { replace: true });
       }
     }
-  }, [authLoading, isAuthenticated, user, isOAuthFlow, requestId]);
+  }, [authLoading, isAuthenticated, user, isOAuthFlow, requestId, navigate]);
 
   const passwordRequirements = [
     { label: 'At least 8 characters', met: password.length >= 8 },
